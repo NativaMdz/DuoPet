@@ -1,0 +1,1361 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#4b1c8c">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="DuoPet">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<title>DuoPet</title>
+<!-- Versão publicada. A cada publicação o app compara com a versão aberta e se atualiza sozinho.
+     (Mesmo que você esqueça de mudar este número, o app também compara o conteúdo do arquivo.) -->
+<script>window.DP_BUILD = "20261031-0001";
+window.addEventListener("beforeinstallprompt", function (e) { e.preventDefault(); window.__pwaPrompt = e; });
+window.addEventListener("appinstalled", function () { window.__pwaPrompt = null; });</script>
+<style>
+/* ========== 1. BASE ========== */
+:root{--ink:#3b2f4a;--soft:#8d7f99;--rose:#ff7a93;--rose2:#ff9a8b;--line:#f1e3e6;--glass:rgba(255,255,255,.88);--sh:0 10px 28px rgba(80,40,80,.16)}
+*{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{font-family:ui-rounded,"SF Pro Rounded","Nunito","Trebuchet MS",system-ui,sans-serif;background:#2a2233;color:var(--ink);overflow:hidden;overscroll-behavior:none}
+button,input{font:inherit;color:inherit}
+button{border:0;background:none;cursor:pointer}
+svg.i{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+#app{height:100%;max-width:480px;margin:0 auto;position:relative;overflow:hidden;background:#fff6f0}
+.view{display:none;position:absolute;inset:0;flex-direction:column}
+.view.on{display:flex;animation:in .25s ease}
+@keyframes in{from{opacity:0}to{opacity:1}}
+.app{width:52px;height:52px;border-radius:17px;background:linear-gradient(145deg,var(--a),var(--b));display:grid;place-items:center;color:#fff;box-shadow:0 6px 14px rgba(60,30,60,.2),inset 0 2px 0 rgba(255,255,255,.4)}
+.app svg.i{width:26px;height:26px}
+/* ========== 2. CASA (tela fixa) ========== */
+.stage{position:relative;flex:1;min-height:0;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none}
+.stage::after{content:"";position:absolute;inset:0;background:radial-gradient(130% 90% at 50% 45%,transparent 55%,rgba(60,30,70,.25));pointer-events:none;z-index:2}
+.stage.night::before{content:"";position:absolute;inset:0;background:rgba(30,25,90,.45);z-index:4;pointer-events:none}
+.rm{position:absolute;inset:0;animation:in .4s ease}
+.wall{position:absolute;inset:0 0 34% 0}.floor{position:absolute;inset:66% 0 0 0}
+.base{position:absolute;left:0;right:0;top:66%;height:7px;background:rgba(80,40,40,.14);box-shadow:0 -2px 0 rgba(255,255,255,.35)}
+.d{position:absolute}.lamp{cursor:pointer}
+.beam{position:absolute;left:6%;top:12%;width:44%;height:56%;background:linear-gradient(rgba(255,255,255,.4),transparent);clip-path:polygon(0 0,70% 0,100% 100%,20% 100%);pointer-events:none}
+.rug{position:absolute;left:50%;top:71%;width:78%;height:15%;transform:translateX(-50%);border-radius:50%;background:radial-gradient(ellipse,#ffc9d5,#ff9db2);opacity:.85;box-shadow:inset 0 0 0 6px rgba(255,255,255,.5)}
+.slot{position:absolute;left:50%;top:calc(50% - 14px);transform:translate(-50%,-50%);width:min(78%,45vh);max-width:320px;cursor:pointer;z-index:3}
+.pv{flex:none;height:230px;background:linear-gradient(#ffe9dc 0 66%,#ecc9a2 66%);border-bottom-left-radius:28px;border-bottom-right-radius:28px;box-shadow:var(--sh)}
+.pv .slot{width:min(52%,200px);top:52%}
+.pet{display:block;width:100%;transform-origin:50% 100%;animation:breathe 3.2s ease-in-out infinite;overflow:visible}
+.pet.np{animation:none;overflow:hidden}
+.np .eyes{animation:none}
+.slot.bounce .pet{animation:bounce .6s}
+.slot.sleep .pet{animation-duration:5.5s}
+@keyframes breathe{50%{transform:scale(1.025,.975)}}
+@keyframes bounce{30%{transform:translateY(-24px) scale(.96,1.05)}60%{transform:scale(1.05,.95)}}
+.eyes{animation:blink 4.5s infinite;transform-box:fill-box;transform-origin:center}
+@keyframes blink{0%,94%,100%{transform:scaleY(1)}97%{transform:scaleY(.1)}}
+.pup{transition:transform .12s;transform:translate(calc(var(--ex,0)*1px),calc(var(--ey,0)*1px))}
+.tail{animation:wag 2.4s ease-in-out infinite;transform-box:fill-box;transform-origin:0 50%}
+@keyframes wag{50%{transform:rotate(14deg)}}
+.shake{animation:shake .4s}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.fl{position:absolute;left:50%;bottom:55%;font-weight:900;font-size:20px;color:#fff;text-shadow:0 2px 8px rgba(120,40,80,.65);pointer-events:none;animation:fl 1.1s ease-out forwards;z-index:4}
+@keyframes fl{to{transform:translate(-50%,-70px);opacity:0}}
+.bub,.ht,.dr{position:absolute;pointer-events:none;z-index:4}
+.bub,.ht{animation:rise 1s ease-out forwards}
+.bub{border-radius:50%;background:radial-gradient(circle at 30% 30%,#fff,rgba(180,225,250,.6));border:2px solid #fff}
+.ht{color:#ff5f86}.ht svg{width:22px;height:22px}
+.dr{top:8%;width:5px;height:18px;border-radius:4px;background:#6ec1ff;animation:drop .9s linear forwards}
+@keyframes rise{to{transform:translateY(-56px);opacity:0}}
+@keyframes drop{to{transform:translateY(330px);opacity:.2}}
+.zz{animation:zz 2.4s ease-in-out infinite}
+@keyframes zz{50%{transform:translateY(-6px);opacity:.5}}
+.eat{animation:eat .3s infinite alternate;transform-box:fill-box;transform-origin:center}
+@keyframes eat{to{transform:scaleY(.6)}}
+/* HUD */
+.hud{position:absolute;top:0;left:0;right:0;padding:calc(env(safe-area-inset-top,0px) + 10px) 12px 0;z-index:5;display:flex;flex-direction:column;gap:8px}
+.hrow{display:flex;align-items:stretch;gap:8px}
+.who,.coins,.mbtn,.sbar,.menu{background:var(--glass);box-shadow:var(--sh)}
+.who{flex:1;min-width:0;text-align:left;padding:7px 12px;border-radius:18px}
+.who b{display:block;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lvp{display:flex;align-items:center;gap:6px;margin-top:4px}
+.lvp i{font-style:normal;font-size:11px;font-weight:800;color:#fff;background:linear-gradient(135deg,var(--rose2),var(--rose));padding:1px 8px;border-radius:10px}
+.lvp em{flex:1;height:6px;border-radius:6px;background:var(--line);overflow:hidden}
+.lvp u{display:block;height:100%;width:0;background:linear-gradient(90deg,#ffc371,var(--rose));transition:width .5s}
+.coins{display:flex;align-items:center;gap:5px;padding:0 12px;border-radius:18px;font-weight:900;color:#b9781a}
+.coins svg{width:22px;height:22px}
+.mbtn{position:relative;width:50px;border-radius:18px;display:grid;place-items:center}
+.mbtn.pend::after{content:"";position:absolute;right:10px;top:10px;width:10px;height:10px;border-radius:50%;background:var(--rose);border:2px solid #fff}
+.menu{position:absolute;top:calc(env(safe-area-inset-top,0px) + 74px);right:12px;display:none;flex-direction:column;gap:4px;padding:8px;border-radius:20px;z-index:8;min-width:176px}
+.menu.on{display:flex;animation:in .18s ease}
+.mi{display:flex;align-items:center;gap:10px;padding:6px 12px 6px 6px;border-radius:14px;font-weight:800;font-size:14px;text-align:left}
+.mi:active{background:rgba(255,122,147,.12)}
+.mi small{display:block;font-weight:600;color:var(--soft);font-size:11px}
+.mi .app{width:36px;height:36px;border-radius:12px}.mi .app svg.i{width:20px;height:20px}
+.sbar{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:8px 14px;border-radius:16px}
+.sg{display:flex;align-items:center;gap:5px}
+.sg svg.i{width:16px;height:16px}
+.sg .tr{flex:1;height:7px;border-radius:7px;background:rgba(120,90,110,.18);overflow:hidden}
+.sg .tr i{display:block;height:100%;border-radius:7px;transition:width .4s,background .4s}
+.sg.low{animation:pulse .9s infinite}
+@keyframes pulse{50%{transform:scale(1.08)}}
+.tcard{position:absolute;left:10px;right:10px;bottom:calc(env(safe-area-inset-bottom,0px) + 88px);height:76px;display:flex;align-items:center;justify-content:center;gap:16px;padding:8px 12px;border-radius:26px;background:var(--glass);box-shadow:var(--sh);z-index:5}
+.tl{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11px;font-weight:800;color:var(--soft);text-align:center}
+.tl b{color:var(--ink);font-size:12px}
+.tool{touch-action:none;cursor:grab;display:flex;flex-direction:column;align-items:center}
+.tool svg{width:50px;height:50px;pointer-events:none;filter:drop-shadow(0 4px 4px rgba(80,40,60,.25))}
+.arr{width:34px;height:34px;border-radius:50%;background:#fff;box-shadow:0 3px 8px rgba(80,40,60,.18);display:grid;place-items:center;color:var(--soft)}
+.arr svg.i{width:18px;height:18px}
+.dock{position:absolute;left:10px;right:10px;bottom:calc(env(safe-area-inset-bottom,0px) + 10px);display:grid;grid-template-columns:repeat(4,1fr);padding:5px;border-radius:26px;background:var(--glass);box-shadow:var(--sh);z-index:5}
+.dk{display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 0;border-radius:20px;font-size:10px;font-weight:800;color:var(--soft);transition:.2s}
+.dk .app{width:34px;height:34px;border-radius:12px;filter:grayscale(.85);opacity:.65;transition:.2s}
+.dk .app svg.i{width:20px;height:20px}
+.dk.on{color:var(--ink);background:rgba(255,122,147,.13)}
+.dk.on .app{filter:none;opacity:1;transform:translateY(-3px) scale(1.1)}
+.ghost{position:fixed;left:0;top:0;width:64px;height:64px;pointer-events:none;z-index:50;filter:drop-shadow(0 12px 8px rgba(0,0,0,.3))}
+.ghost svg{width:100%;height:100%}
+/* ========== 3. TELAS SECUNDÁRIAS ========== */
+.sv{background:linear-gradient(#fff6f0,#ffeaf0)}
+.top{flex:none;display:flex;align-items:center;gap:10px;padding:calc(env(safe-area-inset-top,0px) + 10px) 12px 10px}
+.top h1{font-size:22px;flex:1}
+.back{width:42px;height:42px;border-radius:50%;background:#fff;box-shadow:var(--sh);display:grid;place-items:center}
+.top .coins{padding:8px 12px}
+.scroll{flex:1;overflow-y:auto;padding:6px 12px 28px;scrollbar-width:none}
+.tabs{display:flex;gap:6px;overflow-x:auto;padding:2px 0 12px;scrollbar-width:none}
+.tab{flex:none;padding:9px 15px;border-radius:16px;background:#fff;font-weight:800;font-size:13px;color:var(--soft);box-shadow:0 3px 8px rgba(80,40,60,.08)}
+.tab.on{background:linear-gradient(135deg,var(--rose2),var(--rose));color:#fff}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.grid.g2{grid-template-columns:1fr 1fr}
+.tile{position:relative;border-radius:22px;background:#fff;padding:10px 6px;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12px;font-weight:800;text-align:center;box-shadow:0 6px 16px rgba(80,40,60,.1);border:2px solid transparent}
+.tile.on{border-color:var(--rose);background:#fff3f5}.tile.lock{background:#f6f1f1}
+.tile .pic{width:84px;height:84px;display:grid;place-items:center;border-radius:18px;background:linear-gradient(#fff6ef,#ffeef3);overflow:hidden}
+.tile .pic svg{width:100%;height:100%;overflow:hidden}
+.tile small{font-weight:600;color:var(--soft);font-size:11px;line-height:1.25}
+.sw{width:46px;height:46px;border-radius:50%;border:4px solid #fff;box-shadow:0 3px 8px rgba(0,0,0,.2)}
+.tile svg.lk{position:absolute;right:8px;top:8px;width:18px;height:18px;color:#b9a9b3}
+.price{display:flex;align-items:center;justify-content:center;gap:4px;padding:7px 14px;border-radius:14px;background:linear-gradient(135deg,#ffd36b,#ffb347);font-weight:900;color:#7a4a00;box-shadow:0 4px 10px rgba(255,179,71,.4)}
+.price svg{width:18px;height:18px}.price:active{transform:scale(.95)}
+.price.own{background:#e8e1e4;color:#8d7f99;box-shadow:none}
+.card{background:#fff;border-radius:24px;padding:16px;margin-top:12px;box-shadow:0 6px 18px rgba(80,40,60,.1)}
+.card h2{font-size:17px;margin-bottom:4px}
+.card p,.hint{font-size:13px;color:var(--soft);line-height:1.45;font-weight:600}
+.btn{padding:11px 18px;border-radius:16px;background:linear-gradient(135deg,var(--rose2),var(--rose));color:#fff;font-weight:900;box-shadow:0 6px 14px rgba(255,122,147,.4);transition:transform .15s}
+.btn:active{transform:scale(.95)}
+.btn.alt{background:linear-gradient(135deg,#c7b6f5,#9b87f5);box-shadow:0 6px 14px rgba(155,135,245,.4)}
+.btn.red{background:#ffe4e8;color:#d4405e;box-shadow:none}
+.row{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--line)}
+.row:first-of-type{border-top:0}
+.row .t{flex:1;min-width:0}.row .t b{display:block;font-size:14px}.row .t span{font-size:12px;color:var(--soft);font-weight:600}
+.row .pic{width:54px;height:54px;flex:none}.row .pic svg{width:100%;height:100%}
+.inp{width:100%;padding:13px 15px;border-radius:16px;border:2px solid var(--line);background:#fffaf8;outline:0;margin:8px 0;font-weight:700}
+.inp:focus{border-color:#b8a4f0}
+.seg{display:grid;grid-template-columns:1fr 1fr;background:var(--line);border-radius:16px;padding:4px;margin-top:8px}
+.seg button{padding:10px;border-radius:12px;font-weight:800;color:var(--soft)}
+.seg button.on{background:#fff;color:var(--rose);box-shadow:0 2px 8px rgba(0,0,0,.1)}
+.empty{text-align:center;padding:22px 10px;color:var(--soft);font-size:14px;font-weight:700}
+.code{font-size:26px;letter-spacing:6px;font-weight:900;text-align:center;padding:14px;border-radius:16px;background:#f4effd;border:2px dashed #b8a4f0;color:#7a62c9;margin:8px 0}
+.flex{display:flex;gap:8px}.flex>*{flex:1}
+#toast{position:absolute;left:16px;right:16px;bottom:calc(env(safe-area-inset-bottom,0px) + 176px);padding:12px 16px;border-radius:18px;background:#3b2f4a;color:#fff;font-size:14px;font-weight:700;text-align:center;opacity:0;transform:translateY(12px);transition:.3s;pointer-events:none;z-index:40}
+#toast.show{opacity:1;transform:none}#toast.ok{background:#2fa57c}#toast.warn{background:#d4566d}
+.modal{position:absolute;inset:0;background:rgba(40,30,50,.55);display:none;align-items:center;justify-content:center;padding:24px;z-index:60}
+.modal.on{display:flex}.modal .card{width:100%;margin:0;text-align:center;animation:in .3s}
+/* ========== 4. LOJA (visual cartoon 2D) ========== */
+.sv{--pw:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ffffff'%3E%3Cellipse cx='12' cy='16' rx='5' ry='4'/%3E%3Ccircle cx='5.5' cy='11' r='2'/%3E%3Ccircle cx='9.5' cy='6.5' r='2.2'/%3E%3Ccircle cx='14.5' cy='6.5' r='2.2'/%3E%3Ccircle cx='18.5' cy='11' r='2'/%3E%3C/svg%3E");background:radial-gradient(120% 60% at 50% 0,#7a35c4,transparent 70%),linear-gradient(#5a22a0,#8a3fc4 55%,#c15bd2);overflow:hidden}
+.sv::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.07;background:var(--pw) 18px 40px/34px 34px,var(--pw) 140px 150px/26px 26px;background-repeat:space;transform:rotate(-12deg) scale(1.4)}
+.sv::after{content:"";position:absolute;left:0;right:0;bottom:0;height:70px;pointer-events:none;background:radial-gradient(circle at 12% 110%,#c56ae0 0 44px,transparent 45px),radial-gradient(circle at 38% 118%,#b45ad8 0 50px,transparent 51px),radial-gradient(circle at 66% 112%,#c56ae0 0 46px,transparent 47px),radial-gradient(circle at 92% 116%,#b45ad8 0 48px,transparent 49px)}
+.sv>*{position:relative;z-index:1}
+.sv::after{z-index:0}
+.sv .top{gap:8px;padding:calc(env(safe-area-inset-top,0px) + 10px) max(12px,env(safe-area-inset-right)) 10px max(12px,env(safe-area-inset-left));background:linear-gradient(#4b1c8c,#3a1578);box-shadow:0 4px 14px rgba(30,0,70,.45),inset 0 -2px 0 rgba(255,255,255,.1)}
+.sv .back{flex:none;width:46px;height:46px;border-radius:50%;background:radial-gradient(circle at 35% 25%,#7b3fd0,#3a1580);border:3px solid #a46bf2;box-shadow:0 0 10px rgba(168,110,255,.7),0 4px 0 #26095a,inset 0 2px 0 rgba(255,255,255,.35)}
+.sv .back svg{width:24px;height:24px}
+.sv .back:active,.sv .plus:active,.sv .tab:active{transform:scale(.92)}
+.sv h1{display:flex;align-items:center;gap:6px;flex:1;min-width:0;font-size:clamp(26px,8vw,36px);font-weight:900;color:#fff;line-height:1;text-shadow:0 3px 0 #3a1580,0 0 12px rgba(255,160,255,.6),-2px 0 #3a1580,2px 0 #3a1580}
+.sv .sico{flex:none;width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(#6a30b8,#3d1a82);border:2.5px solid #8d55e0;box-shadow:inset 0 2px 0 rgba(255,255,255,.25)}
+.sv .sico svg{width:30px;height:30px}
+.sv .spk{width:16px;height:16px;background:#ffe56b;clip-path:polygon(50% 0,62% 38%,100% 50%,62% 62%,50% 100%,38% 62%,0 50%,38% 38%);align-self:flex-start}
+.sv .coins{flex:none;gap:7px;padding:4px 5px 4px 10px;border-radius:26px;color:#fff;font-size:24px;background:linear-gradient(#5a2aa8,#37157a);border:3px solid #a46bf2;box-shadow:0 0 12px rgba(168,110,255,.65),inset 0 2px 0 rgba(255,255,255,.25)}
+.sv .coins svg{width:32px;height:32px;filter:drop-shadow(0 2px 0 rgba(60,20,0,.4))}
+.sv .coins b{text-shadow:0 2px 0 #26095a;min-width:1ch}
+.sv .plus{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 35% 25%,#c58bff,#7a3ee0);border:2px solid #e2c8ff;box-shadow:0 3px 0 #4a1c9a;transition:transform .12s}
+.sv .plus svg{width:18px;height:18px}
+.sv .tabs{flex:none;gap:8px;padding:10px max(12px,env(safe-area-inset-right)) 10px max(12px,env(safe-area-inset-left));background:rgba(40,8,90,.38);box-shadow:inset 0 -2px 0 rgba(255,255,255,.08);-webkit-overflow-scrolling:touch}
+.sv .tab{display:flex;align-items:center;gap:6px;padding:6px 14px 6px 9px;height:44px;border-radius:22px;font-size:15px;font-weight:800;color:#e7d4ff;background:linear-gradient(#4a1f94,#321468);border:3px solid #26095a;box-shadow:0 0 0 2px #5b2fb0,inset 0 2px 0 rgba(255,255,255,.18);transition:transform .12s}
+.sv .tab .ti{width:26px;height:26px;flex:none;filter:grayscale(1) sepia(.42) saturate(1.8) hue-rotate(220deg) drop-shadow(0 1px 1px rgba(35,8,70,.18));overflow:visible}
+.sv .tab.on{color:#fff;background:linear-gradient(#ff6fbd,#e0207f);border-color:#a8104f;box-shadow:0 0 14px rgba(255,79,168,.75),inset 0 2px 0 rgba(255,255,255,.5);text-shadow:0 2px 0 rgba(120,0,50,.5)}
+.sv .scroll{padding:14px max(12px,env(safe-area-inset-right)) calc(env(safe-area-inset-bottom,0px) + 90px) max(12px,env(safe-area-inset-left));overflow-x:hidden;-webkit-overflow-scrolling:touch}
+.sv .sg2{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 12px}
+.sv .pc{position:relative;display:flex;flex-direction:column;align-items:center;padding:8px 8px 12px;border-radius:26px;background:linear-gradient(#fff3ee,#fbe3ee 60%,#f6d6ea);border:3px solid #fff;box-shadow:0 0 0 2.5px #5a2a9a,0 8px 0 rgba(40,8,90,.35),0 12px 18px rgba(30,0,70,.3),inset 0 0 18px rgba(255,170,220,.45);transition:transform .18s}
+@media(hover:hover){.sv .pc:hover{transform:translateY(-3px)}}
+.sv .pc .pic{position:relative;display:grid;place-items:center;width:100%;aspect-ratio:1/.86;border-radius:20px;background:radial-gradient(closest-side,rgba(var(--g),.55),rgba(var(--g),.18) 70%,transparent) center/92% 92% no-repeat;overflow:visible}
+.sv .pc .pic>svg{width:88%;height:100%;overflow:visible;filter:drop-shadow(0 4px 3px rgba(60,0,60,.18))}
+.sv .pc .pic>svg.pet{height:80%;margin-bottom:12px}
+.sv .pc .pic>.sw{width:56%;height:auto;aspect-ratio:1}
+.sv .pc .pic::before,.sv .pc .pic::after{content:"";position:absolute;width:13px;height:13px;background:#fff;opacity:.9;clip-path:polygon(50% 0,62% 38%,100% 50%,62% 62%,50% 100%,38% 62%,0 50%,38% 38%)}
+.sv .pc .pic::before{left:8%;top:34%}.sv .pc .pic::after{right:9%;top:54%;width:10px;height:10px}
+.sv .nm{position:relative;z-index:1;margin-top:-10px;width:92%;text-align:center;padding:5px 6px 6px;border-radius:12px 12px 16px 16px;font-size:clamp(16px,4.8vw,21px);font-weight:900;color:#fff;line-height:1.1;background:linear-gradient(#5c2ea4,#3a1a78);border:2px solid #2a0e5c;box-shadow:0 3px 0 #2a0e5c,inset 0 2px 0 rgba(255,255,255,.25);text-shadow:0 2px 0 rgba(20,0,60,.6);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sv .st{width:96%;margin:8px 0 10px;padding:7px 4px;min-height:52px;display:flex;flex-direction:column;justify-content:center;border-radius:18px;background:rgba(214,170,236,.28);font-size:clamp(9px,2.75vw,12.5px);white-space:nowrap;font-weight:700;line-height:1.35;color:#4a2a6e;text-align:center}
+.sv .st strong{font-weight:900;color:#3a1a78}
+.sv .price.gold{display:flex;align-items:center;justify-content:center;gap:8px;width:82%;height:40px;padding:0 10px;border-radius:20px;font-size:21px;font-weight:900;color:#5a2d00;background:linear-gradient(#ffe97a,#ffc62e 55%,#f59e10);border:3px solid #8a4a12;box-shadow:0 4px 0 #8a4a12,0 7px 8px rgba(80,30,0,.35),inset 0 2px 0 rgba(255,255,255,.75),inset 0 -3px 0 rgba(200,100,0,.35);text-shadow:0 1px 0 rgba(255,255,255,.55);transition:transform .1s,box-shadow .1s;position:relative}
+.sv .price.gold::before{content:"";position:absolute;left:14px;right:14px;top:3px;height:7px;border-radius:6px;background:rgba(255,255,255,.5)}
+.sv .price.gold svg{width:26px;height:26px;flex:none}
+.sv .price.gold:active{transform:translateY(3px) scale(.97);box-shadow:0 1px 0 #8a4a12,0 3px 5px rgba(80,30,0,.35),inset 0 2px 0 rgba(255,255,255,.6)}
+.sv .price.gold.own{background:linear-gradient(#e9dcf7,#c9b3e6);border-color:#7a5aa8;box-shadow:0 4px 0 #7a5aa8;color:#5a3a88;text-shadow:none}
+.sv .price.gold.own::before{display:none}
+.sv .hint{color:#e6d0fa;text-align:center;font-size:12px}
+/* ========== 5. TEMA GLOBAL ========== */
+body{background:#1d0b3d}
+.app{border:2.5px solid #2a0e5c;box-shadow:0 4px 0 #2a0e5c,0 7px 10px rgba(30,0,70,.35),inset 0 2px 0 rgba(255,255,255,.5);position:relative;overflow:hidden}
+.app::after{content:"";position:absolute;left:12%;right:12%;top:4px;height:30%;border-radius:10px;background:rgba(255,255,255,.35);pointer-events:none}
+.app svg.i{stroke:#fff;stroke-width:2.6;filter:drop-shadow(0 1.5px 0 rgba(40,0,80,.45))}
+.who,.mbtn,.sbar,.menu,.tcard,.dock,#v-home .coins{background:linear-gradient(#5a2aa8,#37157a);border:3px solid #a46bf2;box-shadow:0 0 12px rgba(168,110,255,.55),0 5px 0 #26095a,inset 0 2px 0 rgba(255,255,255,.22);color:#fff}
+#v-home .coins{font-size:19px;gap:6px}#v-home .coins svg{width:28px;height:28px}
+.who b{color:#fff;text-shadow:0 2px 0 #26095a}.mbtn{color:#fff}.mi{color:#fff}.mi small{color:#d9c3f5}.mi:active{background:rgba(255,79,168,.3)}
+.lvp i{background:linear-gradient(#ff6fbd,#e0207f);border:1.5px solid #a8104f}.lvp em{background:rgba(255,255,255,.2)}.lvp u{background:linear-gradient(90deg,#ffe56b,#ff8a3d)}
+.sg .tr{background:rgba(255,255,255,.2)}
+.tl{color:#e7d4ff}.tl b{color:#fff}
+.arr{background:linear-gradient(#7b3fd0,#3a1580);border:2.5px solid #a46bf2;color:#fff}
+.dk{color:#d9c3f5}.dk.on{color:#fff;background:rgba(255,79,168,.38);box-shadow:inset 0 0 0 2px #ff6fbd}
+.dk .app{filter:none;opacity:.8}
+.mbtn.pend::after{border-color:#37157a}
+.rm svg.d{filter:drop-shadow(2px 0 0 #3b1a38) drop-shadow(-2px 0 0 #3b1a38) drop-shadow(0 2px 0 #3b1a38) drop-shadow(0 -2px 0 #3b1a38) drop-shadow(0 6px 6px rgba(40,0,60,.25))}
+.rug{box-shadow:inset 0 0 0 6px rgba(255,255,255,.5),0 0 0 3px #3b1a38}
+.base{background:#3b1a38;opacity:.35}
+.pet{filter:drop-shadow(0 6px 6px rgba(40,0,60,.25))}
+.pv{background:radial-gradient(60% 70% at 50% 55%,#d98ae8,transparent),linear-gradient(#8a3fc4 0 66%,#5a2aa8 66%);border-bottom:3px solid #a46bf2;box-shadow:0 6px 0 #26095a,0 10px 16px rgba(30,0,70,.4)}
+.sv .card{background:linear-gradient(#fff3ee,#fbe3ee 60%,#f6d6ea);border:3px solid #fff;box-shadow:0 0 0 2.5px #5a2a9a,0 7px 0 rgba(40,8,90,.35),inset 0 0 16px rgba(255,170,220,.4);color:#3a1a78}
+.sv .card h2{color:#3a1a78}.sv .card p,.sv .row .t span,.sv .empty{color:#6a4a8e}.sv .row{border-color:rgba(90,42,154,.18)}.sv .row .t b{color:#3a1a78}
+.sv .tile{background:linear-gradient(#fff3ee,#fbe3ee 60%,#f6d6ea);border:3px solid #fff;box-shadow:0 0 0 2.5px #5a2a9a,0 6px 0 rgba(40,8,90,.35),inset 0 0 14px rgba(255,170,220,.4);color:#3a1a78;font-weight:900;transition:transform .12s}
+.sv .tile:active{transform:scale(.96)}
+.sv .tile.on{box-shadow:0 0 0 3px #ff4fa8,0 0 16px rgba(255,79,168,.8),0 6px 0 rgba(40,8,90,.35)}
+.sv .tile.lock{opacity:.88;background:linear-gradient(#efe6f5,#dccbe8)}
+.sv .tile .pic{background:radial-gradient(closest-side,rgba(214,150,255,.45),transparent 90%);border-radius:18px;overflow:visible}
+.sv .tile small{color:#6a4a8e}
+.btn{background:linear-gradient(#ffe97a,#ffc62e 55%,#f59e10);color:#5a2d00;border:3px solid #8a4a12;box-shadow:0 4px 0 #8a4a12,inset 0 2px 0 rgba(255,255,255,.7);text-shadow:0 1px 0 rgba(255,255,255,.55)}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 #8a4a12}
+.btn.alt{background:linear-gradient(#9b5ae8,#5a2aa8);color:#fff;border-color:#2a0e5c;box-shadow:0 4px 0 #2a0e5c,inset 0 2px 0 rgba(255,255,255,.35);text-shadow:0 2px 0 rgba(20,0,60,.5)}
+.btn.red{background:linear-gradient(#ffd9e2,#ff9fb4);color:#8a1030;border-color:#a8104f;box-shadow:0 4px 0 #a8104f}
+.sv .back svg.i{stroke:#fff;stroke-width:4;filter:none}.sv .back{color:#fff}
+.inp{border:3px solid #a46bf2;background:#fff}.seg{background:rgba(90,42,154,.2)}.seg button.on{color:#e0207f}
+#toast{background:linear-gradient(#5a2aa8,#37157a);border:3px solid #a46bf2}#toast.ok{background:linear-gradient(#3fcf98,#1f8f66);border-color:#d6ffe9}#toast.warn{background:linear-gradient(#ff6f8f,#d4405e);border-color:#ffd6df}
+.modal{background:rgba(30,10,60,.7)}
+/* ========== 6. ANIMACOES ========== */
+:root{--spring:cubic-bezier(.2,1.5,.4,1);--out:cubic-bezier(.16,.9,.3,1)}
+button{transition:transform .18s var(--spring),filter .2s}
+button:active{transform:scale(.93)}
+.scroll{scroll-behavior:smooth}
+.view.on{animation:viewIn .5s var(--out)}
+@keyframes viewIn{from{opacity:0;transform:translateY(22px) scale(.97)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}}
+@keyframes fadeIn{from{opacity:0}}
+@keyframes popIn{from{transform:scale(.4);opacity:0}}
+@keyframes topIn{from{transform:translateY(-100%);opacity:0}}
+@keyframes dockIn{from{transform:translateY(130%)}}
+@keyframes spinIn{from{transform:rotate(-140deg) scale(.3);opacity:0}}
+.sv.on .top{animation:topIn .55s var(--out) backwards}
+.sv.on .tabs{animation:fadeUp .5s .1s var(--out) backwards}
+.sv.on h1{animation:fadeUp .5s .12s var(--out) backwards}
+.sv.on .back{animation:spinIn .65s .15s var(--spring) backwards}
+.sv.on .coins{animation:popIn .55s .2s var(--spring) backwards}
+.coins.bump,.sv.on .coins.bump,#v-home .coins.bump{animation:bump .55s var(--spring)}
+@keyframes bump{40%{transform:scale(1.2)}}
+.sv::before{animation:drift 60s linear infinite}
+@keyframes drift{to{transform:rotate(-12deg) scale(1.4) translate(90px,90px)}}
+.sv::after{animation:cloud 6s ease-in-out infinite alternate}
+@keyframes cloud{to{transform:translateY(6px)}}
+.enter .pc,.enter .tile{animation:cardIn .6s var(--spring) backwards;animation-delay:calc(var(--i,0)*60ms)}
+@keyframes cardIn{from{opacity:0;transform:translateY(46px) scale(.8) rotate(-3deg)}}
+.enter>:nth-child(1){--i:0}.enter>:nth-child(2){--i:1}.enter>:nth-child(3){--i:2}.enter>:nth-child(4){--i:3}.enter>:nth-child(5){--i:4}.enter>:nth-child(6){--i:5}.enter>:nth-child(7){--i:6}.enter>:nth-child(8){--i:7}.enter>:nth-child(9){--i:8}.enter>:nth-child(10){--i:9}.enter>:nth-child(11){--i:10}.enter>:nth-child(12){--i:11}.enter>:nth-child(13){--i:12}.enter>:nth-child(14){--i:13}
+.pc:active,.sv .tile:active{transform:scale(.96)}
+.sv .pc .pic>svg{animation:bob 3.4s ease-in-out infinite}
+.sv .pc:nth-child(even) .pic>svg{animation-delay:-1.7s}
+@keyframes bob{50%{transform:translateY(-5px) rotate(1.5deg)}}
+.sv .pc .pic::before{animation:twinkle 2.4s ease-in-out infinite}
+.sv .pc .pic::after{animation:twinkle 1.9s -.8s ease-in-out infinite}
+@keyframes twinkle{50%{transform:scale(1.6) rotate(45deg);opacity:.35}}
+.tab.on{animation:popIn .4s var(--spring)}
+.sv .tile.on{animation:popIn .45s var(--spring)}
+.price.gold{overflow:hidden}
+.price.gold::after{content:"";position:absolute;top:0;bottom:0;width:28%;left:-40%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.7),transparent);transform:skewX(-20deg);animation:shine 3.8s ease-in-out infinite}
+.price.gold.own::after{display:none}
+@keyframes shine{0%,55%{left:-40%}100%{left:130%}}
+.sg .tr i,.lvp u{position:relative;overflow:hidden}
+.sg .tr i::after,.lvp u::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.6),transparent);transform:translateX(-100%);animation:sweep 3.2s ease-in-out infinite}
+@keyframes sweep{60%,100%{transform:translateX(100%)}}
+#v-home.on .hud{animation:topIn .6s var(--out) backwards}
+#v-home.on .dock{animation:dockIn .6s .1s var(--out) backwards}
+.rm.swap{animation:roomIn .6s var(--out)}
+@keyframes roomIn{from{opacity:0;transform:scale(1.06) translateX(26px);filter:blur(4px)}}
+.tcard.enter>*{animation:popIn .5s var(--spring) backwards}
+.tcard.enter>:nth-child(2){animation-delay:.07s}.tcard.enter>:nth-child(3){animation-delay:.14s}.tcard.enter>:nth-child(4){animation-delay:.21s}
+.tool>svg{animation:bob 2.8s ease-in-out infinite}
+.dk .app{transition:transform .4s var(--spring),opacity .2s}
+.dk.on .app{animation:dkPop .6s var(--spring)}
+@keyframes dkPop{from{transform:translateY(0) scale(.7)}}
+.menu.on{animation:menuIn .35s var(--spring);transform-origin:100% 0}
+@keyframes menuIn{from{opacity:0;transform:scale(.6) translateY(-10px)}}
+.menu.on .mi{animation:fadeUp .4s var(--out) backwards}
+.menu.on .mi:nth-child(2){animation-delay:.05s}.menu.on .mi:nth-child(3){animation-delay:.1s}
+.slot{transition:transform .3s var(--spring)}
+.slot.hot{transform:translate(-50%,-50%) scale(1.07)}
+.slot.hot .pet{filter:drop-shadow(0 0 16px #ff9ae0) drop-shadow(0 0 4px #fff)}
+@keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.03,.97) rotate(.6deg)}}
+@keyframes bounce{0%{transform:scale(1)}15%{transform:scale(1.1,.88)}40%{transform:translateY(-34px) scale(.94,1.08)}65%{transform:scale(1.1,.88)}82%{transform:scale(.97,1.03)}100%{transform:none}}
+.slot.bounce .pet{animation:bounce .75s}
+@keyframes wag{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(20deg)}}
+@keyframes fl{0%{transform:translate(-50%,0) scale(.5);opacity:0}20%{transform:translate(-50%,-20px) scale(1.25);opacity:1}100%{transform:translate(-50%,-84px) scale(1);opacity:0}}
+@keyframes rise{0%{transform:scale(.4);opacity:1}100%{transform:translateY(-72px) scale(1.2) rotate(12deg);opacity:0}}
+.modal.on{animation:fadeIn .25s}
+.modal .card{animation:popIn .5s var(--spring)}
+#toast{transform:translateY(30px) scale(.9);transition:transform .45s var(--spring),opacity .25s}
+.fxp{position:fixed;left:0;top:0;width:20px;height:20px;pointer-events:none;z-index:80;animation:fxp 1s cubic-bezier(.2,.7,.3,1) both}
+.fxp svg{width:100%;height:100%;display:block}
+.fxp.star{background:#ffe56b;clip-path:polygon(50% 0,62% 38%,100% 50%,62% 62%,50% 100%,38% 62%,0 50%,38% 38%)}
+@keyframes fxp{0%{transform:translate(var(--x),var(--y)) scale(.2);opacity:0}15%{opacity:1}55%{transform:translate(calc(var(--x) + var(--dx)),calc(var(--y) + var(--dy))) scale(var(--s)) rotate(var(--r))}100%{transform:translate(calc(var(--x) + var(--dx)*1.2),calc(var(--y) + var(--dy) + 70px)) scale(calc(var(--s)*.6)) rotate(var(--r));opacity:0}}
+/* ========== 7. DESEMPENHO ========== */
+.rm svg.d{filter:none}
+.rm{contain:layout paint;will-change:transform,opacity}
+@keyframes roomIn{from{opacity:0;transform:translateX(28px)}}
+.rm.swap{animation:roomIn .3s var(--out)}
+.pet{filter:none}
+.np .tail,.np .zz,.np .eat{animation:none}
+.sv::before,.sv::after,.sv .pc .pic>svg,.sv .pc .pic::before,.sv .pc .pic::after,.sg .tr i::after,.lvp u::after{animation:none}
+.price.gold::after{display:none}
+.sv .pc .pic>svg{filter:none}
+.sv .pc{box-shadow:0 0 0 2.5px #5a2a9a,0 6px 0 rgba(40,8,90,.35);content-visibility:auto;contain-intrinsic-size:auto 290px}
+.sv .tile{box-shadow:0 0 0 2.5px #5a2a9a,0 5px 0 rgba(40,8,90,.35)}
+.sv .tile.on{box-shadow:0 0 0 3px #ff4fa8,0 5px 0 rgba(40,8,90,.35)}
+.sv .scroll{contain:content;overscroll-behavior:contain}
+.sv .price.gold{box-shadow:0 4px 0 #8a4a12,inset 0 2px 0 rgba(255,255,255,.75),inset 0 -3px 0 rgba(200,100,0,.35)}
+.app{box-shadow:0 4px 0 #2a0e5c,inset 0 2px 0 rgba(255,255,255,.5)}
+/* ========== 8. IMERSAO ========== */
+.decor{position:absolute;left:0;top:3%;width:100%;pointer-events:none}
+.stream{position:absolute;left:50%;top:6%;width:96px;height:58%;margin-left:-48px;pointer-events:none;z-index:4;background:repeating-linear-gradient(100deg,transparent 0 5px,rgba(170,225,255,.8) 5px 8px);clip-path:polygon(42% 0,58% 0,100% 100%,0 100%);transform-origin:top;animation:strm 1.5s ease-out forwards}
+@keyframes strm{0%{opacity:0;transform:scaleY(.1)}12%{opacity:.5;transform:scaleY(1)}85%{opacity:.5}100%{opacity:0}}
+.stm{position:absolute;width:48px;height:48px;border-radius:50%;background:radial-gradient(rgba(255,255,255,.75),transparent 70%);pointer-events:none;z-index:4;animation:stm 1.8s ease-out both}
+@keyframes stm{from{opacity:.9;transform:translateY(0) scale(.5)}to{opacity:0;transform:translateY(-80px) scale(1.7)}}
+.fly{transform-origin:100px 100px;animation:fly 1.8s linear infinite}
+@keyframes fly{to{transform:rotate(360deg)}}
+.fxp.bub{border-radius:50%;background:radial-gradient(circle at 30% 30%,#fff,rgba(180,225,250,.55));border:2px solid #fff}
+.fxp.crumb{width:7px;height:7px;border-radius:50%;background:#d9923c}
+.bgp{position:relative;display:block;width:76%;aspect-ratio:1;border-radius:14px;overflow:hidden;border:3px solid #3b1a38}
+.bgp i{position:absolute;left:0;right:0;top:0;height:62%;display:block}
+.sv .pc .pic>.bgp{width:60%;height:auto}
+/* ========== 9. CHUVEIRO ARRASTAVEL ========== */
+.ghost.spray::after{content:"";position:absolute;left:14%;top:96%;width:72%;height:96px;background:repeating-linear-gradient(90deg,rgba(150,215,255,.9) 0 3px,rgba(150,215,255,.15) 3px 8px);clip-path:polygon(8% 0,92% 0,100% 100%,0 100%);opacity:.8}
+.wd{position:fixed;width:5px;height:14px;border-radius:5px;background:linear-gradient(#e8f8ff,#7fc8f5);pointer-events:none;z-index:49;animation:wd .6s ease-in both}
+@keyframes wd{from{transform:translateY(0);opacity:1}to{transform:translateY(95px);opacity:0}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.fxp{display:none}}
+/* ========== 10. CONTA, DUPLA ONLINE E ATUALIZAÇÃO ========== */
+.btn.block{display:block;width:100%;margin-top:10px}
+.sv .hint.msg{color:#6a4a8e;text-align:left;margin-top:8px;min-height:1.3em}
+.sv .hint.msg.err{color:#b3123f}
+.who2{font-weight:800;color:#3a1a78}
+.sync{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:800;color:#6a4a8e}
+.sync i{width:9px;height:9px;border-radius:50%;background:#2fbf86}
+.sync[data-s=sync] i{background:#f2a91d}
+.sync[data-s=off] i,.sync[data-s=err] i{background:#ff5f50}
+.inp.up{text-transform:uppercase;letter-spacing:6px;text-align:center;font-size:22px}
+.splash{margin:auto;color:#fff;font-weight:900;font-size:20px;text-align:center;text-shadow:0 2px 0 #26095a}
+.upd{position:fixed;left:12px;right:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 12px);max-width:456px;margin:0 auto;z-index:90;display:flex;align-items:center;gap:10px;padding:10px 12px 10px 16px;border-radius:20px;color:#fff;font-weight:800;font-size:14px;background:linear-gradient(#5a2aa8,#37157a);border:3px solid #a46bf2;box-shadow:0 0 12px rgba(168,110,255,.55),0 5px 0 #26095a}
+.upd span{flex:1}.upd .btn{padding:8px 14px}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<radialGradient id="cg" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#fff2a8"/><stop offset=".6" stop-color="#ffd24a"/><stop offset="1" stop-color="#f0a21c"/></radialGradient>
+<symbol id="i-sofa" viewBox="0 0 24 24"><path d="M5 11V8a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v3"/><path d="M3 13a2 2 0 0 1 4 0v2h10v-2a2 2 0 0 1 4 0v5H3z"/><path d="M5 18v2M19 18v2"/></symbol>
+<symbol id="i-food" viewBox="0 0 24 24"><path d="M7 3v8M4 3v5a3 3 0 0 0 6 0V3M7 11v10M17 21V3c-2.5 1.5-3 5-3 8h3"/></symbol>
+<symbol id="i-shower" viewBox="0 0 24 24"><path d="M5 21V8a4 4 0 0 1 4-4h6"/><path d="M13 7h8l-2 4h-4z"/><path d="M15 14v2M18 14v3M21 14v2"/></symbol>
+<symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z"/></symbol>
+<symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></symbol>
+<symbol id="i-care" viewBox="0 0 24 24"><path d="M12 21s-8-5.3-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 5.7-8 11-8 11z"/></symbol>
+<symbol id="i-drop" viewBox="0 0 24 24"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/></symbol>
+<symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 3L5 14h6l-1 7 8-11h-6z"/></symbol>
+<symbol id="i-shop" viewBox="0 0 24 24"><g stroke="#7a3d18" stroke-width="1.25" stroke-linejoin="round" stroke-linecap="round"><path d="M4 9 5.5 4h13L20 9z" fill="#fff8df"/><path d="M5.5 4 4 9h4.5L9 4z" fill="#ff6f91"/><path d="M9 4 8.5 9h4L12 4z" fill="#ffd34f"/><path d="M12 4 12.5 9h4L15 4z" fill="#ff8a45"/><path d="M15 4 16 9h4l-1.5-5z" fill="#7fd9a0"/><path d="M4 9a2.7 2.7 0 0 0 5.3 0 2.7 2.7 0 0 0 5.4 0A2.7 2.7 0 0 0 20 9" fill="#ff6f91"/><path d="M5 11.5V21h14v-9.5z" fill="#ffe5b8"/><rect x="9.5" y="14" width="5" height="7" rx="1" fill="#9b70ed"/><path d="M6.5 13h2" stroke="#fff" stroke-width="1.4"/></g></symbol>
+<symbol id="i-hanger" viewBox="0 0 24 24"><g stroke="#87436d" stroke-width="1.35" stroke-linejoin="round" stroke-linecap="round"><path d="M12 8a2.5 2.5 0 1 0-2.5-2.5" fill="none" stroke="#9a70df" stroke-width="2"/><path d="M12 8v2.5L3 17a1.5 1.5 0 0 0 1 2.7h16a1.5 1.5 0 0 0 1-2.7l-9-6.5z" fill="#fff0f6"/><path d="M4.2 17.8 12 12.2l7.8 5.6" fill="none" stroke="#ff75a8" stroke-width="2.2"/><path d="M7 19.5h10" fill="none" stroke="#ffd36b" stroke-width="1.5"/></g></symbol>
+<symbol id="i-users" viewBox="0 0 24 24"><g stroke="#5145a6" stroke-width="1.35" stroke-linejoin="round" stroke-linecap="round"><circle cx="8.5" cy="7.5" r="3.5" fill="#ffd36b"/><path d="M2 19.5a6.5 6.5 0 0 1 13 0v.5H2z" fill="#ff8eb8"/><circle cx="17" cy="8.5" r="2.8" fill="#8edcff"/><path d="M15.2 14.5a5 5 0 0 1 6.3 4.8v.7h-5" fill="#a9a0ff"/><path d="M6.5 7a2 2 0 0 1 2.5-1.6M16 7.5a1.5 1.5 0 0 1 1.5-.8" fill="none" stroke="#fff" stroke-width="1.2"/></g></symbol>
+<symbol id="i-fridge" viewBox="0 0 24 24"><rect x="6" y="3" width="12" height="18" rx="2"/><path d="M6 11h12M9 6v2M9 14v3"/></symbol>
+<symbol id="i-lamp" viewBox="0 0 24 24"><path d="M8 3h8l3 9H5z"/><path d="M12 12v6M8 21h8"/></symbol>
+<symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></symbol>
+<symbol id="i-back" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></symbol>
+<symbol id="i-next" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></symbol>
+<symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+<linearGradient id="gLeaf" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#9aec6e"/><stop offset="1" stop-color="#2e9a3c"/></linearGradient>
+<radialGradient id="gApple" cx=".35" cy=".3" r=".85"><stop offset="0" stop-color="#ff8a98"/><stop offset=".55" stop-color="#ec1d38"/><stop offset="1" stop-color="#9c0b25"/></radialGradient>
+<radialGradient id="gCookie" cx=".35" cy=".3" r=".85"><stop offset="0" stop-color="#fad27f"/><stop offset=".7" stop-color="#dc9238"/><stop offset="1" stop-color="#b3641f"/></radialGradient>
+<linearGradient id="gChoc" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7a4426"/><stop offset="1" stop-color="#2e170d"/></linearGradient>
+<linearGradient id="gBun" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fcca66"/><stop offset="1" stop-color="#e08a2c"/></linearGradient>
+<linearGradient id="gBunB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4ae4a"/><stop offset="1" stop-color="#cf7522"/></linearGradient>
+<linearGradient id="gLet" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a6ee66"/><stop offset="1" stop-color="#36a038"/></linearGradient>
+<linearGradient id="gTom" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff7464"/><stop offset="1" stop-color="#c91c1e"/></linearGradient>
+<linearGradient id="gChe" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffec6a"/><stop offset="1" stop-color="#f2ac14"/></linearGradient>
+<linearGradient id="gPat" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#94512f"/><stop offset="1" stop-color="#43200f"/></linearGradient>
+<linearGradient id="gCream" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fffbf0"/><stop offset="1" stop-color="#f3d9ab"/></linearGradient>
+<linearGradient id="gPink" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff86bd"/><stop offset="1" stop-color="#dc2078"/></linearGradient>
+<linearGradient id="gCone" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f6cb86"/><stop offset="1" stop-color="#cf8840"/></linearGradient>
+<radialGradient id="gS1" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#ffc6e4"/><stop offset="1" stop-color="#ec4f9f"/></radialGradient>
+<radialGradient id="gS2" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#9ff4f0"/><stop offset="1" stop-color="#17abc8"/></radialGradient>
+<radialGradient id="gS3" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#fffdf0"/><stop offset="1" stop-color="#f5d58f"/></radialGradient>
+<radialGradient id="gCh" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#ff8080"/><stop offset="1" stop-color="#c0102c"/></radialGradient>
+<linearGradient id="gCrust" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f6c06a"/><stop offset="1" stop-color="#c06a26"/></linearGradient>
+<linearGradient id="gCheese" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffee74"/><stop offset="1" stop-color="#f5b01a"/></linearGradient>
+<radialGradient id="gPep" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#ff7a74"/><stop offset="1" stop-color="#b3121f"/></radialGradient>
+<linearGradient id="gSau" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff8a62"/><stop offset=".55" stop-color="#d93b22"/><stop offset="1" stop-color="#9c1c14"/></linearGradient>
+<clipPath id="kCone"><path d="M34 68h52L60 114z"/></clipPath><symbol id="f-maca" viewBox="0 0 120 120"><g stroke="#3b1a38" stroke-width="3.6" stroke-linejoin="round" stroke-linecap="round"><ellipse cx="60" cy="112" rx="30" ry="5" fill="rgba(60,0,60,.2)" stroke="none"/><path d="M60 36C46 24 20 30 20 62c0 28 18 48 32 46 4-1 9-3 16 0 14 2 32-18 32-46 0-32-26-38-40-26z" fill="url(#gApple)"/><path d="M60 38c-1-10 1-18 8-26" fill="none" stroke-width="9"/><path d="M60 38c-1-10 1-18 8-26" fill="none" stroke="#9a5a22" stroke-width="3.5"/><path d="M66 24c8-12 24-12 32-5-6 13-22 15-32 5z" fill="url(#gLeaf)"/><path d="M70 23c8-3 15-3 22-3" fill="none" stroke="#1f7a2c" stroke-width="2"/><path d="M30 56c0-10 6-17 13-20" fill="none" stroke="#fff" stroke-width="6" opacity="0.85"/><circle cx="30" cy="70" r="3" fill="#fff" stroke="none" opacity=".8"/></g></symbol><symbol id="f-biscoito" viewBox="0 0 120 120"><g stroke="#3b1a38" stroke-width="3.6" stroke-linejoin="round" stroke-linecap="round"><ellipse cx="60" cy="112" rx="32" ry="5" fill="rgba(60,0,60,.2)" stroke="none"/><path d="M98.0 62.0L98.6 65.4L98.6 68.8L97.9 72.2L96.5 75.3L94.5 78.1L92.3 80.7L90.2 83.1L88.1 85.6L86.2 88.2L84.3 90.9L82.1 93.6L79.6 95.9L76.6 97.6L73.3 98.6L69.9 99.0L66.5 99.0L63.2 98.8L60.0 98.7L56.8 98.8L53.5 99.0L50.1 99.0L46.7 98.6L43.4 97.6L40.4 95.9L37.9 93.6L35.7 90.9L33.8 88.2L31.9 85.6L29.8 83.1L27.7 80.7L25.5 78.1L23.5 75.3L22.1 72.2L21.4 68.8L21.4 65.4L22.0 62.0L22.9 58.8L23.8 55.6L24.5 52.5L25.1 49.3L25.7 46.0L26.5 42.7L27.9 39.5L29.9 36.8L32.5 34.5L35.4 32.7L38.5 31.3L41.6 30.1L44.5 28.7L47.3 27.2L50.3 25.6L53.3 24.1L56.6 23.1L60.0 22.7L63.4 23.1L66.7 24.1L69.7 25.6L72.7 27.2L75.5 28.7L78.4 30.1L81.5 31.3L84.6 32.7L87.5 34.5L90.1 36.8L92.1 39.5L93.5 42.7L94.3 46.0L94.9 49.3L95.5 52.5L96.2 55.6L97.1 58.8z" fill="url(#gCookie)"/><path d="M30 44q10-14 28-16" fill="none" stroke="#fff" stroke-width="4" opacity=".55"/><g transform="rotate(-20 42 46)"><ellipse cx="42" cy="46" rx="7.5" ry="6" fill="url(#gChoc)"/><ellipse cx="40" cy="44" rx="2.6" ry="1.6" fill="#fff" stroke="none" opacity=".5"/></g><g transform="rotate(25 76 40)"><ellipse cx="76" cy="40" rx="7.5" ry="6" fill="url(#gChoc)"/><ellipse cx="74" cy="38" rx="2.6" ry="1.6" fill="#fff" stroke="none" opacity=".5"/></g><g transform="rotate(-10 84 70)"><ellipse cx="84" cy="70" rx="7.5" ry="6" fill="url(#gChoc)"/><ellipse cx="82" cy="68" rx="2.6" ry="1.6" fill="#fff" stroke="none" opacity=".5"/></g><g transform="rotate(35 54 76)"><ellipse cx="54" cy="76" rx="7.5" ry="6" fill="url(#gChoc)"/><ellipse cx="52" cy="74" rx="2.6" ry="1.6" fill="#fff" stroke="none" opacity=".5"/></g><g transform="rotate(0 66 58)"><ellipse cx="66" cy="58" rx="7.5" ry="6" fill="url(#gChoc)"/><ellipse cx="64" cy="56" rx="2.6" ry="1.6" fill="#fff" stroke="none" opacity=".5"/></g><g transform="rotate(15 34 72)"><ellipse cx="34" cy="72" rx="7.5" ry="6" fill="url(#gChoc)"/><ellipse cx="32" cy="70" rx="2.6" ry="1.6" fill="#fff" stroke="none" opacity=".5"/></g></g></symbol><symbol id="f-sanduiche" viewBox="0 0 120 120"><g stroke="#3b1a38" stroke-width="3.6" stroke-linejoin="round" stroke-linecap="round"><ellipse cx="60" cy="110" rx="44" ry="5" fill="rgba(60,0,60,.2)" stroke="none"/><path d="M18 96h84v2a10 10 0 0 1-10 10H28a10 10 0 0 1-10-10z" fill="url(#gBunB)"/><rect x="14" y="82" width="92" height="16" rx="8" fill="url(#gPat)"/><path d="M26 87h30" fill="none" stroke="#fff" stroke-width="3" opacity="0.35"/><path d="M14 72h92v6l-8 8-10-8-12 10-12-10-12 10-12-10-12 10-14-8z" fill="url(#gChe)"/><rect x="16" y="62" width="88" height="12" rx="6" fill="url(#gTom)"/><path d="M26 66h26" fill="none" stroke="#fff" stroke-width="3" opacity="0.5"/><path d="M10 56c6-4 10 6 16 2s10 6 17 2 10 6 17 2 10 6 17 2 10-6 17-2 10-6 16-2v8c-6 4-10-4-16 0s-10 6-17 2-10-6-17-2-10 6-17 2-10-6-17-2-10 4-16 0z" fill="url(#gLet)"/><path d="M14 56C14 28 34 10 60 10s46 18 46 46z" fill="url(#gBun)"/><path d="M26 42c2-10 10-18 20-20" fill="none" stroke="#fff" stroke-width="5" opacity="0.7"/><g fill="#fff3d0" stroke="#a65d18" stroke-width="1.4"><ellipse cx="46" cy="28" rx="3.4" ry="2" transform="rotate(-20 46 28)"/><ellipse cx="66" cy="24" rx="3.4" ry="2" transform="rotate(15 66 24)"/><ellipse cx="82" cy="34" rx="3.4" ry="2" transform="rotate(35 82 34)"/><ellipse cx="56" cy="40" rx="3.4" ry="2"/><ellipse cx="76" cy="46" rx="3.4" ry="2" transform="rotate(-25 76 46)"/><ellipse cx="38" cy="46" rx="3.4" ry="2" transform="rotate(25 38 46)"/></g></g></symbol><symbol id="f-bolo" viewBox="0 0 120 120"><g stroke="#3b1a38" stroke-width="3.6" stroke-linejoin="round" stroke-linecap="round"><ellipse cx="60" cy="112" rx="46" ry="5" fill="rgba(60,0,60,.2)" stroke="none"/><path d="M60 26L104 94H16z" fill="url(#gCream)"/><path d="M42.7 52h34.6l13.6 22H29.1z" fill="url(#gPink)"/><path d="M60 56l3.5 7 7.5 1-5.5 5.2 1.4 7.6-6.9-3.8-6.9 3.8 1.4-7.6L49 64l7.5-1z" fill="#fff"/><path d="M10 92h100v10a8 8 0 0 1-8 8H18a8 8 0 0 1-8-8z" fill="#f6dba8"/><path d="M20 100h40" fill="none" stroke="#fff" stroke-width="3" opacity="0.6"/><path d="M10 92h100" stroke-width="3"/><g stroke="none" fill="#fff" opacity=".9"><circle cx="46" cy="44" r="2"/><circle cx="76" cy="46" r="2"/></g><path d="M60 22c0-6 3-10 8-12" fill="none" stroke="#2f7a2c" stroke-width="3.5"/><circle cx="60" cy="22" r="10" fill="url(#gCh)"/><ellipse cx="56" cy="18" rx="3.4" ry="2.2" fill="#fff" stroke="none" opacity=".8"/></g></symbol><symbol id="f-sorvete" viewBox="0 0 120 120"><g stroke="#3b1a38" stroke-width="3.6" stroke-linejoin="round" stroke-linecap="round"><ellipse cx="60" cy="116" rx="18" ry="3" fill="rgba(60,0,60,.2)" stroke="none"/><path d="M34 68h52L60 114z" fill="url(#gCone)"/><g clip-path="url(#kCone)" stroke="#a45f22" stroke-width="2.2" fill="none"><path d="M30 74l40 44M44 68l34 40M58 68l26 30M72 68l14 14M90 74L50 118M76 68L40 106M62 68L34 94"/></g><path d="M34 68h52L60 114z" fill="none"/><circle cx="40" cy="54" r="19" fill="url(#gS1)"/><circle cx="80" cy="54" r="19" fill="url(#gS2)"/><path d="M36 60c4 10 12 8 14 14 4-4 10 0 12-6 4 6 12 4 14-2 2 5 8 4 12 0" fill="none" stroke="none"/><circle cx="60" cy="38" r="19" fill="url(#gS3)"/><ellipse cx="32" cy="46" rx="5" ry="3" fill="#fff" stroke="none" opacity=".75" transform="rotate(-30 32 46)"/><ellipse cx="72" cy="46" rx="5" ry="3" fill="#fff" stroke="none" opacity=".6" transform="rotate(-30 72 46)"/><ellipse cx="53" cy="30" rx="5" ry="3" fill="#fff" stroke="none" opacity=".8" transform="rotate(-30 53 30)"/><path d="M60 14c0-5 3-8 8-9" fill="none" stroke="#2f7a2c" stroke-width="3"/><circle cx="60" cy="16" r="8" fill="url(#gCh)"/><ellipse cx="57" cy="13" rx="2.6" ry="1.8" fill="#fff" stroke="none" opacity=".8"/></g></symbol><symbol id="f-pizza" viewBox="0 0 120 120"><g stroke="#3b1a38" stroke-width="3.6" stroke-linejoin="round" stroke-linecap="round"><g transform="translate(60 62) rotate(-28) scale(.86) translate(-60 -64)"><path d="M16 46c28-12 60-12 88 0L60 110z" fill="url(#gCheese)"/><path d="M12 32c30-14 66-14 96 0l-3 16c-30-12-60-12-90 0z" fill="url(#gCrust)"/><path d="M22 36c26-9 52-9 78 0" fill="none" stroke="#fff" stroke-width="3.5" opacity="0.5"/><circle cx="45" cy="62" r="9.5" fill="url(#gPep)"/><circle cx="76" cy="60" r="9.5" fill="url(#gPep)"/><circle cx="60" cy="86" r="8.5" fill="url(#gPep)"/><ellipse cx="42" cy="59" rx="3" ry="1.8" fill="#fff" stroke="none" opacity=".7"/><ellipse cx="73" cy="57" rx="3" ry="1.8" fill="#fff" stroke="none" opacity=".7"/><ellipse cx="57" cy="83" rx="3" ry="1.8" fill="#fff" stroke="none" opacity=".7"/><g stroke="none" fill="#fff" opacity=".6"><circle cx="58" cy="68" r="1.6"/><circle cx="34" cy="52" r="1.6"/><circle cx="88" cy="50" r="1.6"/></g></g></g></symbol><symbol id="f-salsicha" viewBox="0 0 120 120"><g stroke="#3b1a38" stroke-width="3.6" stroke-linejoin="round" stroke-linecap="round"><ellipse cx="60" cy="112" rx="40" ry="5" fill="rgba(60,0,60,.2)" stroke="none"/><g transform="rotate(-20 60 40)"><rect x="12" y="22" width="96" height="32" rx="16" fill="url(#gSau)"/><path d="M34 26q-3 12 0 24M52 26q-3 12 0 24M70 26q-3 12 0 24M88 26q-3 12 0 24" fill="none" stroke="#7a1810" stroke-width="2.4" opacity=".7"/><path d="M26 30h58" fill="none" stroke="#fff" stroke-width="4" opacity="0.6"/></g><g transform="rotate(-12 60 78)"><rect x="12" y="62" width="96" height="32" rx="16" fill="url(#gSau)"/><path d="M34 66q-3 12 0 24M52 66q-3 12 0 24M70 66q-3 12 0 24M88 66q-3 12 0 24" fill="none" stroke="#7a1810" stroke-width="2.4" opacity=".7"/><path d="M26 70h58" fill="none" stroke="#fff" stroke-width="4" opacity="0.6"/></g></g></symbol><symbol id="t-shop" viewBox="0 0 24 24"><g stroke="#3b1a78" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"><path d="M3 9l2-5h14l2 5z" fill="#fff"/><path d="M5 4L3 9h4l1-5zM11 4l-.5 5h3L13 4zM16 4l1 5h4l-2-5z" fill="#ff4fa8"/><path d="M4 9a2.6 2.6 0 0 0 5 0 2.6 2.6 0 0 0 6 0 2.6 2.6 0 0 0 5 0" fill="#ff4fa8"/><path d="M5 11.5V21h14v-9.5" fill="#ffe9c9"/><rect x="9.5" y="14" width="5" height="7" rx="1" fill="#b56bf0"/></g></symbol><symbol id="t-food" viewBox="0 0 24 24"><g stroke="#3b1a78" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"><path d="M5 2v6a2 2 0 0 0 1.5 2V22h2V10A2 2 0 0 0 10 8V2H8.6v5h-1V2H6.4v5h-1V2zM17 2c-2.2 2-3 5-3 8 0 2 1 3 2 3.2V22h2z" fill="#ffd96a"/></g></symbol><symbol id="t-cor" viewBox="0 0 24 24"><g stroke="#3b1a78" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"><path d="M12 3C6.5 3 2.5 7 2.5 12s4 9 8.5 9c1.7 0 2.3-1 2-2.2-.3-1.2.4-2.3 1.7-2.3H17c2.8 0 4.5-1.8 4.5-4.3C21.5 6.5 17.5 3 12 3z" fill="#f2b6ec"/><circle cx="8" cy="11" r="1.7" fill="#ff4fa8" stroke="none"/><circle cx="11.5" cy="7.5" r="1.7" fill="#ffd23f" stroke="none"/><circle cx="16" cy="9" r="1.7" fill="#4fd1ff" stroke="none"/></g></symbol><symbol id="t-hat" viewBox="0 0 24 24"><g stroke="#68418e" stroke-width="1.35" stroke-linejoin="round" stroke-linecap="round"><ellipse cx="12" cy="17" rx="10" ry="3.6" fill="#ff9bc5"/><path d="M6.5 16C6.5 9 8 5 12 5s5.5 4 5.5 11z" fill="#8fdcff"/><path d="M7.5 12.5q4.5 2 9 0" fill="none" stroke="#fff" stroke-width="2"/><circle cx="12" cy="7.5" r="2" fill="#ffd75e"/><path d="M12 3.5v1.2" stroke="#ff8b45" stroke-width="2"/></g></symbol><symbol id="t-face" viewBox="0 0 24 24"><g stroke="#3b1a78" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"><circle cx="12" cy="12" r="9.5" fill="#d9a8ff"/><circle cx="8.8" cy="10.3" r="1.3" fill="#3b1a78" stroke="none"/><circle cx="15.2" cy="10.3" r="1.3" fill="#3b1a78" stroke="none"/><path d="M8 14.5q4 3.4 8 0" fill="none"/></g></symbol><symbol id="t-top" viewBox="0 0 24 24"><g stroke="#65418e" stroke-width="1.35" stroke-linejoin="round" stroke-linecap="round"><path d="M8.5 3 2.5 6.5l2.3 4.6 2.2-1V21h10V10.1l2.2 1 2.3-4.6L15.5 3q-1.3 2-3.5 2t-3.5-2z" fill="#ff9bc5"/><path d="M8.5 3q3.5 4 7 0" fill="none" stroke="#ffd36b" stroke-width="2.2"/><path d="M9 11v6M15 11v6" fill="none" stroke="#fff" stroke-width="1.4"/><path d="M10 20h4" fill="none" stroke="#8fdcff" stroke-width="2"/></g></symbol><symbol id="t-feet" viewBox="0 0 24 24"><g stroke="#68418e" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round"><ellipse cx="12" cy="16.5" rx="5.2" ry="4.3" fill="#ff9bc5"/><circle cx="5.5" cy="11.5" r="2.2" fill="#8fdcff"/><circle cx="9.5" cy="6.8" r="2.4" fill="#ffd36b"/><circle cx="14.5" cy="6.8" r="2.4" fill="#a9a0ff"/><circle cx="18.5" cy="11.5" r="2.2" fill="#7fe0b0"/><path d="M9 16q3-2 6 0" fill="none" stroke="#fff" stroke-width="1.2"/></g></symbol><symbol id="t-duo" viewBox="0 0 24 24"><g stroke="#3b1a78" stroke-width="1.5" stroke-linejoin="round"><path d="M8 20S2.5 16 2.5 11.2A3.6 3.6 0 0 1 8 8.6a3.6 3.6 0 0 1 5.500 2.600C13.500 16 8 20 8 20z" fill="#ff6fbd"/><path d="M16.5 21s-4.500-3.300-4.500-7.200a3 3 0 0 1 4.500-2.200 3 3 0 0 1 4.500 2.200c0 3.900-4.500 7.200-4.500 7.200z" fill="#ffd96a"/></g></symbol><symbol id="t-bg" viewBox="0 0 24 24"><g stroke="#3b1a78" stroke-width="1.5" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="3" fill="#bfe4ff"/><circle cx="16" cy="9" r="2.200" fill="#ffe56b"/><path d="M3 18l6-6 4 4 3-3 5 5v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" fill="#7fd9a0"/></g></symbol></defs></svg>
+
+<div id="app">
+  <!-- CASA: tela fixa, sem rolagem -->
+  <section class="view" id="v-home">
+    <div class="stage" id="stage">
+      <div class="rm" id="rm"></div>
+      <div class="slot petslot"></div>
+      <div class="hud">
+        <div class="hrow">
+          <button class="who" data-act="rename" aria-label="Renomear pet"><b id="pname"></b><span class="lvp"><i id="lnum"></i><em><u id="xpb"></u></em></span></button>
+          <button class="coins" data-act="go" data-v="shop" aria-label="Abrir loja"><span id="hCoinIc"></span><b id="hCoins"></b></button>
+          <button class="mbtn pend" id="mbtn" data-act="menu" aria-label="Menu"><svg class="i"><use href="#i-menu"/></svg></button>
+        </div>
+        <div class="sbar" id="sbar"></div>
+      </div>
+      <div class="menu" id="menu">
+        <button class="mi" data-act="go" data-v="shop"><span class="app" style="--a:#ffd36b;--b:#ff9a3d"><svg class="i"><use href="#i-shop"/></svg></span>Loja</button>
+        <button class="mi" data-act="go" data-v="care"><span class="app" style="--a:#ff9ec0;--b:#ff6f9b"><svg class="i"><use href="#i-hanger"/></svg></span>Armário</button>
+        <button class="mi" data-act="go" data-v="duo"><span class="app" style="--a:#a9c4ff;--b:#7a8cf5"><svg class="i"><use href="#i-users"/></svg></span><span>Dupla<small id="menuDuo">convite pendente</small></span></button>
+      </div>
+      <div class="tcard" id="tcard"></div>
+      <nav class="dock" id="dock" aria-label="Cômodos"></nav>
+    </div>
+  </section>
+
+  <!-- ARMÁRIO -->
+  <section class="view sv" id="v-care">
+    <div class="top"><button class="back" data-act="go" data-v="home" aria-label="Voltar"><svg class="i"><use href="#i-back"/></svg></button><h1><span class="sico"><svg viewBox="0 0 24 24"><use href="#t-top"/></svg></span>Armário</h1></div>
+    <div class="stage pv" style="flex:none"><div class="slot petslot"></div></div>
+    <div class="scroll"><div class="tabs" id="cTabs"></div><div class="grid" id="cGrid"></div></div>
+  </section>
+
+  <!-- LOJA -->
+  <section class="view sv" id="v-shop">
+    <div class="top"><button class="back" data-act="go" data-v="home" aria-label="Voltar"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><h1><span class="sico"><svg viewBox="0 0 24 24"><use href="#t-shop"/></svg></span>Loja<i class="spk"></i></h1><div class="coins"><span data-ci></span><b id="sCoins"></b><button class="plus" data-act="coinhint" aria-label="Como ganhar moedas"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="4.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button></div></div>
+    <div class="tabs" id="sTabs"></div>
+    <div class="scroll"><div class="grid g2 sg2" id="sGrid"></div>
+      <p class="hint" style="margin-top:16px">As moedas são fictícias e servem só para testar a economia. Brincar rende moedas.</p></div>
+  </section>
+
+  <!-- DESPENSA -->
+  <section class="view sv" id="v-inv">
+    <div class="top"><button class="back" data-act="go" data-v="home" aria-label="Voltar"><svg class="i"><use href="#i-back"/></svg></button><h1><span class="sico"><svg viewBox="0 0 24 24"><use href="#t-food"/></svg></span>Despensa</h1></div>
+    <div class="scroll"><div class="card" style="margin-top:0" id="invFood"></div></div>
+  </section>
+
+  <!-- DUPLA -->
+  <section class="view sv" id="v-duo">
+    <div class="top"><button class="back" data-act="go" data-v="home" aria-label="Voltar"><svg class="i"><use href="#i-back"/></svg></button><h1><span class="sico"><svg viewBox="0 0 24 24"><use href="#t-duo"/></svg></span>Nossa dupla</h1></div>
+    <div class="scroll">
+      <div class="card" style="margin-top:0"><h2>Tipo de dupla</h2>
+        <div class="seg" id="seg"><button data-act="mode" data-m="casal">Casal</button><button data-act="mode" data-m="amigos">Amigos</button></div>
+        <input class="inp" id="duoInp" maxlength="20" placeholder="Nome da dupla (opcional)" autocomplete="off">
+        <button class="btn" data-act="duoName">Salvar dupla</button></div>
+      <div class="card" id="invCard"><h2 id="invTitle">Jogador 2: convite pendente</h2>
+        <p id="invText">Envie este código para a outra pessoa entrar na sua dupla.</p>
+        <div id="invBox"><div class="code" id="code"></div>
+        <div class="flex"><button class="btn alt" data-act="copy">Copiar</button><button class="btn alt" data-act="share">Enviar</button></div>
+        <button class="btn alt block" data-act="newcode">Gerar novo código</button></div></div>
+      <div class="card"><h2>Seu progresso</h2><p id="sumry"></p>
+        <p style="margin-top:8px"><span class="sync" id="syncTxt" data-s="ok"><i></i><b>Sincronizado</b></span></p></div>
+      <div class="card" id="instCard"><h2>Instalar no celular</h2><p>Abre em tela cheia, como um app, e funciona mesmo sem internet.</p>
+        <button class="btn alt block" data-act="install">Instalar o DuoPet</button></div>
+      <div class="card" id="accCard"><h2>Conta</h2><p id="accTxt"></p>
+        <button class="btn red block" data-act="leave">Sair da dupla</button>
+        <button class="btn red block" data-act="logout">Sair da conta</button></div>
+    </div>
+  </section>
+
+  <!-- CARREGANDO -->
+  <section class="view sv on" id="v-load"><div class="splash">Carregando o DuoPet...</div></section>
+
+  <!-- ENTRAR -->
+  <section class="view sv" id="v-auth">
+    <div class="top"><h1><span class="sico"><svg viewBox="0 0 24 24"><use href="#t-duo"/></svg></span>DuoPet</h1></div>
+    <div class="scroll">
+      <div class="card" style="margin-top:0"><h2>Entrar</h2>
+        <p>Entre para cuidar do pet junto com a sua dupla. O progresso fica salvo na sua conta.</p>
+        <button class="btn block" data-act="google">Entrar com Google</button>
+        <input class="inp" id="aEmail" type="email" placeholder="E-mail" autocomplete="email" autocapitalize="off">
+        <input class="inp" id="aPass" type="password" placeholder="Senha (mínimo 6 caracteres)" autocomplete="current-password">
+        <div class="flex"><button class="btn alt" data-act="login">Entrar</button><button class="btn alt" data-act="register">Criar conta</button></div>
+        <p class="hint msg" id="aMsg" role="status"></p></div>
+    </div>
+  </section>
+
+  <!-- CRIAR OU ENTRAR NA DUPLA -->
+  <section class="view sv" id="v-join">
+    <div class="top"><h1><span class="sico"><svg viewBox="0 0 24 24"><use href="#t-duo"/></svg></span>Sua dupla</h1></div>
+    <div class="scroll">
+      <div class="card" style="margin-top:0"><h2>Criar uma dupla</h2>
+        <p>Você cria o pet e recebe um código para convidar o Jogador 2.</p>
+        <button class="btn block" data-act="create">Criar minha dupla</button></div>
+      <div class="card"><h2>Tenho um código</h2>
+        <input class="inp up" id="joinInp" maxlength="6" placeholder="CÓDIGO" autocomplete="off" autocapitalize="characters">
+        <button class="btn alt block" data-act="join">Entrar na dupla</button></div>
+      <p class="hint msg" id="jMsg" role="status"></p>
+      <div class="card"><p id="jWho"></p><button class="btn red block" data-act="logout">Sair da conta</button></div>
+    </div>
+  </section>
+
+  <div id="toast" role="status" aria-live="polite"></div>
+  <div class="modal" id="modal"><div class="card"><h2 id="mTitle"></h2>
+    <p>Escolha um nome de até 12 letras.</p>
+    <input class="inp" id="nameInp" maxlength="12" placeholder="Ex.: Mochi" autocomplete="off">
+    <div class="flex"><button class="btn alt" id="mCancel" data-act="cancel">Cancelar</button><button class="btn" data-act="start">Salvar</button></div></div></div>
+</div>
+
+<script type="module">
+"use strict";
+/* ========== A. CONFIGURAÇÃO DO FIREBASE ==========
+   Cole aqui os dados do seu projeto (Firebase Console > Configurações do projeto > Seus apps > Web).
+   Esses valores são públicos por design; quem protege os dados são as regras do Firestore.
+   Deixe o apiKey vazio para jogar só neste aparelho (modo local). */
+const FIREBASE_CONFIG = {
+  apiKey: "",
+  authDomain: "",
+  projectId: "",
+  storageBucket: "",
+  messagingSenderId: "",
+  appId: ""
+};
+const CLOUD_ON = Boolean(FIREBASE_CONFIG.apiKey && FIREBASE_CONFIG.projectId);
+const SDK = "https://www.gstatic.com/firebasejs/11.6.1/";
+
+/* Cópia local: abre rápido, funciona sem internet e guarda o que ainda não foi enviado. */
+const LocalCache = {
+  KEY: "duopet.v2.cache",
+  load(uid) { try { const o = JSON.parse(localStorage.getItem(this.KEY)); return o && (uid === undefined || o.uid === uid) ? o : null; } catch (e) { return null; } },
+  save(o) { try { localStorage.setItem(this.KEY, JSON.stringify(o)); } catch (e) {} },
+  clear() { try { localStorage.removeItem(this.KEY); } catch (e) {} }
+};
+/* Relógio do servidor: os dois celulares calculam fome e energia pela mesma hora, mesmo com relógios diferentes. */
+const Clock = { off: 0, now() { return Date.now() + this.off; } };
+
+/* ========== B. ÍCONES E ILUSTRAÇÕES ========== */
+const ic = n => `<svg class="i"><use href="#i-${n}"/></svg>`;
+const tile = (g, a, b, cls) => `<span class="app ${cls || ""}" style="--a:${a};--b:${b}">${ic(g)}</span>`;
+const SOFT = "rgba(90,50,70,.35)";
+const ill = (b, vb) => `<svg viewBox="${vb || "0 0 64 64"}" stroke="${SOFT}" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round">${b}</svg>`;
+const COIN = `<svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="14.5" fill="url(#cg)" stroke="#8f5209" stroke-width="2"/><circle cx="16" cy="16" r="10.6" fill="none" stroke="#d58f12" stroke-width="1.6"/><g fill="#8a4e0c"><ellipse cx="16" cy="19.6" rx="4.4" ry="3.5"/><circle cx="10.6" cy="15.2" r="2"/><circle cx="14" cy="11.8" r="2.1"/><circle cx="18" cy="11.8" r="2.1"/><circle cx="21.4" cy="15.2" r="2"/></g><path d="M7.5 11.5a10 10 0 0 1 6-5" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" opacity=".75"/></svg>`;
+const SHOWER = `<svg viewBox="0 0 64 64"><g stroke="#3b1a38" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"><path d="M32 3v14" fill="none" stroke-width="8"/><path d="M32 3v14" fill="none" stroke="#d3e0e8" stroke-width="3.6"/><path d="M8 45a24 24 0 0 1 48 0z" fill="#bfe4fb"/><path d="M6 45h52v5a3 3 0 0 1-3 3H9a3 3 0 0 1-3-3z" fill="#8fc6ee"/></g><path d="M15 37a18 15 0 0 1 11-10" fill="none" stroke="#fff" stroke-width="3.6" stroke-linecap="round" opacity=".85"/><g fill="#3b1a38"><circle cx="14" cy="49.500" r="1.700"/><circle cx="23" cy="49.500" r="1.700"/><circle cx="32" cy="49.500" r="1.700"/><circle cx="41" cy="49.500" r="1.700"/><circle cx="50" cy="49.500" r="1.700"/></g></svg>`;
+const SOAP = ill(`<defs><linearGradient id="sg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#9be3ff"/><stop offset="1" stop-color="#4fa8f0"/></linearGradient></defs><g transform="rotate(-14 32 34)"><rect x="7" y="20" width="50" height="28" rx="10" fill="url(#sg)"/><rect x="14" y="25" width="28" height="8" rx="4" fill="#fff" opacity=".6" stroke="none"/></g><circle cx="52" cy="14" r="6" fill="#fff" opacity=".85"/><circle cx="43" cy="9" r="4" fill="#fff" opacity=".85"/>`);
+const BALL = ill(`<defs><radialGradient id="bg" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#ffb3c7"/><stop offset="1" stop-color="#ff5f86"/></radialGradient></defs><circle cx="32" cy="32" r="25" fill="url(#bg)"/><path d="M8 28q24 9 48 0M9 44q23-9 46 0" fill="none" stroke="#fff" stroke-width="6" opacity=".85"/><ellipse cx="22" cy="16" rx="7" ry="4" transform="rotate(-35 22 16)" fill="#fff" opacity=".6" stroke="none"/>`);
+const foodSVG = id => `<svg viewBox="0 0 120 120" aria-hidden="true"><use href="#f-${id}"/></svg>`;
+
+/* ========== C. CATÁLOGO ========== */
+const FOODS = {
+  maca: { n: "Maçã", p: 8, hu: 30, ha: 5 }, biscoito: { n: "Biscoito", p: 5, hu: 20, ha: 2 },
+  sanduiche: { n: "Sanduíche", p: 14, hu: 40, ha: 8 }, bolo: { n: "Bolo", p: 16, hu: 35, ha: 18 },
+  sorvete: { n: "Sorvete", p: 12, hu: 25, ha: 22 }, pizza: { n: "Pizza", p: 18, hu: 45, ha: 10 }, salsicha: { n: "Salsichas", p: 10, hu: 30, ha: 6 }
+};
+const COSM = [
+  { id: "pessego", t: "cor", n: "Pêssego", p: 0, c: "#ffc4a3" }, { id: "lavanda", t: "cor", n: "Lavanda", p: 30, c: "#cdbcf7" },
+  { id: "menta", t: "cor", n: "Menta", p: 30, c: "#a8e6cf" }, { id: "ceu", t: "cor", n: "Céu", p: 40, c: "#a9d6f7" },
+  { id: "nohat", t: "hat", n: "Sem chapéu", p: 0 }, { id: "laco", t: "hat", n: "Laço", p: 30 }, { id: "bone", t: "hat", n: "Boné", p: 40 },
+  { id: "gorro", t: "hat", n: "Gorro", p: 50 }, { id: "festa", t: "hat", n: "Festa", p: 60 }, { id: "abafador", t: "hat", n: "Abafador", p: 80 }, { id: "coroa", t: "hat", n: "Coroa", p: 120 },
+  { id: "noface", t: "face", n: "Sem óculos", p: 0 }, { id: "oculos", t: "face", n: "Óculos", p: 50 }, { id: "sol", t: "face", n: "Óculos de sol", p: 70 },
+  { id: "notop", t: "top", n: "Sem roupa", p: 0 }, { id: "gravata", t: "top", n: "Gravata", p: 35 }, { id: "camiseta", t: "top", n: "Camiseta", p: 45 },
+  { id: "cachecol", t: "top", n: "Cachecol", p: 60 }, { id: "pijama", t: "top", n: "Pijama", p: 90 },
+  { id: "nofeet", t: "feet", n: "Descalço", p: 0 }, { id: "pantufa", t: "feet", n: "Pantufas", p: 55 }, { id: "tenis", t: "feet", n: "Tênis", p: 65 }
+];
+const CATS = [["cor", "Cores"], ["hat", "Chapéus"], ["face", "Rosto"], ["top", "Roupa"], ["feet", "Pés"], ["bg", "Fundos"]];
+const CROP = { hat: "20 0 160 144", face: "26 28 148 148", top: "10 22 180 180", feet: "10 22 180 180" };
+const TH = {
+  sala_estrela: { room: "sala", n: "Sala Estrelada", p: 40, w: "linear-gradient(#352380,#6a4ac0)", f: "repeating-linear-gradient(90deg,#8a6a9e 0 64px,#7a5a8e 64px 66px)", k: "star", c: "#ffe56b" },
+  sala_menta: { room: "sala", n: "Sala Menta", p: 35, w: "linear-gradient(#c8f2e0,#9fe0c8)", f: "repeating-linear-gradient(90deg,#ecd9b0 0 64px,#dcc89e 64px 66px)", k: "dot", c: "#fff" },
+  sala_coracao: { room: "sala", n: "Sala Coração", p: 45, w: "linear-gradient(#ffc9d9,#ff9fbd)", f: "repeating-linear-gradient(90deg,#f2d0b8 0 64px,#e6c0a6 64px 66px)", k: "heart", c: "#fff" },
+  coz_limao: { room: "cozinha", n: "Cozinha Limão", p: 35, w: "linear-gradient(rgba(255,255,255,.7) 2px,transparent 2px) 0 0/40px 40px,linear-gradient(90deg,rgba(255,255,255,.7) 2px,transparent 2px) 0 0/40px 40px,#fff2a8", f: "repeating-conic-gradient(#fffbe6 0 25%,#f6e08a 0 50%) 0 0/56px 56px", k: "dot", c: "#fff" },
+  coz_doce: { room: "cozinha", n: "Cozinha Doceria", p: 45, w: "linear-gradient(rgba(255,255,255,.7) 2px,transparent 2px) 0 0/40px 40px,linear-gradient(90deg,rgba(255,255,255,.7) 2px,transparent 2px) 0 0/40px 40px,#ffd6e6", f: "repeating-conic-gradient(#fff 0 25%,#ffc2d6 0 50%) 0 0/56px 56px", k: "heart", c: "#ff8fbd" },
+  coz_azul: { room: "cozinha", n: "Cozinha Azulejo", p: 40, w: "linear-gradient(rgba(255,255,255,.7) 2px,transparent 2px) 0 0/40px 40px,linear-gradient(90deg,rgba(255,255,255,.7) 2px,transparent 2px) 0 0/40px 40px,#bfe0ff", f: "repeating-conic-gradient(#fff 0 25%,#cfe3f5 0 50%) 0 0/56px 56px", k: "dot", c: "#7fb8f0" },
+  ban_bolha: { room: "banheiro", n: "Banho Bolhas", p: 40, w: "linear-gradient(#bff0ff,#8fdcff)", f: "repeating-linear-gradient(45deg,#d9ecf4 0 28px,#c8e2ee 28px 56px)", k: "bub", c: "#fff" },
+  ban_praia: { room: "banheiro", n: "Banho Praia", p: 50, w: "linear-gradient(#8fdcff,#d6f4ff)", f: "repeating-linear-gradient(90deg,#f3d9a4 0 64px,#e8c88a 64px 66px)", k: "cloud", c: "#fff" },
+  ban_spa: { room: "banheiro", n: "Banho Spa Lilás", p: 45, w: "linear-gradient(#e6d4ff,#d2b8f5)", f: "repeating-linear-gradient(45deg,#cdb4f0 0 28px,#bda0e6 28px 56px)", k: "paw", c: "#fff" },
+  qua_noite: { room: "quarto", n: "Quarto Noturno", p: 50, w: "linear-gradient(#1e1b5e,#4a3aa8)", f: "repeating-linear-gradient(90deg,#6a4a88 0 64px,#5a3a78 64px 66px)", k: "star", c: "#fff" },
+  qua_nuvem: { room: "quarto", n: "Quarto Nuvens", p: 40, w: "linear-gradient(#bfe4ff,#eaf6ff)", f: "repeating-linear-gradient(90deg,#c9a98a 0 64px,#b99878 64px 66px)", k: "cloud", c: "#fff" },
+  qua_pata: { room: "quarto", n: "Quarto Patinhas", p: 35, w: "linear-gradient(#ffd9f0,#ffbfe4)", f: "repeating-linear-gradient(90deg,#b99a82 0 64px,#a98a72 64px 66px)", k: "paw", c: "#ff8fbd" }
+};
+const DEF = {
+  sala: { n: "Sala Padrão", w: "linear-gradient(#ffd6f2,#f2a8e0)", f: "#ecc9a2" },
+  cozinha: { n: "Cozinha Padrão", w: "#cdeedd", f: "#f9f1e6" },
+  banheiro: { n: "Banho Padrão", w: "#d6edfb", f: "#d9ecf4" },
+  quarto: { n: "Quarto Padrão", w: "linear-gradient(#cfc4f6,#b7a8ef)", f: "#a98a73" }
+};
+COSM.push(...Object.keys(DEF).flatMap(r => [{ id: "nobg_" + r, t: "bg", room: r, n: DEF[r].n, p: 0 }, ...Object.entries(TH).filter(([, t]) => t.room === r).map(([id, t]) => ({ id, t: "bg", room: r, n: t.n, p: t.p }))]));
+const bgPic = c => { const t = TH[c.id] || DEF[c.room]; return `<span class="bgp" style="background:${t.f}"><i style="background:${t.w}"></i></span>`; };
+const DK = { star: '<path d="M0-6l1.800 4.200 4.500.400-3.400 3 1 4.400L0 3l-3.900 2.400 1-4.400-3.400-3 4.500-.4z"/>', heart: '<path d="M0 5S-6 1-6-2a3 3 0 0 1 6-1 3 3 0 0 1 6 1C6 1 0 5 0 5z"/>', bub: '<circle r="4" fill="none" stroke="#fff" stroke-width="1.500"/>', dot: '<circle r="2.600"/>', cloud: '<ellipse rx="8" ry="3.600"/><ellipse cx="-4" cy="-2" rx="4.500" ry="3"/><ellipse cx="3" cy="-2.500" rx="4" ry="3"/>', paw: '<ellipse cy="2" rx="3.200" ry="2.600"/><circle cx="-4" cy="-1" r="1.400"/><circle cx="-1.500" cy="-4" r="1.500"/><circle cx="1.500" cy="-4" r="1.500"/><circle cx="4" cy="-1" r="1.400"/>' };
+const deco = (k, c) => `<svg class="decor" viewBox="0 0 100 60">${[[8, 10], [22, 26], [38, 9], [52, 24], [67, 10], [80, 27], [92, 12], [14, 43], [46, 44], [74, 46], [91, 42]].map(([x, y], i) => `<g transform="translate(${x} ${y}) scale(${.9 + (i % 3) * .3})" fill="${c}" opacity=".8">${DK[k]}</g>`).join("")}</svg>`;
+const STATS = [["hunger", "Fome", "food"], ["happy", "Alegria", "care"], ["hygiene", "Higiene", "drop"], ["energy", "Energia", "bolt"]];
+const ROOMS = [["sala", "Sala", "sofa", "#ffb199", "#ff7a93"], ["cozinha", "Cozinha", "food", "#ffd27a", "#ff9a52"], ["banheiro", "Banho", "shower", "#7fd3ff", "#4f9cf5"], ["quarto", "Quarto", "moon", "#b9a4ff", "#8266f0"]];
+const BODY = { pessego: ["#fff0e4", "#ffc9a8", "#ec9a70"], lavanda: ["#f2ecff", "#cdbcf7", "#9a80dc"], menta: ["#e4faf0", "#a8e6cf", "#68c09a"], ceu: ["#e4f3ff", "#a9d6f7", "#72aee2"] };
+
+/* ========== D. ESTADO ========== */
+const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+
+/* Regras puras (sem tela, sem rede). Ficam entre os marcadores abaixo para serem testadas em Node. */
+/*PURE-START*/
+const clamp = (v, a = 0, b = 100) => Math.max(a, Math.min(b, v));
+const genCode = () => { const c = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; let s = ""; for (let i = 0; i < 6; i++) s += c[Math.floor(Math.random() * c.length)]; return s; };
+const xpNeed = l => 40 + l * 20;
+const clone = o => JSON.parse(JSON.stringify(o));
+const newState = () => ({
+  pet: { name: "", named: false, hunger: 80, happy: 80, energy: 80, hygiene: 80, foam: 0, xp: 0, level: 1, sleeping: false, color: "pessego", hat: "", face: "", top: "", feet: "" },
+  coins: 50, bg: {}, food: { maca: 1, biscoito: 3, sanduiche: 0, bolo: 0, sorvete: 0, pizza: 0, salsicha: 0 }, owned: ["pessego"],
+  duo: { mode: "casal", name: "", code: "" }, t: Date.now()
+});
+/* Só os campos do jogo; completa o que faltar (versões antigas) e ignora o resto do documento. */
+const normState = d => {
+  d = d || {}; const b = newState();
+  return clone({
+    pet: Object.assign(b.pet, d.pet), coins: typeof d.coins === "number" ? d.coins : b.coins, bg: Object.assign({}, d.bg),
+    food: Object.assign(b.food, d.food), owned: Array.isArray(d.owned) ? d.owned : b.owned, duo: Object.assign(b.duo, d.duo),
+    t: typeof d.t === "number" ? d.t : b.t
+  });
+};
+/* Passa o tempo: fome, alegria, higiene e energia caem (ou a energia sobe, se estiver dormindo). */
+function advanceState(st, ms) {
+  const m = Math.min(Math.max(ms, 0), 7200000) / 60000, p = st.pet;
+  if (p.sleeping) { p.energy += 6 * m; p.hunger -= m; p.happy -= .3 * m; p.hygiene -= .3 * m; }
+  else { p.hunger -= 2 * m; p.happy -= (p.hunger < 20 ? 2.2 : 1.2) * m; p.hygiene -= m; p.energy -= .8 * m; }
+  ["hunger", "happy", "energy", "hygiene"].forEach(k => p[k] = clamp(p[k]));
+  if (p.sleeping && p.energy >= 100) { p.sleeping = false; return true; }
+  return false;
+}
+const totalXp = p => { let t = p.xp; for (let l = 1; l < p.level; l++) t += xpNeed(l); return t; };
+const fromTotalXp = (t, p) => { let l = 1; while (t >= xpNeed(l)) { t -= xpNeed(l); l++; } p.level = l; p.xp = t; };
+/* União de três estados, todos no mesmo instante:
+   R = o que está na nuvem (inclui o que a outra pessoa fez), L = o que eu vejo agora, B = a nuvem como eu a conhecia antes de agir.
+   Moedas, comida, status e XP somam só a MINHA diferença (L - B) em cima de R: duas pessoas gastando ao mesmo tempo se somam, ninguém sobrescreve ninguém. */
+function mergeState(R, L, B) {
+  const o = clone(R), p = o.pet, dif = (a, b) => (a || 0) - (b || 0);
+  o.coins = Math.max(0, R.coins + dif(L.coins, B.coins));
+  for (const k of Object.keys(L.food)) o.food[k] = Math.max(0, (R.food[k] || 0) + dif(L.food[k], B.food[k]));
+  ["hunger", "happy", "energy", "hygiene", "foam"].forEach(k => p[k] = clamp(R.pet[k] + dif(L.pet[k], B.pet[k])));
+  fromTotalXp(Math.max(0, totalXp(R.pet) + dif(totalXp(L.pet), totalXp(B.pet))), p);
+  o.owned = [...new Set([...(R.owned || []), ...(L.owned || [])])];
+  for (const k of Object.keys(L.bg || {})) if (L.bg[k] !== (B.bg || {})[k]) o.bg[k] = L.bg[k];
+  for (const k of ["name", "named", "color", "hat", "face", "top", "feet", "sleeping"]) if (L.pet[k] !== B.pet[k]) p[k] = L.pet[k];
+  for (const k of ["mode", "name"]) if (L.duo[k] !== B.duo[k]) o.duo[k] = L.duo[k];
+  o.t = R.t;
+  return o;
+}
+/*PURE-END*/
+const has = id => S.owned.includes(id) || id.startsWith("no");
+const cur = t => t === "cor" ? S.pet.color : (S.pet[t] || "no" + t);
+const foodList = () => Object.keys(FOODS).filter(k => S.food[k] > 0);
+let S = newState(), BASE = null, view = "load", room = "sala", drawn = "", fxMode = "", lastMood = "", fi = 0, tabC = "cor", tabS = "food";
+
+/* ========== E. MECÂNICAS DO PET (sem interface) ========== */
+const Pet = {
+  advance(ms) { if (advanceState(S, ms)) return "woke"; },
+  gain(xp, coins) {
+    const p = S.pet; S.coins += coins || 0; p.xp += xp;
+    while (p.xp >= xpNeed(p.level)) { p.xp -= xpNeed(p.level); p.level++; S.coins += 20; FX.burst(innerWidth / 2, innerHeight * .35, "star", 18); FX.burst(innerWidth / 2, innerHeight * .35, "coin", 6); UI.toast(p.name + " chegou ao nível " + p.level + "! Bônus: 20 moedas.", "ok"); }
+  },
+  mood() {
+    const p = S.pet;
+    if (p.sleeping) return "sleep"; if (fxMode) return fxMode;
+    if (p.hunger < 25) return "hungry"; if (p.happy < 30) return "sad";
+    if (p.foam > 20) return "happy"; return p.happy > 70 ? "happy" : "normal";
+  },
+  do(a, foodId) {
+    const p = S.pet;
+    if (p.sleeping && a !== "sleep") return UI.deny(p.name + " está dormindo. Acorde no quarto.");
+    if (a === "feed") {
+      const id = foodId || foodList()[0];
+      if (!id || !S.food[id]) return UI.deny("Sem comida. Compre na loja.");
+      if (p.hunger >= 95) return UI.deny(p.name + " já está satisfeito.");
+      const f = FOODS[id]; S.food[id]--; p.hunger = clamp(p.hunger + f.hu); p.happy = clamp(p.happy + f.ha);
+      this.gain(8, 0); UI.fx("eat", "+8 XP"); UI.toast(p.name + " comeu " + f.n + ".", "ok");
+    } else if (a === "play") {
+      if (p.energy < 20) return UI.deny(p.name + " está cansado demais para brincar.");
+      p.happy = clamp(p.happy + 25); p.energy = clamp(p.energy - 15); p.hunger = clamp(p.hunger - 8); p.hygiene = clamp(p.hygiene - 8);
+      this.gain(10, 5); UI.fx("happy", "+10 XP  +5"); UI.toast("Brincadeira divertida! +5 moedas.", "ok");
+    } else if (a === "sleep") {
+      if (!p.sleeping && p.energy >= 95) return UI.deny(p.name + " não está com sono.");
+      p.sleeping = !p.sleeping; UI.toast(p.sleeping ? p.name + " foi dormir." : p.name + " acordou.", "ok");
+    }
+    Persist.save(); UI.render();
+  },
+  scrub(x, y) {
+    const p = S.pet;
+    if (p.sleeping) return UI.deny(p.name + " está dormindo.");
+    if (p.hygiene >= 100 && p.foam >= 100) return;
+    const b0 = FB(p.foam);
+    p.foam = clamp(p.foam + 6); p.hygiene = clamp(p.hygiene + 3); p.happy = clamp(p.happy + .3); p.energy = clamp(p.energy - .2);
+    UI.puff(x, y, "", "bub", 10 + Math.random() * 16); FX.vib(8); UI.live();
+    if (FB(p.foam) !== b0) { UI.pet(); UI.home(); }
+    if (p.foam >= 100 && b0 < FOAM.length) UI.toast(p.name + " está coberto de espuma! Use o chuveiro.", "ok");
+  },
+  rinse(d) {
+    if (!d.over) return;
+    const p = S.pet, g = d.g.classList;
+    if (p.sleeping) { g.remove("spray"); if (!d.warned) { d.warned = 1; UI.deny(p.name + " está dormindo."); } return; }
+    if (p.hygiene >= 98 && p.foam <= 0) { g.remove("spray"); if (!d.warned) { d.warned = 1; UI.toast(p.name + " já está limpinho."); } return; }
+    g.add("spray");
+    const had = p.foam > 0, b0 = FB(p.foam);
+    p.foam = clamp(p.foam - 5); p.hygiene = clamp(p.hygiene + 1.3); p.energy = clamp(p.energy - .1); p.happy = clamp(p.happy + .2);
+    FX.vib(6); d.n = (d.n || 0) + 1;
+    for (let i = 0; i < 3; i++) { const w = document.createElement("span"); w.className = "wd"; w.style.cssText = `left:${d.cx - 20 + Math.random() * 40}px;top:${d.cy}px;animation-delay:${i * 50}ms`; document.body.appendChild(w); setTimeout(() => w.remove(), 750); }
+    const r = $("#v-home .petslot").getBoundingClientRect();
+    FX.burst(r.left + r.width * (.3 + Math.random() * .4), r.top + r.height * .5, "bub", 2);
+    if (d.n % 6 === 0) { const m = document.createElement("span"); m.className = "stm"; m.style.left = (30 + Math.random() * 40) + "%"; m.style.top = "50%"; $("#stage").appendChild(m); setTimeout(() => m.remove(), 2000); }
+    UI.live();
+    const done = (had && p.foam <= 0) || (!had && p.hygiene >= 98 && !d.paid);
+    if (done) { d.paid = 1; this.gain(4, 0); FX.burst(r.left + r.width / 2, r.top + r.height * .4, "star", 10); UI.toast(p.name + " está limpinho e cheiroso!", "ok"); UI.fx("happy", "Limpinho!"); g.remove("spray"); }
+    if (done || FB(p.foam) !== b0) { UI.pet(); UI.home(); }
+  },
+  shower() {
+    const p = S.pet;
+    if (p.sleeping) return UI.deny(p.name + " está dormindo.");
+    if (p.hygiene >= 98 && p.foam <= 0) return UI.deny(p.name + " já está limpinho.");
+    const had = p.foam > 0;
+    p.foam = clamp(p.foam - 34); p.hygiene = clamp(p.hygiene + 15); p.energy = clamp(p.energy - 1); this.gain(4, 0);
+    FX.vib(30); UI.rain();
+    const r = $("#v-home .petslot").getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height * .4;
+    FX.burst(cx, cy, "bub", had ? 10 : 5);
+    if (had && p.foam <= 0) { FX.burst(cx, cy, "star", 10); UI.toast(p.name + " está limpinho e cheiroso!", "ok"); UI.fx("happy", "Limpinho!"); } else UI.fx("happy", "+4 XP");
+    Persist.save(); UI.render();
+  },
+  buy(kind, id) {
+    if (kind === "food") {
+      const f = FOODS[id]; if (S.coins < f.p) return UI.deny("Moedas insuficientes.");
+      S.coins -= f.p; S.food[id]++; UI.toast(f.n + " comprado.", "ok");
+    } else {
+      const c = COSM.find(x => x.id === id);
+      if (has(id)) return UI.deny("Você já tem este item.");
+      if (S.coins < c.p) return UI.deny("Moedas insuficientes.");
+      S.coins -= c.p; S.owned.push(id); if (c.t === "bg") { S.bg[c.room] = id; drawn = ""; } UI.toast(c.n + (c.t === "bg" ? " aplicado!" : " adquirido. Equipe no Armário (quarto)."), "ok");
+    }
+    Persist.save(); UI.render();
+  },
+  equip(id) {
+    const c = COSM.find(x => x.id === id);
+    if (!has(id)) { UI.deny("Item bloqueado. Compre na loja."); tabS = c.t; return UI.go("shop"); }
+    if (c.t === "bg") { S.bg[c.room] = id; drawn = ""; UI.toast(c.n + " aplicado.", "ok"); Persist.save(); return UI.render(); }
+    S.pet[c.t === "cor" ? "color" : c.t] = id.startsWith("no") ? "" : id; UI.fx("happy", ""); Persist.save(); UI.render();
+  },
+  rename(v) {
+    v = (v || "").trim();
+    if (!v) return UI.deny("Digite um nome para o pet.");
+    S.pet.name = v.slice(0, 12); S.pet.named = true; Persist.save(); UI.render(); return true;
+  }
+};
+
+/* ========== F. PERSISTÊNCIA ========== */
+const Persist = {
+  /* Modo local (sem Firebase): carrega o que está salvo neste aparelho. */
+  init() {
+    const c = LocalCache.load("local");
+    if (c && c.S) S = normState(c.S);
+    const r = Pet.advance(Clock.now() - S.t); S.t = Clock.now();
+    if (r === "woke") setTimeout(() => UI.toast(S.pet.name + " acordou descansado.", "ok"), 400);
+  },
+  /* Toda ação do jogador passa por aqui. Na nuvem, o envio é agrupado (a cada ~1 s) e feito em transação. */
+  save() { if (CLOUD_ON) Cloud.touch(); else LocalCache.save({ uid: "local", S }); }
+};
+
+/* ========== G. DESENHO DO PET E DOS CENÁRIOS ========== */
+const SK = "#3b1a38";
+const HAT = {
+  laco: `<path d="M146 62l18-14v28zM146 62l-18-14v28z" fill="#ff7f9c"/><circle cx="146" cy="62" r="6" fill="#ffc2d0"/>`,
+  bone: `<path d="M60 76Q62 30 106 32T142 76z" fill="#ee5d74"/><path d="M128 72q36-2 40 10q-26 6-44 0z" fill="#cf4560"/><circle cx="102" cy="32" r="4.5" fill="#cf4560"/>`,
+  gorro: `<path d="M62 78Q60 30 100 30t38 48z" fill="#72b4f2"/><rect x="58" y="68" width="84" height="14" rx="7" fill="#fff"/><circle cx="100" cy="26" r="9" fill="#fff"/>`,
+  festa: `<path d="M100 10l-26 60h52z" fill="#ffd067"/><circle cx="100" cy="10" r="7" fill="#ff8fa3"/><path d="M84 54h32M92 36h16" stroke="#fff" stroke-width="4"/>`,
+  coroa: `<path d="M68 72l-4-32 22 15 14-22 14 22 22-15-4 32z" fill="#ffd067"/><circle cx="100" cy="42" r="4" fill="#ff8fa3" stroke-width="2"/>`,
+  abafador: `<path d="M44 90Q50 24 100 24t56 66" fill="none" stroke-width="12"/><path d="M44 90Q50 24 100 24t56 66" fill="none" stroke="#fff" stroke-width="7"/><ellipse cx="44" cy="96" rx="15" ry="20" fill="#fff"/><ellipse cx="156" cy="96" rx="15" ry="20" fill="#fff"/><ellipse cx="44" cy="96" rx="7" ry="12" fill="#e6ecf2" stroke-width="2"/><ellipse cx="156" cy="96" rx="7" ry="12" fill="#e6ecf2" stroke-width="2"/>`
+};
+const FACE = {
+  oculos: `<g fill="rgba(255,255,255,.3)"><circle cx="76" cy="107" r="18"/><circle cx="124" cy="107" r="18"/></g><path d="M94 107h12" fill="none"/>`,
+  sol: `<g fill="#2d2438"><rect x="56" y="94" width="38" height="28" rx="11"/><rect x="106" y="94" width="38" height="28" rx="11"/></g><path d="M94 104h12" fill="none"/><path d="M63 101l10-2M113 101l10-2" stroke="#fff" stroke-width="3" opacity=".6"/>`
+};
+const FEET = {
+  pantufa: `<ellipse cx="70" cy="177" rx="25" ry="14" fill="#ffb3d1"/><ellipse cx="130" cy="177" rx="25" ry="14" fill="#ffb3d1"/><ellipse cx="70" cy="168" rx="18" ry="7" fill="#fff"/><ellipse cx="130" cy="168" rx="18" ry="7" fill="#fff"/><g fill="#ff7fae" stroke-width="2"><circle cx="70" cy="178" r="3.5"/><circle cx="130" cy="178" r="3.5"/></g><path d="M52 183q18 8 36 0M112 183q18 8 36 0" fill="none" stroke="#fff" stroke-width="3" opacity=".7"/>`,
+  tenis: `<ellipse cx="70" cy="177" rx="25" ry="14" fill="#fff"/><ellipse cx="130" cy="177" rx="25" ry="14" fill="#fff"/><path d="M45 182q25 12 50 0v4q-25 12-50 0zM105 182q25 12 50 0v4q-25 12-50 0z" fill="#ee5d74"/><path d="M47 178q2-10 14-10 2 8-2 14zM107 178q2-10 14-10 2 8-2 14z" fill="#ff8aa0"/><path d="M68 168l8 3M72 165l8 3M124 168l8 3M128 165l8 3" fill="none" stroke-width="2.4"/>`
+};
+const TOP = (id, u) => ({
+  camiseta: `<g clip-path="url(#${u}c)"><path d="M26 147Q100 170 174 147V200H26z" fill="#ff8fb5" stroke="none"/><path d="M26 174Q100 197 174 174" fill="none" stroke="#fff" stroke-width="6"/><path d="M26 147Q100 170 174 147" fill="none"/></g><path d="M62 144q38 20 76 0" fill="none" stroke="#fff" stroke-width="5"/><path d="M100 170c-6-6-12 0-6 5l6 5 6-5c6-5 0-11-6-5z" fill="#fff" stroke-width="2"/>`,
+  gravata: `<path d="M100 157L75 145v24zM100 157l25-12v24z" fill="#7a5af0"/><circle cx="100" cy="157" r="7" fill="#a58cff"/><circle cx="84" cy="157" r="2" fill="#fff" stroke="none"/><circle cx="116" cy="157" r="2" fill="#fff" stroke="none"/><path d="M96 154q3-3 6 0" fill="none" stroke="#fff" stroke-width="2" opacity=".8"/>`,
+  cachecol: `<clipPath id="${u}s"><path d="M26 138Q100 166 174 138V160Q100 190 26 160z"/></clipPath><g clip-path="url(#${u}c)"><g clip-path="url(#${u}s)"><rect x="20" y="130" width="160" height="70" fill="#fff" stroke="none"/><path d="M36 130l10 70M60 130l10 70M84 130l10 70M108 130l10 70M132 130l10 70M156 130l10 70" stroke="#e8445e" stroke-width="9" fill="none"/></g><path d="M26 138Q100 166 174 138M26 160Q100 190 174 160" fill="none"/></g><path d="M116 168l24 2-3 28-24-2z" fill="#fff"/><path d="M114 180l25 2M113 191l25 2" stroke="#e8445e" stroke-width="6" fill="none"/><path d="M114 198v6M120 199v6M126 200v6M132 200v6" stroke-width="2.4" fill="none"/>`,
+  pijama: `<g clip-path="url(#${u}c)"><path d="M26 146Q100 168 174 146V200H26z" fill="#b9a8ff" stroke="none"/><g fill="#ffe56b" stroke="none"><circle cx="48" cy="170" r="3"/><circle cx="152" cy="166" r="3"/><circle cx="62" cy="186" r="2.4"/><circle cx="140" cy="184" r="2.4"/></g><g fill="#fff" stroke="none"><circle cx="100" cy="161" r="3.6"/><circle cx="100" cy="172" r="3.6"/><circle cx="100" cy="183" r="3.6"/></g><path d="M26 146Q100 168 174 146" fill="none"/></g><path d="M62 143q38 20 76 0" fill="none" stroke="#fff" stroke-width="5"/>`
+}[id] || "");
+const SLV = { camiseta: ["#ff8fb5", "#fff"], pijama: ["#b9a8ff", "#fff"] };
+const TOPO = id => SLV[id] ? `<g transform="rotate(22 35 131)"><ellipse cx="35" cy="131" rx="14" ry="11" fill="${SLV[id][0]}"/><path d="M23 135q12 6 24 0" fill="none" stroke="${SLV[id][1]}" stroke-width="4"/></g><g transform="rotate(-22 165 131)"><ellipse cx="165" cy="131" rx="14" ry="11" fill="${SLV[id][0]}"/><path d="M153 135q12 6 24 0" fill="none" stroke="${SLV[id][1]}" stroke-width="4"/></g>` : "";
+
+const FOAM = [[100, 70, 15], [78, 76, 11], [122, 76, 11], [60, 146, 13], [140, 146, 13], [84, 164, 12], [116, 164, 12], [100, 176, 11], [48, 126, 10], [152, 126, 10], [36, 148, 9], [164, 148, 9], [56, 62, 9], [144, 62, 9], [70, 182, 9], [130, 182, 9]];
+const FB = f => Math.ceil(f / 100 * FOAM.length);
+const foamSVG = f => `<g>${FOAM.slice(0, FB(f)).map(([x, y, r]) => `<circle cx="${x}" cy="${y}" r="${r}" fill="#fff" stroke="#8fcdf5" stroke-width="2.2"/><circle cx="${x - r * .35}" cy="${y - r * .35}" r="${r * .28}" fill="#d6f0ff"/>`).join("")}</g>`;
+const FLIES = `<g class="fly"><circle cx="100" cy="38" r="2.6" fill="#3b1a38"/><ellipse cx="97" cy="35" rx="3" ry="1.600" fill="#fff" opacity=".8"/></g><g class="fly" style="animation-duration:2.6s;animation-direction:reverse"><circle cx="152" cy="84" r="2.6" fill="#3b1a38"/></g>`;
+const SPARK = `<g fill="#fff" stroke="#ffd96a" stroke-width="1.5"><path transform="translate(162 84)" d="M0-7L2-2 7 0 2 2 0 7-2 2-7 0-2-2z"/><path transform="translate(40 96) scale(.8)" d="M0-7L2-2 7 0 2 2 0 7-2 2-7 0-2-2z"/><path transform="translate(150 160) scale(.7)" d="M0-7L2-2 7 0 2 2 0 7-2 2-7 0-2-2z"/></g>`;
+let uid = 0;
+function petSVG(o, vb, mood) {
+  o = o || S.pet; const m0 = mood; mood = mood || Pet.mood();
+  const u = "u" + (++uid), [l, c, d] = BODY[o.color] || BODY.pessego, K = "#3a2d45";
+  const eye = x => `<ellipse cx="${x}" cy="108" rx="11.5" ry="14" fill="${K}"/><g class="pup"><ellipse cx="${x}" cy="108" rx="11.5" ry="14" fill="none"/><circle cx="${x + 3.5}" cy="102" r="4.2" fill="#fff"/><circle cx="${x - 3.5}" cy="114" r="2" fill="#fff"/></g>`;
+  const arc = `<path d="M64 110q12-16 24 0M112 110q12-16 24 0" fill="none" stroke="${K}" stroke-width="5" stroke-linecap="round"/>`;
+  let eyes, mouth, extra = "";
+  if (mood === "sleep") { eyes = `<path d="M64 108q12 9 24 0M112 108q12 9 24 0" fill="none" stroke="${K}" stroke-width="5" stroke-linecap="round"/>`; mouth = `<path d="M93 133q7 4 14 0" fill="none" stroke="${K}" stroke-width="3.5" stroke-linecap="round"/>`; extra = `<g class="zz" fill="#fff" stroke="${SK}" stroke-width="1.5" font-weight="900" font-family="sans-serif"><text x="152" y="62" font-size="26">Z</text><text x="168" y="40" font-size="17">z</text></g>`; }
+  else if (mood === "happy") { eyes = arc; mouth = `<path d="M87 128q13 20 26 0z" fill="#e8647c" stroke="${K}" stroke-width="3" stroke-linejoin="round"/><path d="M95 138q5-5 10 0" fill="#ff9bb0"/>`; }
+  else if (mood === "eat") { eyes = arc; mouth = `<ellipse class="eat" cx="100" cy="134" rx="10" ry="8" fill="#e8647c" stroke="${K}" stroke-width="3"/>`; }
+  else if (mood === "sad" || mood === "hungry") { eyes = `<g class="eyes">${eye(76)}${eye(124)}</g><path d="M62 88l24 8M138 88l-24 8" stroke="${K}" stroke-width="4" stroke-linecap="round"/>`; mouth = `<path d="M92 138q8-9 16 0" fill="none" stroke="${K}" stroke-width="3.5" stroke-linecap="round"/>`; if (mood === "hungry") extra += `<path d="M148 122q6 9 0 13-6-4 0-13z" fill="#9ed3f6"/>`; }
+  else { eyes = `<g class="eyes">${eye(76)}${eye(124)}</g>`; mouth = `<path d="M92 131q8 6 16 0" fill="none" stroke="${K}" stroke-width="3.5" stroke-linecap="round"/>`; }
+  if (!vb && !m0 && S.pet.hygiene < 30) extra += `<g fill="#6b4c30" opacity=".5"><circle cx="56" cy="142" r="6"/><circle cx="144" cy="152" r="7"/><circle cx="120" cy="168" r="4"/><circle cx="84" cy="74" r="4"/><circle cx="110" cy="84" r="3"/></g>`;
+  if (!vb && !m0 && o.hygiene < 30 && !o.foam) extra += FLIES;
+  const foam = !vb && !m0 && o.foam > 0 ? foamSVG(o.foam) : (!vb && !m0 && o.hygiene >= 97 && mood !== "sleep" ? SPARK : "");
+  const cheeks = mood === "sleep" ? "" : `<ellipse cx="56" cy="128" rx="11" ry="7" fill="#ff7f9f" opacity=".5"/><ellipse cx="144" cy="128" rx="11" ry="7" fill="#ff7f9f" opacity=".5"/>`;
+  const G = `url(#${u}g)`, E = `stroke="${SK}" stroke-width="3.4"`;
+  return `<svg class="pet${vb ? " np" : ""}" viewBox="${vb || "0 0 200 200"}" role="img" aria-label="Pet"><defs><radialGradient id="${u}g" cx=".36" cy=".26" r=".9"><stop offset="0" stop-color="${l}"/><stop offset=".5" stop-color="${c}"/><stop offset="1" stop-color="${d}"/></radialGradient><clipPath id="${u}c"><ellipse cx="100" cy="124" rx="70" ry="62"/></clipPath></defs>
+  <ellipse cx="100" cy="192" rx="62" ry="7" fill="rgba(60,30,60,.18)"/>
+  <g class="tail"><circle cx="168" cy="160" r="14" fill="#fff" ${E}/></g>
+  <ellipse cx="56" cy="62" rx="17" ry="28" transform="rotate(-20 56 62)" fill="${G}" ${E}/><ellipse cx="144" cy="62" rx="17" ry="28" transform="rotate(20 144 62)" fill="${G}" ${E}/>
+  <ellipse cx="57" cy="65" rx="7" ry="16" transform="rotate(-20 57 65)" fill="#ffb3c1" opacity=".8"/><ellipse cx="143" cy="65" rx="7" ry="16" transform="rotate(20 143 65)" fill="#ffb3c1" opacity=".8"/>
+  <ellipse cx="70" cy="180" rx="19" ry="10" fill="${d}" ${E}/><ellipse cx="130" cy="180" rx="19" ry="10" fill="${d}" ${E}/>
+  <ellipse cx="100" cy="124" rx="70" ry="62" fill="${G}" ${E}/>
+  <ellipse cx="100" cy="150" rx="40" ry="28" fill="#fff" opacity=".35"/><ellipse cx="70" cy="80" rx="24" ry="11" transform="rotate(-25 70 80)" fill="#fff" opacity=".6"/><ellipse cx="136" cy="150" rx="22" ry="18" fill="${d}" opacity=".35"/><circle cx="52" cy="98" r="3.5" fill="#fff" opacity=".6"/>
+  <g stroke="${SK}" stroke-width="3.4" stroke-linejoin="round" stroke-linecap="round">${FEET[o.feet] || ""}${TOP(o.top, u)}</g>
+  ${cheeks}${eyes}<ellipse cx="100" cy="121" rx="4" ry="3" fill="#c96a86"/>${mouth}${extra}
+  <ellipse cx="32" cy="142" rx="12" ry="19" transform="rotate(22 32 142)" fill="${G}" ${E}/><ellipse cx="168" cy="142" rx="12" ry="19" transform="rotate(-22 168 142)" fill="${G}" ${E}/>
+  <g stroke="${SK}" stroke-width="3.4" stroke-linejoin="round" stroke-linecap="round">${TOPO(o.top)}${FACE[o.face] || ""}${HAT[o.hat] || ""}</g>${foam}</svg>`;
+}
+const cosmPic = c => c.t === "bg" ? bgPic(c) : c.c ? `<span class="sw" style="background:${c.c}"></span>` : c.id.startsWith("no") ? `<svg viewBox="0 0 64 64" fill="none" stroke="#c9bcc4" stroke-width="4" stroke-linecap="round"><circle cx="32" cy="32" r="18"/><path d="M19 45L45 19"/></svg>` : petSVG({ color: S.pet.color, hat: "", face: "", top: "", feet: "", [c.t]: c.id }, CROP[c.t], "normal");
+
+const WINDOW = (sky, cur) => `<svg viewBox="0 0 120 100"><defs><linearGradient id="wk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${sky[0]}"/><stop offset="1" stop-color="${sky[1]}"/></linearGradient></defs><rect x="14" y="6" width="92" height="88" rx="12" fill="#fff"/><rect x="20" y="12" width="80" height="76" rx="8" fill="url(#wk)"/><path d="M60 12v76M20 50h80" stroke="#fff" stroke-width="4"/><path d="M4 2h24l-4 70q-8 8-18 0z" fill="${cur}" opacity=".95"/><path d="M116 2H92l4 70q8 8 18 0z" fill="${cur}" opacity=".95"/></svg>`;
+const ROOMHTML = {
+  sala: `<div class="wall" style="background:linear-gradient(#ffd6f2,#f2a8e0)"></div><div class="floor" style="background:repeating-linear-gradient(90deg,#ecc9a2 0 64px,#dfb88d 64px 66px)"></div><div class="base"></div>
+<div class="d" style="left:5%;top:21%;width:30%">${WINDOW(["#bfe6ff", "#e9f7ff"], "#ff9db2")}</div>
+<svg stroke="#3b1a38" stroke-width="2.5" stroke-linejoin="round" class="d" style="right:7%;top:23%;width:14%" viewBox="0 0 60 70"><rect x="3" y="3" width="54" height="64" rx="8" fill="#fff" stroke="#d9b595" stroke-width="5"/><path d="M10 56l14-18 10 12 8-8 8 14z" fill="#9fd8b8"/><circle cx="40" cy="22" r="6" fill="#ffd067"/></svg>
+<div class="rug"></div>
+<svg stroke="#3b1a38" stroke-width="2.5" stroke-linejoin="round" class="d" style="right:5%;bottom:34%;width:13%" viewBox="0 0 60 80"><path d="M30 50C14 44 8 28 10 12c16 4 24 16 20 38zM30 50c14-6 22-20 20-36-16 4-24 16-20 36z" fill="#7fcf9f"/><path d="M14 52h32l-4 26H18z" fill="#e59a7a"/></svg>`,
+  cozinha: `<div class="wall" style="background:linear-gradient(rgba(255,255,255,.75) 2px,transparent 2px),linear-gradient(90deg,rgba(255,255,255,.75) 2px,transparent 2px),#cdeedd;background-size:42px 42px"></div><div class="floor" style="background:repeating-conic-gradient(#f9f1e6 0 25%,#e9dccb 0 50%) 0 0/56px 56px"></div><div class="base"></div>
+<svg stroke="#3b1a38" stroke-width="2.5" stroke-linejoin="round" class="d" style="left:3%;bottom:34%;width:22%" viewBox="0 0 80 150"><defs><linearGradient id="fg" x1="0" x2="1"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#d8e8ef"/></linearGradient></defs><rect x="4" y="4" width="72" height="142" rx="12" fill="url(#fg)" stroke="#b9cbd6" stroke-width="3"/><path d="M4 54h72" stroke="#b9cbd6" stroke-width="3"/><rect x="62" y="20" width="6" height="24" rx="3" fill="#9fb2c2"/><rect x="62" y="66" width="6" height="34" rx="3" fill="#9fb2c2"/><circle cx="26" cy="30" r="8" fill="#ff9aa8"/></svg>
+<svg stroke="#3b1a38" stroke-width="2.5" stroke-linejoin="round" class="d" style="right:6%;top:23%;width:30%" viewBox="0 0 120 70"><rect x="0" y="50" width="120" height="8" rx="4" fill="#d9b595"/><rect x="10" y="22" width="24" height="28" rx="7" fill="#ff9aa8"/><rect x="44" y="14" width="24" height="36" rx="7" fill="#9fd8b8"/><rect x="78" y="26" width="28" height="24" rx="7" fill="#ffd067"/></svg>`,
+  banheiro: `<div class="wall" style="background:linear-gradient(rgba(255,255,255,.7) 2px,transparent 2px),linear-gradient(90deg,rgba(255,255,255,.7) 2px,transparent 2px),#d6edfb;background-size:46px 46px"></div><div class="floor" style="background:repeating-linear-gradient(45deg,#d9ecf4 0 28px,#c8e2ee 28px 56px)"></div><div class="base"></div>
+<svg stroke="#3b1a38" stroke-width="2.5" stroke-linejoin="round" class="d" style="left:2%;bottom:33%;width:36%" viewBox="0 0 160 84"><defs><linearGradient id="tg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#dcecf5"/></linearGradient></defs><path d="M6 24h148v16a36 36 0 0 1-36 36H42A36 36 0 0 1 6 40z" fill="url(#tg)" stroke="#c0d6e2" stroke-width="3"/><path d="M14 24q66-16 132 0" fill="#b6e2f7"/><circle cx="40" cy="22" r="7" fill="#fff"/><circle cx="52" cy="18" r="5" fill="#fff"/><ellipse cx="112" cy="20" rx="12" ry="8" fill="#ffd93d"/><circle cx="120" cy="12" r="6" fill="#ffd93d"/><path d="M125 11l7 2-7 2z" fill="#ff9a52"/></svg>
+<svg stroke="#3b1a38" stroke-width="2.5" stroke-linejoin="round" class="d" style="right:8%;top:22%;width:20%" viewBox="0 0 70 90"><ellipse cx="35" cy="45" rx="29" ry="39" fill="#fff" stroke="#d9b595" stroke-width="5"/><ellipse cx="35" cy="45" rx="23" ry="33" fill="#e6f6ff"/><path d="M22 32q8-10 18-6" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round"/></svg>
+<svg stroke="#3b1a38" stroke-width="2.5" stroke-linejoin="round" class="d" style="left:6%;top:22%;width:15%" viewBox="0 0 50 70"><path d="M4 8h42" stroke="#9a8a98" stroke-width="4" stroke-linecap="round"/><path d="M10 8h30l-2 52H12z" fill="#ff9db2"/><path d="M10 24h28M11 40h27" stroke="#fff" stroke-width="3" opacity=".7"/></svg>
+<svg stroke="#3b1a38" stroke-width="2.5" stroke-linejoin="round" class="d" style="left:40%;top:0;width:20%" viewBox="0 0 60 44"><path d="M27 0h6v16h-6z" fill="#c8d6df"/><path d="M6 36a24 20 0 0 1 48 0z" fill="#dce8ef"/><g stroke="none" fill="#7fb8d8"><circle cx="16" cy="32" r="1.600"/><circle cx="26" cy="32" r="1.600"/><circle cx="36" cy="32" r="1.600"/><circle cx="46" cy="32" r="1.600"/></g></svg>`,
+  quarto: `<div class="wall" style="background:radial-gradient(circle,rgba(255,255,255,.55) 1.6px,transparent 2.2px) 0 0/38px 38px,linear-gradient(#cfc4f6,#b7a8ef)"></div><div class="floor" style="background:repeating-linear-gradient(90deg,#a98a73 0 64px,#98796a 64px 66px)"></div><div class="base"></div>
+<svg stroke="#3b1a38" stroke-width="2.5" stroke-linejoin="round" class="d" style="left:6%;top:21%;width:26%" viewBox="0 0 100 100"><rect x="4" y="4" width="92" height="92" rx="14" fill="#fff"/><rect x="11" y="11" width="78" height="78" rx="9" fill="#2f3a7a"/><path d="M60 26a22 22 0 1 0 14 38 18 18 0 0 1-14-38z" fill="#ffe28a"/><circle cx="28" cy="30" r="2" fill="#fff"/><circle cx="34" cy="68" r="2" fill="#fff"/><circle cx="76" cy="28" r="1.6" fill="#fff"/><path d="M50 11v78M11 50h78" stroke="#fff" stroke-width="3"/></svg>
+<svg stroke="#3b1a38" stroke-width="2.5" stroke-linejoin="round" class="d" style="left:2%;bottom:34%;width:38%" viewBox="0 0 170 84"><rect x="4" y="34" width="162" height="34" rx="12" fill="#9a86f0"/><rect x="4" y="18" width="30" height="50" rx="12" fill="#7a64d8"/><rect x="34" y="22" width="120" height="26" rx="12" fill="#fff"/><rect x="40" y="30" width="26" height="14" rx="7" fill="#ffd3de"/><path d="M80 48h82v18H80z" fill="#ff9db2" opacity=".9"/><rect x="10" y="66" width="9" height="14" rx="3" fill="#7a64d8"/><rect x="150" y="66" width="9" height="14" rx="3" fill="#7a64d8"/></svg>
+<svg stroke="#3b1a38" stroke-width="2.5" stroke-linejoin="round" class="d lamp" data-act="do" data-a="sleep" style="right:6%;bottom:34%;width:12%" viewBox="0 0 50 90"><path d="M10 6h30l8 30H2z" fill="#ffd067" stroke="#e8a92c" stroke-width="2"/><rect x="22" y="36" width="6" height="30" fill="#b09fc0"/><rect x="8" y="64" width="34" height="22" rx="6" fill="#d9b595"/></svg>`
+};
+
+const HEART = `<svg viewBox="0 0 24 24"><path d="M12 21s-8-5.3-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 5.7-8 11-8 11z" fill="#ff5fa0" stroke="#fff" stroke-width="1.5"/></svg>`;
+const FX = {
+  vib(n) { try { navigator.vibrate && navigator.vibrate(n); } catch (e) {} },
+  burst(x, y, kind, n) {
+    for (let i = 0; i < (n || 8); i++) {
+      const e = document.createElement("span"), a = Math.random() * 6.283, v = 40 + Math.random() * 60;
+      e.className = "fxp " + kind; e.innerHTML = kind === "coin" ? COIN : kind === "heart" ? HEART : "";
+      e.style.cssText = `--x:${x - 10}px;--y:${y - 10}px;--dx:${Math.cos(a) * v}px;--dy:${Math.sin(a) * v - 40}px;--r:${(Math.random() - .5) * 240}deg;--s:${.7 + Math.random() * .7};animation-delay:${i * 18}ms`;
+      document.body.appendChild(e); setTimeout(() => e.remove(), 1300);
+    }
+  },
+  num(el, to) {
+    if (el._to === undefined || !el.textContent) { el._to = to; el.textContent = to; return; }
+    if (el._to === to) return; const from = +el.textContent || 0, t0 = performance.now(); el._to = to; cancelAnimationFrame(el._r);
+    const st = t => { const k = Math.min(1, (t - t0) / 450); el.textContent = Math.round(from + (to - from) * (1 - Math.pow(1 - k, 3))); if (k < 1) el._r = requestAnimationFrame(st); };
+    el._r = requestAnimationFrame(st); const b = el.parentNode; b.classList.remove("bump"); void b.offsetWidth; b.classList.add("bump");
+  },
+  guard() { /* só troca o innerHTML se o conteúdo mudou: evita reiniciar animações a cada tick */
+    const d = Object.getOwnPropertyDescriptor(Element.prototype, "innerHTML");
+    [...["sGrid", "sTabs", "cTabs", "cGrid", "tcard", "invFood", "dock", "sbar"].map(i => document.getElementById(i)), ...$$(".petslot")].forEach(e => { let last;
+      Object.defineProperty(e, "innerHTML", { get() { return d.get.call(this); }, set(v) { const n = String(v).replace(/u\d+/g, "u"); if (n !== last) { last = n; d.set.call(this, v); } } }); });
+  }
+};
+
+/* ========== H. INTERFACE ========== */
+const UI = {
+  timer: 0,
+  toast(msg, kind) { const t = $("#toast"); t.textContent = msg; t.className = "show " + (kind || ""); clearTimeout(this.timer); this.timer = setTimeout(() => t.className = "", 2400); },
+  deny(msg) { this.toast(msg, "warn"); const r = $(".view.on .stage"); if (r) { r.classList.remove("shake"); void r.offsetWidth; r.classList.add("shake"); } return false; },
+  puff(x, y, html, cls, size) {
+    const st = $(".view.on .stage"); if (!st) return; const r = st.getBoundingClientRect(), s = document.createElement("span");
+    s.className = cls; s.innerHTML = html; s.style.left = (x - r.left) + "px"; s.style.top = (y - r.top) + "px";
+    if (size) s.style.width = s.style.height = size + "px"; st.appendChild(s); setTimeout(() => s.remove(), 1000);
+  },
+  rain() {
+    const st = $("#stage");
+    for (let i = 0; i < 18; i++) { const d = document.createElement("span"); d.className = "dr"; d.style.left = (30 + Math.random() * 40) + "%"; d.style.animationDelay = (Math.random() * .6) + "s"; st.appendChild(d); setTimeout(() => d.remove(), 1700); }
+    const w = document.createElement("div"); w.className = "stream"; st.appendChild(w); setTimeout(() => w.remove(), 1500);
+    for (let i = 0; i < 4; i++) { const m = document.createElement("span"); m.className = "stm"; m.style.left = (28 + Math.random() * 40) + "%"; m.style.top = (45 + Math.random() * 20) + "%"; m.style.animationDelay = (i * .2) + "s"; st.appendChild(m); setTimeout(() => m.remove(), 2100); }
+  },
+  fx(mode, text) {
+    fxMode = mode; this.pet();
+    $$(".view.on .petslot").forEach(s => {
+      s.classList.remove("bounce"); void s.offsetWidth; s.classList.add("bounce"); const q = s.getBoundingClientRect(); FX.burst(q.left + q.width / 2, q.top + q.height * .35, mode === "eat" ? "heart" : "star", mode === "eat" ? 5 : 7); if (mode === "eat") FX.burst(q.left + q.width / 2, q.top + q.height * .5, "crumb", 7);
+      if (text) { const f = document.createElement("span"); f.className = "fl"; f.textContent = text; s.parentNode.appendChild(f); setTimeout(() => f.remove(), 1100); }
+    });
+    setTimeout(() => { fxMode = ""; this.pet(); }, 1300);
+  },
+  enter(id, key) { const k = this._k2 || (this._k2 = {}); $("#" + id).classList.toggle("enter", k[id] !== key); k[id] = key; },
+  go(v) { this._k2 = {}; $("#menu").classList.remove("on"); view = v; $$(".view").forEach(e => e.classList.toggle("on", e.id === "v-" + v)); $$(".scroll").forEach(s => s.scrollTop = 0); this.render(); },
+  setRoom(r) { room = r; this.render(); },
+  openName(first) {
+    $("#mTitle").textContent = first ? "Bem-vindos ao DuoPet" : "Renomear pet"; $("#nameInp").value = first ? "" : S.pet.name;
+    $("#mCancel").style.display = first ? "none" : ""; $("#modal").classList.add("on"); setTimeout(() => $("#nameInp").focus(), 60);
+  },
+  head() {
+    const p = S.pet;
+    FX.num($("#hCoins"), S.coins); FX.num($("#sCoins"), S.coins); $("#lnum").textContent = "Nv " + p.level;
+    $("#xpb").style.width = (p.xp / xpNeed(p.level) * 100) + "%"; $("#pname").textContent = p.name || "Seu pet";
+  },
+  stats() {
+    const p = S.pet;
+    $("#sbar").innerHTML = STATS.map(([k, n, i]) => { const v = Math.round(p[k]), col = v > 60 ? "#2fbf86" : v > 30 ? "#f2a91d" : "#ff5f50";
+      return `<div class="sg ${v < 20 ? "low" : ""}" role="img" aria-label="${n} ${v}%" title="${n}: ${v}%" style="color:${col}">${ic(i)}<span class="tr"><i style="width:${v}%;background:${col}"></i></span></div>`; }).join("");
+  },
+  pet() {
+    lastMood = Pet.mood();
+    $$(".petslot").forEach(s => { const pv = s.closest(".pv"); s.innerHTML = petSVG(null, null, pv ? "happy" : ""); s.classList.toggle("sleep", S.pet.sleeping && !pv); });
+    $$(".stage").forEach(s => s.classList.toggle("night", S.pet.sleeping && !s.classList.contains("pv")));
+  },
+  live() { this.head(); this.stats(); if (Pet.mood() !== lastMood) this.pet(); },
+  home() {
+    if (drawn !== room) { $("#rm").innerHTML = ROOMHTML[room]; drawn = room; const r = $("#rm"); r.classList.remove("swap"); void r.offsetWidth; r.classList.add("swap"); const th = TH[S.bg[room]]; if (th) { r.querySelector(".wall").style.background = th.w; r.querySelector(".floor").style.background = th.f; r.querySelector(".base").insertAdjacentHTML("afterend", deco(th.k, th.c)); } }
+    $("#dock").innerHTML = ROOMS.map(([r, n, g, a, b]) => `<button class="dk ${room === r ? "on" : ""}" data-act="room" data-r="${r}" aria-label="${n}">${tile(g, a, b)}${n}</button>`).join("");
+    const T = (inner, lab, cls, attr) => `<div class="tl ${cls || ""}" ${attr || ""}>${inner}<span>${lab}</span></div>`;
+    let h;
+    if (room === "sala") h = `<div class="tool" data-tool="ball">${BALL}</div><div class="tl"><span>Jogue a bola<br>no pet</span></div>`;
+    else if (room === "banheiro") h = `<div class="tool" data-tool="soap">${SOAP}</div><div class="tool" data-tool="shower">${SHOWER}</div><div class="tl"><span>${S.pet.foam > 0 ? "Espuma " + Math.round(S.pet.foam) + "%<br>Arraste o chuveiro" : "Ensaboe o pet<br>e enxágue"}</span></div>`;
+    else if (room === "quarto") h = `<button class="tl" data-act="do" data-a="sleep">${tile(S.pet.sleeping ? "sun" : "lamp", "#ffd36b", "#ff9a3d")}<span>${S.pet.sleeping ? "Acender a luz" : "Apagar a luz"}</span></button><div class="tl"><span>${S.pet.sleeping ? "Dormindo..." : "Recupera a<br>energia"}</span></div>`;
+    else {
+      const fl = foodList(); if (fi >= fl.length) fi = 0;
+      h = fl.length ? `<button class="arr" data-act="fprev" aria-label="Comida anterior"><svg class="i"><use href="#i-back"/></svg></button><div class="tool" data-tool="food" data-id="${fl[fi]}">${foodSVG(fl[fi])}<b style="font-size:12px;color:var(--ink)">${FOODS[fl[fi]].n} x${S.food[fl[fi]]}</b></div><button class="arr" data-act="fnext" aria-label="Próxima comida"><svg class="i"><use href="#i-next"/></svg></button><button class="tl" data-act="go" data-v="inv">${tile("fridge", "#9fe3c4", "#3fbf8f")}<span>Despensa</span></button>`
+        : `<div class="tl"><b>Sem comida</b><span>Compre na loja</span></div><button class="tl" data-act="go" data-v="shop">${tile("shop", "#ffd36b", "#ff9a3d")}<span>Loja</span></button>`;
+    }
+    this.enter("tcard", room + fi); $("#tcard").innerHTML = h;
+  },
+  tile(c) {
+    const own = has(c.id), on = c.t === "bg" ? (S.bg[c.room] || "nobg_" + c.room) === c.id : cur(c.t) === c.id;
+    return `<button class="tile ${on ? "on" : ""} ${own ? "" : "lock"}" data-act="equip" data-id="${c.id}"><span class="pic">${cosmPic(c)}</span>${c.n}${own ? "" : `<small>${c.p} moedas</small>` + ic("lock").replace('class="i"', 'class="i lk"')}</button>`;
+  },
+  msg(id, text, bad) { const e = $("#" + id); if (!e) return; e.textContent = text || ""; e.classList.toggle("err", !!bad); },
+  sync() {
+    const e = $("#syncTxt"); if (!e) return; const s = Cloud.status;
+    e.dataset.s = s; e.querySelector("b").textContent = !CLOUD_ON ? "Salvo neste aparelho" : s === "sync" ? "Sincronizando..." : s === "off" ? "Sem conexão: salvo no aparelho, envio assim que voltar" : s === "err" ? "Erro de sincronização" : "Sincronizado";
+  },
+  duo() {
+    const partner = Cloud.partner(), me = Cloud.user, mode = S.duo.mode;
+    $$("#seg button").forEach(b => b.classList.toggle("on", b.dataset.m === mode));
+    $("#invCard").style.display = CLOUD_ON ? "" : "none";
+    $("#invTitle").textContent = partner ? "Jogador 2: " + partner : "Jogador 2: convite pendente";
+    $("#invText").textContent = partner ? "Vocês dois cuidam do mesmo pet, em tempo real." : "Envie este código para a outra pessoa entrar na sua dupla.";
+    $("#invBox").style.display = partner ? "none" : "";
+    $("#code").textContent = S.duo.code || "...";
+    $("#sumry").textContent = `${S.pet.name || "Pet"} está no nível ${S.pet.level}, com ${Math.floor(S.coins)} moedas.` + (CLOUD_ON ? "" : " Modo local: configure o Firebase para jogar a dois.");
+    $("#accCard").style.display = CLOUD_ON ? "" : "none";
+    $("#accTxt").textContent = me && me.email ? "Conectado como " + me.email + "." : "Conectado.";
+    $("#instCard").style.display = (matchMedia("(display-mode: standalone)").matches || navigator.standalone) ? "none" : "";
+    this.sync();
+  },
+  render() {
+    this.head(); this.stats(); this.pet();
+    $$("[data-ci]").forEach(e => e.innerHTML = COIN); $("#hCoinIc").innerHTML = COIN;
+    { const partner = Cloud.partner(); $("#menuDuo").textContent = !CLOUD_ON ? "modo local" : partner ? "com " + partner : "convite pendente"; $("#mbtn").classList.toggle("pend", CLOUD_ON && !partner); }
+    if (view === "join") { const i = $("#joinInp"); if (Cloud.pendingCode && !i.value) i.value = Cloud.pendingCode; $("#jWho").textContent = Cloud.user && Cloud.user.email ? "Conectado como " + Cloud.user.email + "." : ""; }
+    if (view === "home") this.home();
+    if (view === "care") {
+      this.enter("cGrid", "c" + tabC); $("#cTabs").innerHTML = CATS.map(([t, n]) => `<button class="tab ${tabC === t ? "on" : ""}" data-act="tabc" data-t="${t}"><svg class="ti" viewBox="0 0 24 24"><use href="#t-${t}"/></svg><span>${n}</span></button>`).join("");
+      // No armário, mostrar apenas itens adquiridos e opções padrão para remover acessórios.
+      $("#cGrid").innerHTML = COSM.filter(c => c.t === tabC && has(c.id)).map(c => this.tile(c)).join("");
+    }
+    if (view === "inv") {
+      const fl = foodList();
+      $("#invFood").innerHTML = fl.length ? fl.map(k => `<div class="row"><span class="pic">${foodSVG(k)}</span><div class="t"><b>${FOODS[k].n} x${S.food[k]}</b><span>Fome +${FOODS[k].hu} · Alegria +${FOODS[k].ha}</span></div><button class="btn" data-act="do" data-a="feed" data-id="${k}">Dar</button></div>`).join("") : `<div class="empty">A despensa está vazia.<br><br><button class="btn" data-act="go" data-v="shop">Ir à loja</button></div>`;
+    }
+    if (view === "shop") {
+      this.enter("sGrid", "s" + tabS); const cn = Object.fromEntries(CATS), ti = t => `<svg class="ti" viewBox="0 0 24 24"><use href="#t-${t}"/></svg>`;
+      const GLOW = { maca: "255,120,170", biscoito: "255,160,90", sanduiche: "130,220,120", bolo: "190,120,255", sorvete: "100,170,255", pizza: "255,110,170", salsicha: "190,120,255" };
+      const buy = (k, id, p) => `<button class="price gold" data-act="buy" data-k="${k}" data-id="${id}" aria-label="Comprar por ${p} moedas">${COIN}<b>${p}</b></button>`;
+      $("#sTabs").innerHTML = [["food", "Comida"], ...CATS].map(([t, n]) => `<button class="tab ${tabS === t ? "on" : ""}" data-act="tabs" data-t="${t}">${ti(t)}<span>${n}</span></button>`).join("");
+      $("#sGrid").innerHTML = tabS === "food" ? Object.keys(FOODS).map(k => `<div class="pc" style="--g:${GLOW[k]}"><span class="pic">${foodSVG(k)}</span><b class="nm">${FOODS[k].n}</b><div class="st">Fome +${FOODS[k].hu} · Alegria +${FOODS[k].ha}<br><strong>Você tem ${S.food[k]}</strong></div>${buy("food", k, FOODS[k].p)}</div>`).join("")
+        : COSM.filter(c => c.t === tabS && c.p > 0).map(c => `<div class="pc" style="--g:200,140,255"><span class="pic">${cosmPic(c)}</span><b class="nm">${c.n}</b><div class="st">${cn[c.t]}<br><strong>${has(c.id) ? "Já é seu" : "Novo"}</strong></div>${has(c.id) ? `<button class="price gold own" disabled>Seu</button>` : buy("cosm", c.id, c.p)}</div>`).join("");
+    }
+    if (view === "duo") this.duo();
+  }
+};
+
+/* ========== H2. NUVEM (Firebase: login, dupla, tempo real) ==========
+   Coleções: dp_users/{uid} (qual dupla é minha) · dp_duos/{id} (pet, moedas, comida, membros) · dp_invites/{CÓDIGO} (convite -> dupla).
+   Fluxo: toda ação mexe no estado local na hora (sem esperar a rede); a cada ~1 s uma transação lê a nuvem,
+   soma só a minha diferença e grava. A outra pessoa recebe pelo onSnapshot. */
+const DUO = { id: null, members: [], names: {} };
+const AUTH_MSG = {
+  "auth/invalid-email": "E-mail inválido.", "auth/invalid-credential": "E-mail ou senha incorretos.", "auth/user-not-found": "E-mail ou senha incorretos.",
+  "auth/wrong-password": "E-mail ou senha incorretos.", "auth/email-already-in-use": "Este e-mail já tem conta. Toque em Entrar.",
+  "auth/weak-password": "A senha precisa ter pelo menos 6 caracteres.", "auth/too-many-requests": "Muitas tentativas. Aguarde um pouco.",
+  "auth/network-request-failed": "Sem conexão com a internet.", "auth/operation-not-allowed": "Este tipo de login não está ativado no Firebase.",
+  "auth/unauthorized-domain": "Este endereço não está autorizado no Firebase (Authentication > Configurações > Domínios autorizados)."
+};
+const Cloud = {
+  fb: null, auth: null, db: null, user: null, unsub: null, tm: 0, rt: 0,
+  ready: false, busy: false, again: false, dirty: false, gen: 0, first: true, queued: null, status: "ok", wids: new Set(), pendingCode: "",
+  name() { const u = this.user; return ((u && (u.displayName || (u.email || "").split("@")[0])) || "Jogador").slice(0, 14); },
+  partner() { const me = this.user && this.user.uid, p = DUO.members.find(m => m !== me); return p ? (DUO.names[p] || "Parceiro(a)") : ""; },
+  err(e) { return AUTH_MSG[e && e.code] || (e && e.message) || "Algo deu errado."; },
+
+  async boot() {
+    const q = new URLSearchParams(location.search).get("code");
+    if (q) { this.pendingCode = q.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 6); try { history.replaceState(null, "", location.pathname); } catch (e) {} }
+    try {
+      const [A, Au, F] = await Promise.all([import(SDK + "firebase-app.js"), import(SDK + "firebase-auth.js"), import(SDK + "firebase-firestore.js")]);
+      this.fb = Object.assign({}, A, Au, F);
+      const app = A.initializeApp(FIREBASE_CONFIG);
+      this.auth = Au.getAuth(app);
+      try { this.db = F.initializeFirestore(app, { localCache: F.persistentLocalCache({ tabManager: F.persistentMultipleTabManager() }) }); } catch (e) { this.db = F.getFirestore(app); }
+    } catch (e) { return this.offline(); }
+    this.fb.getRedirectResult(this.auth).catch(e => UI.msg("aMsg", this.err(e), true));
+    this.fb.onAuthStateChanged(this.auth, u => this.onUser(u));
+    window.addEventListener("online", () => this.flush());
+  },
+  /* Sem conseguir carregar o Firebase (primeira abertura sem internet): usa a última cópia local, se houver.
+     O que for feito aqui fica guardado e é enviado quando a conexão voltar. */
+  offline() {
+    const c = LocalCache.load();
+    if (c && c.S && c.B && c.duoId) {
+      const now = Clock.now(), ms = now - c.ts;
+      S = normState(c.S); BASE = normState(c.B); advanceState(S, ms); advanceState(BASE, ms); S.t = BASE.t = now;
+      this.user = { uid: c.uid }; DUO.id = c.duoId; this.dirty = !!c.dirty;
+      UI.go("home"); UI.toast("Sem conexão: você está jogando offline.", "warn");
+    } else { UI.go("auth"); UI.msg("aMsg", "Sem conexão com a internet. Conecte-se para entrar.", true); }
+    window.addEventListener("online", () => location.reload(), { once: true });
+  },
+  async onUser(u) {
+    this.stop(); this.user = u;
+    if (!u) { S = newState(); BASE = null; DUO.id = null; DUO.members = []; return UI.go("auth"); }
+    UI.go("load"); await this.syncClock();
+    let duoId = null;
+    try { const s = await this.fb.getDoc(this.fb.doc(this.db, "dp_users", u.uid)); duoId = s.exists() ? s.data().duoId || null : null; }
+    catch (e) { const c = LocalCache.load(u.uid); duoId = c && c.duoId; if (!duoId) { UI.msg("jMsg", "Não consegui ler sua conta: " + this.err(e), true); return UI.go("join"); } }
+    if (duoId) this.watch(duoId); else UI.go("join");
+  },
+  async syncClock() {
+    try {
+      const { doc, setDoc, getDocFromServer, serverTimestamp } = this.fb, ref = doc(this.db, "dp_users", this.user.uid), t0 = Date.now();
+      await setDoc(ref, { ping: serverTimestamp() }, { merge: true });
+      const s = await getDocFromServer(ref), ts = s.data().ping.toMillis(), t1 = Date.now(), off = ts - (t0 + t1) / 2;
+      if (Math.abs(off) < 864e5) Clock.off = off;
+    } catch (e) { /* sem rede: usa o relógio do aparelho */ }
+  },
+  stop() { if (this.unsub) this.unsub(); this.unsub = null; clearTimeout(this.tm); clearTimeout(this.rt); this.ready = false; this.busy = false; this.dirty = false; this.queued = null; this.wids.clear(); },
+  setStatus(s) { this.status = s; UI.sync(); },
+  cache() { if (this.user && DUO.id && BASE) LocalCache.save({ uid: this.user.uid, duoId: DUO.id, S, B: BASE, ts: Clock.now(), dirty: this.dirty }); },
+
+  watch(duoId) {
+    DUO.id = duoId; this.first = true;
+    const { onSnapshot, doc } = this.fb;
+    this.unsub = onSnapshot(doc(this.db, "dp_duos", duoId), snap => this.onSnap(snap), e => {
+      if (e && e.code === "permission-denied") UI.toast("Sem permissão no Firestore. Confira as regras de segurança.", "warn"); this.setStatus("err");
+    });
+  },
+  onSnap(snap) {
+    if (!snap.exists()) return this.lost("Essa dupla não existe mais.");
+    const d = snap.data();
+    if (!(d.members || []).includes(this.user.uid)) return this.lost("Você não faz mais parte dessa dupla.");
+    DUO.members = d.members; DUO.names = d.names || {};
+    if (this.first) { this.first = false; return this.adopt(d); }
+    if (this.wids.has(d.wid)) return Tools.d ? 0 : UI.render();     // eco da minha própria gravação
+    if (this.busy) { this.queued = d; return; }       // espero minha gravação terminar para não contar duas vezes
+    this.rebase(d);
+  },
+  /* Primeira leitura: junta a nuvem com o que ficou pendente na cópia local (se houver). */
+  adopt(d) {
+    const now = Clock.now(), R = normState(d); advanceState(R, now - d.t); R.t = now;
+    const c = LocalCache.load(this.user.uid); let pend = false;
+    if (c && c.duoId === DUO.id && c.S && c.B) {
+      const ms = now - c.ts, Sc = normState(c.S), Bc = normState(c.B); advanceState(Sc, ms); advanceState(Bc, ms);
+      S = mergeState(R, Sc, Bc); pend = !!c.dirty;
+    } else S = clone(R);
+    S.t = now; BASE = clone(R); this.ready = true; this.dirty = pend; this.setStatus("ok"); this.cache();
+    if (view === "load" || view === "auth" || view === "join") UI.go("home"); else UI.render();
+    if (!S.pet.named) UI.openName(true);
+    if (pend) this.flush();
+  },
+  /* A nuvem mudou (a outra pessoa agiu): coloco a minha diferença ainda não enviada por cima. */
+  rebase(d, B) {
+    B = B || BASE; const R = normState(d), now = Math.max(S.t, d.t);
+    advanceState(R, now - d.t); R.t = now;
+    if (now > S.t) { const dt = now - S.t; advanceState(S, dt); advanceState(B, dt); }
+    S = mergeState(R, S, B); S.t = now; BASE = clone(R); this.cache();
+    if (S.pet.named && $("#modal").classList.contains("on") && $("#mCancel").style.display === "none") $("#modal").classList.remove("on");
+    if (!Tools.d) UI.render();
+  },
+
+  touch() { this.gen++; this.dirty = true; this.cache(); clearTimeout(this.tm); this.tm = setTimeout(() => this.flush(), 900); },
+  async flush() {
+    if (!this.ready || !this.dirty) return;
+    if (this.busy) { this.again = true; return; }
+    clearTimeout(this.tm); clearTimeout(this.rt); this.busy = true; this.setStatus("sync");
+    const { doc, runTransaction } = this.fb, ref = doc(this.db, "dp_duos", DUO.id), uid = this.user.uid, Ls = clone(S), Bs = clone(BASE), gen = this.gen;
+    try {
+      const out = await runTransaction(this.db, async tx => {
+        const snap = await tx.get(ref); if (!snap.exists()) throw new Error("A dupla não existe mais.");
+        const R = normState(snap.data()), now = Clock.now(); advanceState(R, now - R.t); R.t = now;
+        const La = clone(Ls), Ba = clone(Bs), dt = now - Ls.t; advanceState(La, dt); advanceState(Ba, dt);
+        const o = mergeState(R, La, Ba); o.t = now; o.wid = uid.slice(0, 5) + now.toString(36) + Math.random().toString(36).slice(2, 8);
+        this.wids.add(o.wid);
+        tx.update(ref, { pet: o.pet, coins: o.coins, food: o.food, owned: o.owned, bg: o.bg, duo: o.duo, t: o.t, wid: o.wid, by: uid, v: 2 });
+        return o;
+      });
+      // o que já enviei, levado até o instante local de hoje, é a nova "base" da minha diferença
+      const sent = clone(Ls); advanceState(sent, S.t - Ls.t); sent.t = S.t;
+      this.dirty = this.gen !== gen; this.rebase(out, sent); this.setStatus("ok");
+    } catch (e) {
+      this.setStatus("off"); this.rt = setTimeout(() => this.flush(), 8000);
+      if (e && e.code === "permission-denied") UI.toast("Sem permissão para salvar. Confira as regras do Firestore.", "warn");
+    }
+    this.busy = false;
+    const q = this.queued; this.queued = null; if (q && !this.wids.has(q.wid)) this.rebase(q);
+    if (this.again || (this.dirty && this.status === "ok")) { this.again = false; this.flush(); }
+  },
+
+  /* ----- conta ----- */
+  async google() {
+    const { GoogleAuthProvider, signInWithPopup, signInWithRedirect } = this.fb, p = new GoogleAuthProvider();
+    try { await signInWithPopup(this.auth, p); }
+    catch (e) {
+      if (e.code === "auth/popup-blocked" || e.code === "auth/operation-not-supported-in-this-environment") { try { await signInWithRedirect(this.auth, p); } catch (e2) { UI.msg("aMsg", this.err(e2), true); } }
+      else if (e.code !== "auth/popup-closed-by-user" && e.code !== "auth/cancelled-popup-request") UI.msg("aMsg", this.err(e), true);
+    }
+  },
+  async email(create) {
+    const em = $("#aEmail").value.trim(), pw = $("#aPass").value;
+    if (!em || !pw) return UI.msg("aMsg", "Digite e-mail e senha.", true);
+    UI.msg("aMsg", "Entrando...");
+    try { await (create ? this.fb.createUserWithEmailAndPassword : this.fb.signInWithEmailAndPassword)(this.auth, em, pw); } catch (e) { UI.msg("aMsg", this.err(e), true); }
+  },
+  async logout() {
+    if (!this.auth) return UI.toast("Sem conexão com a nuvem agora.", "warn");
+    await this.flush(); LocalCache.clear(); try { await this.fb.signOut(this.auth); } catch (e) {}
+  },
+
+  /* ----- dupla ----- */
+  async create() {
+    const { doc, collection, getDoc, writeBatch, serverTimestamp } = this.fb, uid = this.user.uid;
+    try {
+      let code = "", tries = 0;
+      do { code = genCode(); if (++tries > 8) throw new Error("Tente de novo."); } while ((await getDoc(doc(this.db, "dp_invites", code))).exists());
+      const ref = doc(collection(this.db, "dp_duos")), st = newState(); st.duo.code = code; st.t = Clock.now();
+      const b = writeBatch(this.db);
+      b.set(ref, Object.assign(st, { members: [uid], names: { [uid]: this.name() }, v: 2, wid: "", by: uid, createdAt: serverTimestamp() }));
+      b.set(doc(this.db, "dp_invites", code), { duoId: ref.id, owner: uid, createdAt: serverTimestamp() });
+      b.set(doc(this.db, "dp_users", uid), { duoId: ref.id, name: this.name() }, { merge: true });
+      await b.commit(); this.watch(ref.id);
+    } catch (e) { UI.msg("jMsg", "Não foi possível criar a dupla: " + this.err(e), true); }
+  },
+  async join(raw) {
+    const code = (raw || "").toUpperCase().replace(/[^A-Z0-9]/g, ""), { doc, getDoc, updateDoc, setDoc, arrayUnion } = this.fb, uid = this.user.uid;
+    if (code.length !== 6) return UI.msg("jMsg", "O código tem 6 letras ou números.", true);
+    try {
+      const inv = await getDoc(doc(this.db, "dp_invites", code));
+      if (!inv.exists()) return UI.msg("jMsg", "Código não encontrado. Confira com a outra pessoa.", true);
+      const duoId = inv.data().duoId;
+      try { await updateDoc(doc(this.db, "dp_duos", duoId), { members: arrayUnion(uid), ["names." + uid]: this.name() }); }
+      catch (e) { return UI.msg("jMsg", "Esse código é inválido ou a dupla já está completa.", true); }
+      await setDoc(doc(this.db, "dp_users", uid), { duoId, name: this.name() }, { merge: true });
+      this.watch(duoId);
+    } catch (e) { UI.msg("jMsg", "Não foi possível entrar: " + this.err(e), true); }
+  },
+  async newCode() {
+    const { doc, getDoc, writeBatch, serverTimestamp } = this.fb, uid = this.user.uid, old = S.duo.code;
+    try {
+      let code = "", tries = 0;
+      do { code = genCode(); if (++tries > 8) throw new Error("Tente de novo."); } while ((await getDoc(doc(this.db, "dp_invites", code))).exists());
+      const b = writeBatch(this.db);
+      b.set(doc(this.db, "dp_invites", code), { duoId: DUO.id, owner: uid, createdAt: serverTimestamp() });
+      if (old) b.delete(doc(this.db, "dp_invites", old));
+      b.update(doc(this.db, "dp_duos", DUO.id), { "duo.code": code });
+      await b.commit(); UI.toast("Novo código gerado.", "ok");
+    } catch (e) { UI.toast("Não foi possível gerar outro código.", "warn"); }
+  },
+  async leave() {
+    if (!this.auth) return UI.toast("Sem conexão com a nuvem agora.", "warn");
+    await this.flush();
+    const { doc, updateDoc, setDoc, arrayRemove, deleteField } = this.fb, uid = this.user.uid;
+    try {
+      await updateDoc(doc(this.db, "dp_duos", DUO.id), { members: arrayRemove(uid), ["names." + uid]: deleteField() });
+      await setDoc(doc(this.db, "dp_users", uid), { duoId: null }, { merge: true });
+      this.lost("Você saiu da dupla.");
+    } catch (e) { UI.toast("Não foi possível sair da dupla.", "warn"); }
+  },
+  lost(msg) {
+    this.stop(); DUO.id = null; DUO.members = []; DUO.names = {}; S = newState(); BASE = null; LocalCache.clear();
+    UI.go("join"); UI.toast(msg, "warn");
+  }
+};
+
+/* ========== I. GESTOS ========== */
+const Tools = {
+  d: null,
+  down(e) {
+    const t = e.target.closest(".tool"); if (!t) return; e.preventDefault();
+    const g = document.createElement("div"); g.className = "ghost"; g.innerHTML = t.querySelector("svg").outerHTML; document.body.appendChild(g);
+    this.d = { k: t.dataset.tool, id: t.dataset.id, g, x: e.clientX, y: e.clientY, sx: e.clientX, sy: e.clientY, moved: false, acc: 0, over: false, cx: e.clientX, cy: e.clientY }; this.pos(e);
+    if (this.d.k === "shower") this.d.timer = setInterval(() => Pet.rinse(this.d), 200);
+  },
+  pos(e) { this.d.g.style.transform = `translate(${e.clientX - 32}px,${e.clientY - 72}px) rotate(${Math.max(-18, Math.min(18, (e.clientX - this.d.x) * 1.2)) - 8}deg) scale(1.2)`; },
+  over(e) { const r = $("#v-home .petslot").getBoundingClientRect(); return e.clientX > r.left && e.clientX < r.right && e.clientY > r.top && e.clientY < r.bottom; },
+  move(e) {
+    const d = this.d; if (!d) return; this.pos(e); $("#v-home .petslot").classList.toggle("hot", d.k !== "soap" && d.k !== "shower" && this.over(e));
+    d.cx = e.clientX; d.cy = e.clientY; d.over = this.over(e);
+    if (d.k === "shower" && !d.over) d.g.classList.remove("spray");
+    const dist = Math.hypot(e.clientX - d.x, e.clientY - d.y); d.x = e.clientX; d.y = e.clientY;
+    if (Math.hypot(e.clientX - d.sx, e.clientY - d.sy) > 10) d.moved = true;
+    if (d.k === "soap" && d.moved && this.over(e)) { d.acc += dist; if (d.acc > 24) { d.acc = 0; Pet.scrub(e.clientX, e.clientY); } }
+  },
+  up(e) {
+    const d = this.d; if (!d) return; this.d = null; d.g.remove(); const over = this.over(e); $("#v-home .petslot").classList.remove("hot");
+    if (d.k === "shower") { clearInterval(d.timer); if (!d.moved) UI.toast("Arraste o chuveiro sobre o pet para enxaguar."); else Persist.save(); return; }
+    if (d.k === "soap") { if (!d.moved) UI.toast("Arraste o sabonete sobre o pet para esfregar."); else Persist.save(); return; }
+    if (over || !d.moved) { if (d.k === "food") Pet.do("feed", d.id); else Pet.do("play"); }
+    else UI.toast("Solte sobre o pet.", "warn");
+  }
+};
+const Stage = {
+  on: false, pet: false, sx: 0, sy: 0, lx: 0, ly: 0, moved: 0, acc: 0,
+  down(e) { if (e.target.closest(".hud,.menu,.tcard,.dock")) return; this.on = true; this.sx = this.lx = e.clientX; this.sy = this.ly = e.clientY; this.pet = !!e.target.closest(".slot"); this.moved = this.acc = 0; },
+  move(e) {
+    const s = $("#v-home .petslot"), r = s.getBoundingClientRect();
+    s.style.setProperty("--ex", clamp((e.clientX - r.left - r.width / 2) / 30, -4, 4)); s.style.setProperty("--ey", clamp((e.clientY - r.top - r.height / 2) / 30, -3, 4));
+    if (!this.on || !this.pet || Tools.d) return;
+    const dist = Math.hypot(e.clientX - this.lx, e.clientY - this.ly); this.lx = e.clientX; this.ly = e.clientY; this.moved += dist; this.acc += dist;
+    if (this.moved > 10 && this.acc > 60) { this.acc = 0; if (S.pet.sleeping) return; S.pet.happy = clamp(S.pet.happy + 2); UI.puff(e.clientX, e.clientY, `<svg viewBox="0 0 24 24"><path d="M12 21s-8-5.3-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 5.7-8 11-8 11z" fill="currentColor"/></svg>`, "ht"); UI.live(); }
+  },
+  up(e) {
+    if (!this.on) return; this.on = false;
+    if (this.pet) {
+      if (this.moved < 10) { if (S.pet.sleeping) UI.toast("Shh... " + S.pet.name + " está dormindo.", "warn"); else { S.pet.happy = clamp(S.pet.happy + 1.5); UI.fx("happy", ""); } }
+      Persist.save();
+    } else {
+      const dx = e.clientX - this.sx, dy = e.clientY - this.sy;
+      if (Math.abs(dx) > 70 && Math.abs(dy) < 60) { const i = ROOMS.findIndex(r => r[0] === room); UI.setRoom(ROOMS[(i + (dx < 0 ? 1 : ROOMS.length - 1)) % ROOMS.length][0]); }
+    }
+  }
+};
+
+/* ========== J. EVENTOS ========== */
+document.addEventListener("click", async e => {
+  const mn = $("#menu"); if (mn.classList.contains("on") && !e.target.closest("#menu,#mbtn")) mn.classList.remove("on");
+  const el = e.target.closest("[data-act]"); if (!el) return; const d = el.dataset;
+  switch (d.act) {
+    case "go": UI.go(d.v); break;
+    case "menu": $("#menu").classList.toggle("on"); break;
+    case "room": UI.setRoom(d.r); break;
+    case "fprev": case "fnext": { const n = foodList().length; if (n) { fi = (fi + (d.act === "fnext" ? 1 : n - 1)) % n; UI.home(); } break; }
+    case "shower": Pet.shower(); break;
+    case "do": Pet.do(d.a, d.id); break;
+    case "buy": { const r = el.getBoundingClientRect(), c0 = S.coins; Pet.buy(d.k, d.id); if (S.coins < c0) { FX.vib(20); FX.burst(r.left + r.width / 2, r.top + r.height / 2, "coin", 8); FX.burst(r.left + r.width / 2, r.top, "star", 6); } break; }
+    case "coinhint": UI.toast("Brincar com o pet rende moedas!", "ok"); break;
+    case "equip": Pet.equip(d.id); break;
+    case "tabc": tabC = d.t; UI.render(); break;
+    case "tabs": tabS = d.t; UI.render(); break;
+    case "rename": UI.openName(false); break;
+    case "cancel": $("#modal").classList.remove("on"); break;
+    case "start": { const first = !S.pet.named; if (Pet.rename($("#nameInp").value)) { $("#modal").classList.remove("on"); UI.toast(first ? "Olá, " + S.pet.name + "!" : "Nome salvo.", "ok"); } break; }
+    case "mode": S.duo.mode = d.m; Persist.save(); UI.render(); break;
+    case "duoName": S.duo.name = $("#duoInp").value.trim(); Persist.save(); UI.toast(S.duo.name ? "Dupla salva: " + S.duo.name : "Nome da dupla removido.", "ok"); break;
+    case "newcode": if (Cloud.fb) await Cloud.newCode(); else UI.toast("Sem conexão com a nuvem agora.", "warn"); break;
+    case "copy": try { await navigator.clipboard.writeText(S.duo.code); UI.toast("Código copiado.", "ok"); } catch (_) { UI.toast("Não foi possível copiar. Anote: " + S.duo.code, "warn"); } break;
+    case "share": {
+      const link = location.origin + location.pathname + "?code=" + S.duo.code, text = "Venha cuidar do nosso pet no DuoPet! Código: " + S.duo.code;
+      if (navigator.share) { try { await navigator.share({ title: "DuoPet", text, url: link }); } catch (_) {} }
+      else { try { await navigator.clipboard.writeText(text + "\n" + link); UI.toast("Convite copiado.", "ok"); } catch (_) { UI.toast("Anote o código: " + S.duo.code, "warn"); } }
+      break;
+    }
+    case "install": {
+      if (window.__pwaPrompt) { const p = window.__pwaPrompt; window.__pwaPrompt = null; p.prompt(); }
+      else if (/iphone|ipad|ipod/i.test(navigator.userAgent)) UI.toast("No Safari: toque em Compartilhar e depois em Adicionar à Tela de Início.", "ok");
+      else UI.toast("No menu do navegador, toque em Instalar aplicativo ou Adicionar à tela inicial.", "ok");
+      break;
+    }
+    case "google": Cloud.google(); break;
+    case "login": Cloud.email(false); break;
+    case "register": Cloud.email(true); break;
+    case "create": UI.msg("jMsg", ""); Cloud.create(); break;
+    case "join": UI.msg("jMsg", ""); Cloud.join($("#joinInp").value); break;
+    case "logout": if (confirm("Sair da conta? O progresso fica salvo na nuvem.")) Cloud.logout(); break;
+    case "leave": if (confirm("Sair desta dupla? Você deixa de cuidar deste pet e precisará de um código para voltar.")) Cloud.leave(); break;
+  }
+});
+$("#tcard").addEventListener("pointerdown", e => Tools.down(e));
+const stg = $("#stage");
+stg.addEventListener("pointerdown", e => Stage.down(e));
+stg.addEventListener("pointermove", e => Stage.move(e));
+document.addEventListener("pointermove", e => Tools.move(e));
+document.addEventListener("pointerup", e => { Tools.up(e); Stage.up(e); });
+document.addEventListener("pointercancel", () => { if (Tools.d) { clearInterval(Tools.d.timer); Tools.d.g.remove(); Tools.d = null; $("#v-home .petslot").classList.remove("hot"); } Stage.on = false; });
+$("#nameInp").addEventListener("keydown", e => { if (e.key === "Enter") $("[data-act=start]").click(); });
+$("#duoInp").addEventListener("focus", e => { if (!e.target.value) e.target.value = S.duo.name; });
+
+/* ========== K. ATUALIZAÇÃO AUTOMÁTICA ==========
+   De tempos em tempos (e ao voltar para o app) busca o index.html publicado. Se mudou, avisa e recarrega sozinho.
+   Seu progresso não se perde: ele já está na nuvem (ou na cópia local). */
+const Updater = {
+  base: "", shown: false, last: 0,
+  hash(t) { let h = 2166136261; for (let i = 0; i < t.length; i++) { h ^= t.charCodeAt(i); h = Math.imul(h, 16777619); } return (h >>> 0).toString(36) + "." + t.length; },
+  async fetchSig() {
+    const r = await fetch(location.pathname + "?chk=" + Date.now(), { cache: "no-store" }); if (!r.ok) return null;
+    const t = await r.text(), m = t.match(/window\.DP_BUILD\s*=\s*"([^"]+)"/);
+    return { build: m ? m[1] : "", hash: this.hash(t) };
+  },
+  async check(force) {
+    if (this.shown || !navigator.onLine || (!force && Date.now() - this.last < 60000)) return;
+    this.last = Date.now();
+    try {
+      const s = await this.fetchSig(); if (!s) return;
+      if (s.build !== window.DP_BUILD) return this.ask();              // número da versão mudou
+      if (!this.base) { this.base = s; return; }                       // primeira leitura = versão que está aberta
+      if (s.hash !== this.base.hash) this.ask();                       // conteúdo mudou (mesmo sem trocar o número)
+    } catch (e) { /* sem rede: tenta depois */ }
+  },
+  ask() {
+    if (this.shown) return; this.shown = true;
+    const d = document.createElement("div"); d.className = "upd"; let n = 6;
+    d.innerHTML = `<span>Nova versão do DuoPet. Atualizando em <b>${n}</b>s...</span><button class="btn" type="button">Agora</button>`;
+    document.body.appendChild(d);
+    const go = async () => {
+      clearInterval(iv); d.querySelector("span").textContent = "Atualizando...";
+      try { if (CLOUD_ON && Cloud.ready) await Promise.race([Cloud.flush(), new Promise(r => setTimeout(r, 2500))]); } catch (e) {}
+      try { const reg = await navigator.serviceWorker.getRegistration(); if (reg) await reg.update(); } catch (e) {}
+      location.reload();
+    };
+    const iv = setInterval(() => { if (Tools.d) return; n--; d.querySelector("b").textContent = n; if (n <= 0) go(); }, 1000);
+    d.querySelector("button").onclick = go;
+  }
+};
+document.addEventListener("visibilitychange", () => { if (!document.hidden) Updater.check(); });
+setInterval(() => Updater.check(), 5 * 60 * 1000);
+setTimeout(() => Updater.check(true), 3000);
+if ("serviceWorker" in navigator && /^https?:$/.test(location.protocol)) {
+  const reg = () => navigator.serviceWorker.register("sw.js").catch(e => console.warn("Service worker não registrado:", e));
+  if (document.readyState === "complete") reg(); else window.addEventListener("load", reg);
+}
+
+/* ========== L. TEMPO E INICIALIZAÇÃO ========== */
+function tick() {
+  const now = Clock.now(), ms = now - S.t, r = Pet.advance(ms);
+  if (BASE) { advanceState(BASE, ms); BASE.t = now; }
+  S.t = now;
+  if (r === "woke") UI.toast(S.pet.name + " acordou descansado.", "ok");
+  if (!Tools.d && (view === "home" || view === "care" || view === "shop" || view === "inv" || view === "duo")) UI.render();
+}
+setInterval(tick, 5000);
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden) tick(); else if (CLOUD_ON) { Cloud.cache(); Cloud.flush(); } else Persist.save();
+});
+window.addEventListener("pagehide", () => { if (CLOUD_ON) Cloud.cache(); else Persist.save(); });
+(function init() {
+  FX.guard();
+  if (CLOUD_ON) { UI.render(); Cloud.boot(); return; }          // com Firebase: o login decide o que aparece
+  Persist.init(); UI.go("home");                                  // modo local
+  if (!S.pet.named) UI.openName(true);
+})();
+</script>
+</body>
+</html>
