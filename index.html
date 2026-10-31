@@ -14,7 +14,7 @@
 <title>DuoPet</title>
 <!-- Versão publicada. A cada publicação o app compara com a versão aberta e se atualiza sozinho.
      (Mesmo que você esqueça de mudar este número, o app também compara o conteúdo do arquivo.) -->
-<script>window.DP_BUILD = "20261031-0001";
+<script>window.DP_BUILD = "20261031-0002";
 window.addEventListener("beforeinstallprompt", function (e) { e.preventDefault(); window.__pwaPrompt = e; });
 window.addEventListener("appinstalled", function () { window.__pwaPrompt = null; });</script>
 <style>
@@ -517,12 +517,12 @@ button:active{transform:scale(.93)}
    Esses valores são públicos por design; quem protege os dados são as regras do Firestore.
    Deixe o apiKey vazio para jogar só neste aparelho (modo local). */
 const FIREBASE_CONFIG = {
-  apiKey: "",
-  authDomain: "",
-  projectId: "",
-  storageBucket: "",
-  messagingSenderId: "",
-  appId: ""
+  apiKey: "AIzaSyD8AC3uiRF1bzvGoVZx2s_XFh75bv78_1I",
+  authDomain: "duopet-9a9b0.firebaseapp.com",
+  projectId: "duopet-9a9b0",
+  storageBucket: "duopet-9a9b0.firebasestorage.app",
+  messagingSenderId: "487034806743",
+  appId: "1:487034806743:web:02d5c05bbdcfe448b7eb92"
 };
 const CLOUD_ON = Boolean(FIREBASE_CONFIG.apiKey && FIREBASE_CONFIG.projectId);
 const SDK = "https://www.gstatic.com/firebasejs/11.6.1/";
