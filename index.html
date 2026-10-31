@@ -14,7 +14,7 @@
 <title>DuoPet</title>
 <!-- Versão publicada. A cada publicação o app compara com a versão aberta e se atualiza sozinho.
      (Mesmo que você esqueça de mudar este número, o app também compara o conteúdo do arquivo.) -->
-<script>window.DP_BUILD = "20261031-0002";
+<script>window.DP_BUILD = "20261031-0003";
 window.addEventListener("beforeinstallprompt", function (e) { e.preventDefault(); window.__pwaPrompt = e; });
 window.addEventListener("appinstalled", function () { window.__pwaPrompt = null; });</script>
 <style>
@@ -182,7 +182,7 @@ svg.i{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2.2;stro
 .sv .tab{display:flex;align-items:center;gap:6px;padding:6px 14px 6px 9px;height:44px;border-radius:22px;font-size:15px;font-weight:800;color:#e7d4ff;background:linear-gradient(#4a1f94,#321468);border:3px solid #26095a;box-shadow:0 0 0 2px #5b2fb0,inset 0 2px 0 rgba(255,255,255,.18);transition:transform .12s}
 .sv .tab .ti{width:26px;height:26px;flex:none;filter:grayscale(1) sepia(.42) saturate(1.8) hue-rotate(220deg) drop-shadow(0 1px 1px rgba(35,8,70,.18));overflow:visible}
 .sv .tab.on{color:#fff;background:linear-gradient(#ff6fbd,#e0207f);border-color:#a8104f;box-shadow:0 0 14px rgba(255,79,168,.75),inset 0 2px 0 rgba(255,255,255,.5);text-shadow:0 2px 0 rgba(120,0,50,.5)}
-.sv .scroll{padding:14px max(12px,env(safe-area-inset-right)) calc(env(safe-area-inset-bottom,0px) + 90px) max(12px,env(safe-area-inset-left));overflow-x:hidden;-webkit-overflow-scrolling:touch}
+.sv .scroll{padding:14px max(12px,env(safe-area-inset-right)) calc(env(safe-area-inset-bottom,0px) + 22px) max(12px,env(safe-area-inset-left));overflow-x:hidden;-webkit-overflow-scrolling:touch}
 .sv .sg2{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 12px}
 .sv .pc{position:relative;display:flex;flex-direction:column;align-items:center;padding:8px 8px 12px;border-radius:26px;background:linear-gradient(#fff3ee,#fbe3ee 60%,#f6d6ea);border:3px solid #fff;box-shadow:0 0 0 2.5px #5a2a9a,0 8px 0 rgba(40,8,90,.35),0 12px 18px rgba(30,0,70,.3),inset 0 0 18px rgba(255,170,220,.45);transition:transform .18s}
 @media(hover:hover){.sv .pc:hover{transform:translateY(-3px)}}
@@ -438,8 +438,7 @@ button:active{transform:scale(.93)}
   <section class="view sv" id="v-shop">
     <div class="top"><button class="back" data-act="go" data-v="home" aria-label="Voltar"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><h1><span class="sico"><svg viewBox="0 0 24 24"><use href="#t-shop"/></svg></span>Loja<i class="spk"></i></h1><div class="coins"><span data-ci></span><b id="sCoins"></b><button class="plus" data-act="coinhint" aria-label="Como ganhar moedas"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="4.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button></div></div>
     <div class="tabs" id="sTabs"></div>
-    <div class="scroll"><div class="grid g2 sg2" id="sGrid"></div>
-      <p class="hint" style="margin-top:16px">As moedas são fictícias e servem só para testar a economia. Brincar rende moedas.</p></div>
+    <div class="scroll"><div class="grid g2 sg2" id="sGrid"></div></div>
   </section>
 
   <!-- DESPENSA -->
@@ -565,7 +564,7 @@ const COSM = [
   { id: "nofeet", t: "feet", n: "Descalço", p: 0 }, { id: "pantufa", t: "feet", n: "Pantufas", p: 55 }, { id: "tenis", t: "feet", n: "Tênis", p: 65 }
 ];
 const CATS = [["cor", "Cores"], ["hat", "Chapéus"], ["face", "Rosto"], ["top", "Roupa"], ["feet", "Pés"], ["bg", "Fundos"]];
-const CROP = { hat: "20 0 160 144", face: "26 28 148 148", top: "10 22 180 180", feet: "10 22 180 180" };
+const CROP = { hat: "14 -6 172 152", face: "26 28 148 148", top: "10 22 180 180", feet: "10 22 180 180" };
 const TH = {
   sala_estrela: { room: "sala", n: "Sala Estrelada", p: 40, w: "linear-gradient(#352380,#6a4ac0)", f: "repeating-linear-gradient(90deg,#8a6a9e 0 64px,#7a5a8e 64px 66px)", k: "star", c: "#ffe56b" },
   sala_menta: { room: "sala", n: "Sala Menta", p: 35, w: "linear-gradient(#c8f2e0,#9fe0c8)", f: "repeating-linear-gradient(90deg,#ecd9b0 0 64px,#dcc89e 64px 66px)", k: "dot", c: "#fff" },
@@ -762,14 +761,44 @@ const Persist = {
 
 /* ========== G. DESENHO DO PET E DOS CENÁRIOS ========== */
 const SK = "#3b1a38";
-const HAT = {
-  laco: `<path d="M146 62l18-14v28zM146 62l-18-14v28z" fill="#ff7f9c"/><circle cx="146" cy="62" r="6" fill="#ffc2d0"/>`,
-  bone: `<path d="M60 76Q62 30 106 32T142 76z" fill="#ee5d74"/><path d="M128 72q36-2 40 10q-26 6-44 0z" fill="#cf4560"/><circle cx="102" cy="32" r="4.5" fill="#cf4560"/>`,
-  gorro: `<path d="M62 78Q60 30 100 30t38 48z" fill="#72b4f2"/><rect x="58" y="68" width="84" height="14" rx="7" fill="#fff"/><circle cx="100" cy="26" r="9" fill="#fff"/>`,
-  festa: `<path d="M100 10l-26 60h52z" fill="#ffd067"/><circle cx="100" cy="10" r="7" fill="#ff8fa3"/><path d="M84 54h32M92 36h16" stroke="#fff" stroke-width="4"/>`,
-  coroa: `<path d="M68 72l-4-32 22 15 14-22 14 22 22-15-4 32z" fill="#ffd067"/><circle cx="100" cy="42" r="4" fill="#ff8fa3" stroke-width="2"/>`,
-  abafador: `<path d="M44 90Q50 24 100 24t56 66" fill="none" stroke-width="12"/><path d="M44 90Q50 24 100 24t56 66" fill="none" stroke="#fff" stroke-width="7"/><ellipse cx="44" cy="96" rx="15" ry="20" fill="#fff"/><ellipse cx="156" cy="96" rx="15" ry="20" fill="#fff"/><ellipse cx="44" cy="96" rx="7" ry="12" fill="#e6ecf2" stroke-width="2"/><ellipse cx="156" cy="96" rx="7" ry="12" fill="#e6ecf2" stroke-width="2"/>`
-};
+/* Chapéus: cada um recebe `u` (id único do pet na tela) para usar degradês sem colidir. */
+const FUZZ = (x, u) => [...Array(10)].map((_, i) => { const a = i / 10 * 6.283; return `<circle cx="${(x + Math.cos(a) * 15).toFixed(1)}" cy="${(98 + Math.sin(a) * 21).toFixed(1)}" r="6.5" fill="#fff"/>`; }).join("") + `<ellipse cx="${x}" cy="98" rx="15.5" ry="21.5" fill="#fff" stroke="none"/><ellipse cx="${x}" cy="98" rx="9.5" ry="15" fill="url(#${u}hp)" stroke-width="2.6"/><path d="M${x - 5} 90q3-5 8-4" fill="none" stroke="#fff" stroke-width="3" opacity=".7"/>`;
+const HAT = id => ({
+  laco: u => `<defs><linearGradient id="${u}hl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffb8d0"/><stop offset=".55" stop-color="#ff6f9b"/><stop offset="1" stop-color="#e03a76"/></linearGradient></defs>
+<path d="M135 68L124 88l11-3 3 9 6-26z" fill="#e8497f"/><path d="M141 68l5 26 4-9 11 3-9-20z" fill="#e8497f"/>
+<path d="M140 62C122 38 100 46 106 66c4 12 22 10 34-4z" fill="url(#${u}hl)"/><path d="M140 62C158 38 180 46 174 66c-4 12-22 10-34-4z" fill="url(#${u}hl)"/>
+<path d="M112 56q8-8 18-3M168 56q-8-8-18-3" fill="none" stroke="#fff" stroke-width="3.4" opacity=".7"/>
+<g fill="#fff" stroke="none" opacity=".9"><circle cx="118" cy="66" r="2.6"/><circle cx="126" cy="58" r="2.2"/><circle cx="162" cy="66" r="2.6"/><circle cx="154" cy="58" r="2.2"/></g>
+<ellipse cx="140" cy="62" rx="9" ry="10" fill="url(#${u}hl)"/><path d="M135 57q3-4 7-3" fill="none" stroke="#fff" stroke-width="2.6" opacity=".8"/>`,
+  bone: u => `<defs><linearGradient id="${u}hb" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff8496"/><stop offset=".6" stop-color="#ee4a66"/><stop offset="1" stop-color="#c52f4f"/></linearGradient><linearGradient id="${u}hv" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#dd3f5d"/><stop offset="1" stop-color="#a62043"/></linearGradient></defs>
+<g transform="translate(0 -6)"><path d="M60 82C56 42 80 26 100 26s44 16 40 56z" fill="url(#${u}hb)"/>
+<path d="M100 26C88 40 82 60 82 82M100 26c12 14 18 34 18 56" fill="none" stroke="#a62043" stroke-width="2.4" opacity=".7"/>
+<path d="M72 52q6-14 22-20" fill="none" stroke="#fff" stroke-width="5" opacity=".6"/><circle cx="100" cy="26" r="5.5" fill="#c52f4f"/>
+<path d="M54 82Q100 66 146 82Q152 96 100 98Q48 96 54 82z" fill="url(#${u}hv)"/><path d="M66 85Q100 75 134 85" fill="none" stroke="#fff" stroke-width="3" opacity=".45"/>
+<g transform="translate(100 56)" fill="#fff" stroke="none"><ellipse cy="4" rx="5.5" ry="4.4"/><circle cx="-6.5" cy="-1" r="2.2"/><circle cx="-2.4" cy="-5.4" r="2.3"/><circle cx="2.4" cy="-5.4" r="2.3"/><circle cx="6.5" cy="-1" r="2.2"/></g></g>`,
+  gorro: u => `<defs><linearGradient id="${u}hg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9ad3ff"/><stop offset=".6" stop-color="#5aa4ee"/><stop offset="1" stop-color="#3f84d6"/></linearGradient></defs>
+<path d="M62 74C56 38 80 24 100 24s44 14 38 50z" fill="url(#${u}hg)"/>
+<path d="M76 68Q72 48 84 32M92 66Q90 46 96 28M108 66Q110 46 104 28M124 68Q128 48 116 32" fill="none" stroke="#3f84d6" stroke-width="2.4" opacity=".7"/>
+<path d="M64 50Q100 36 136 50l-1 9Q100 45 65 59z" fill="#ff7b8e" stroke-width="2.6"/><path d="M72 40q10-8 22-10" fill="none" stroke="#fff" stroke-width="4" opacity=".55"/>
+<rect x="54" y="66" width="92" height="19" rx="9.5" fill="#fff"/><path d="M66 68v15M78 68v15M90 68v15M102 68v15M114 68v15M126 68v15M138 68v15" stroke="#cfe3f7" stroke-width="2.4" fill="none"/>
+<circle cx="100" cy="21" r="11" fill="#fff"/><path d="M93 17q4-5 9-4" fill="none" stroke="#dbe9f7" stroke-width="3"/><path d="M94 26l-2 3M100 28v3M106 26l2 3M90 20l-3 1M110 20l3 1" fill="none" stroke="#dbe9f7" stroke-width="2"/>`,
+  festa: u => `<defs><linearGradient id="${u}hf" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffe27a"/><stop offset="1" stop-color="#ffab3d"/></linearGradient><clipPath id="${u}hk"><path d="M100 14L68 76Q100 88 132 76z"/></clipPath></defs>
+<path d="M100 14L68 76Q100 88 132 76z" fill="url(#${u}hf)"/>
+<g clip-path="url(#${u}hk)" fill="none" stroke-width="7"><path d="M56 76L140 44" stroke="#ff7fb0"/><path d="M56 58L140 26" stroke="#7fd6ff"/><path d="M56 94L140 62" stroke="#7fd6ff"/><path d="M56 40L140 8" stroke="#ff7fb0"/></g>
+<path d="M100 14L68 76Q100 88 132 76z" fill="none"/><path d="M93 30L80 62" fill="none" stroke="#fff" stroke-width="4" opacity=".55"/>
+<g fill="#fff" stroke="none"><circle cx="76" cy="77" r="4.6"/><circle cx="88" cy="81" r="4.6"/><circle cx="100" cy="82" r="4.6"/><circle cx="112" cy="81" r="4.6"/><circle cx="124" cy="77" r="4.6"/></g>
+<path d="M100 14l-9-8M100 14l9-8M100 14v-10" fill="none" stroke="#ff7fb0" stroke-width="3"/><circle cx="100" cy="14" r="8.5" fill="#ff7fb0"/><circle cx="97" cy="11" r="2.6" fill="#fff" stroke="none" opacity=".8"/>
+<g stroke="none"><circle cx="91" cy="55" r="2.4" fill="#fff"/><circle cx="108" cy="48" r="2.4" fill="#ff7fb0"/><circle cx="112" cy="66" r="2.4" fill="#fff"/></g>`,
+  abafador: u => `<defs><linearGradient id="${u}hm" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#b9c4ff"/><stop offset="1" stop-color="#6f82f0"/></linearGradient><radialGradient id="${u}hp" cx=".4" cy=".35" r=".8"><stop offset="0" stop-color="#ffd0e0"/><stop offset="1" stop-color="#ff86ae"/></radialGradient></defs>
+<path d="M44 92Q48 24 100 24t56 68" fill="none" stroke-width="13"/><path d="M44 92Q48 24 100 24t56 68" fill="none" stroke="url(#${u}hm)" stroke-width="8"/><path d="M58 62Q70 36 96 32" fill="none" stroke="#fff" stroke-width="2.6" opacity=".6"/>
+${FUZZ(44, u)}${FUZZ(156, u)}`,
+  coroa: u => `<defs><linearGradient id="${u}hc" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff3a0"/><stop offset=".5" stop-color="#ffd23d"/><stop offset="1" stop-color="#e8921a"/></linearGradient></defs>
+<path d="M66 78L60 40l22 16 18-28 18 28 22-16-6 38z" fill="url(#${u}hc)"/>
+<g fill="#fff3a0"><circle cx="60" cy="37" r="5"/><circle cx="100" cy="25" r="6"/><circle cx="140" cy="37" r="5"/></g>
+<path d="M66 66h68v13a4 4 0 0 1-4 4H70a4 4 0 0 1-4-4z" fill="#f5a623"/>
+<circle cx="84" cy="74" r="4.4" fill="#ff4f6e" stroke-width="2.2"/><path d="M100 67l6 7-6 8-6-8z" fill="#5ac8ff" stroke-width="2.2"/><circle cx="116" cy="74" r="4.4" fill="#4fdc9a" stroke-width="2.2"/>
+<path d="M72 60L69 46M96 46l-4 12" fill="none" stroke="#fff" stroke-width="3.4" opacity=".65"/>`
+}[id]);
 const FACE = {
   oculos: `<g fill="rgba(255,255,255,.3)"><circle cx="76" cy="107" r="18"/><circle cx="124" cy="107" r="18"/></g><path d="M94 107h12" fill="none"/>`,
   sol: `<g fill="#2d2438"><rect x="56" y="94" width="38" height="28" rx="11"/><rect x="106" y="94" width="38" height="28" rx="11"/></g><path d="M94 104h12" fill="none"/><path d="M63 101l10-2M113 101l10-2" stroke="#fff" stroke-width="3" opacity=".6"/>`
@@ -820,7 +849,7 @@ function petSVG(o, vb, mood) {
   <g stroke="${SK}" stroke-width="3.4" stroke-linejoin="round" stroke-linecap="round">${FEET[o.feet] || ""}${TOP(o.top, u)}</g>
   ${cheeks}${eyes}<ellipse cx="100" cy="121" rx="4" ry="3" fill="#c96a86"/>${mouth}${extra}
   <ellipse cx="32" cy="142" rx="12" ry="19" transform="rotate(22 32 142)" fill="${G}" ${E}/><ellipse cx="168" cy="142" rx="12" ry="19" transform="rotate(-22 168 142)" fill="${G}" ${E}/>
-  <g stroke="${SK}" stroke-width="3.4" stroke-linejoin="round" stroke-linecap="round">${TOPO(o.top)}${FACE[o.face] || ""}${HAT[o.hat] || ""}</g>${foam}</svg>`;
+  <g stroke="${SK}" stroke-width="3.4" stroke-linejoin="round" stroke-linecap="round">${TOPO(o.top)}${FACE[o.face] || ""}${(HAT(o.hat) || (() => ""))(u)}</g>${foam}</svg>`;
 }
 const cosmPic = c => c.t === "bg" ? bgPic(c) : c.c ? `<span class="sw" style="background:${c.c}"></span>` : c.id.startsWith("no") ? `<svg viewBox="0 0 64 64" fill="none" stroke="#c9bcc4" stroke-width="4" stroke-linecap="round"><circle cx="32" cy="32" r="18"/><path d="M19 45L45 19"/></svg>` : petSVG({ color: S.pet.color, hat: "", face: "", top: "", feet: "", [c.t]: c.id }, CROP[c.t], "normal");
 
