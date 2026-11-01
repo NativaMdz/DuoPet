@@ -303,6 +303,7 @@ button:active{transform:scale(.93)}
 .slot.bounce .pet{animation:bounce .75s}
 .slot.still:not(.bounce) .pet{animation:none}
 .slot.away{display:none}
+.ghost,.sd,.sb,.fxp,.stm,.wd{will-change:transform,opacity}
 @keyframes wag{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(20deg)}}
 @keyframes fl{0%{transform:translate(-50%,0) scale(.5);opacity:0}20%{transform:translate(-50%,-20px) scale(1.25);opacity:1}100%{transform:translate(-50%,-84px) scale(1);opacity:0}}
 @keyframes rise{0%{transform:scale(.4);opacity:1}100%{transform:translateY(-72px) scale(1.2) rotate(12deg);opacity:0}}
@@ -712,7 +713,7 @@ const Pet = {
   advance(ms) { if (advanceState(S, ms)) return "woke"; },
   gain(xp, coins) {
     const p = S.pet; S.coins += coins || 0; p.xp += xp;
-    while (p.xp >= xpNeed(p.level)) { p.xp -= xpNeed(p.level); p.level++; S.coins += 20; FX.burst(innerWidth / 2, innerHeight * .35, "star", 18); FX.burst(innerWidth / 2, innerHeight * .35, "coin", 6); UI.toast(p.name + " chegou ao nível " + p.level + "! Bônus: 20 moedas.", "ok"); }
+    while (p.xp >= xpNeed(p.level)) { p.xp -= xpNeed(p.level); p.level++; S.coins += 20; const lv = p.level; setTimeout(() => { FX.burst(innerWidth / 2, innerHeight * .35, "star", 14); FX.burst(innerWidth / 2, innerHeight * .35, "coin", 5); UI.toast(p.name + " chegou ao nível " + lv + "! Bônus: 20 moedas.", "ok"); }, 700); }
   },
   mood() {
     const p = S.pet;
@@ -747,7 +748,7 @@ const Pet = {
     if (!foamMine) setMine(true);
     p.foam = clamp(p.foam + 6); p.hygiene = clamp(p.hygiene + 3); p.happy = clamp(p.happy + .3); p.energy = clamp(p.energy - .2);
     UI.suds(x, y); UI.bubble(x, y, 1 + (Math.random() * 2 | 0)); FX.vib(8); UI.live();
-    if (FB(p.foam) !== b0) { UI.pet(); UI.home(); }
+    if (FB(p.foam) !== b0) UI.foamTick();
     if (p.foam >= 100 && b0 < FOAM.length) UI.toast(p.name + " está coberto de espuma! Use o chuveiro.", "ok");
   },
   rinse(d) {
@@ -769,8 +770,8 @@ const Pet = {
     if (d.n % 8 === 0) { const m = document.createElement("span"); m.className = "stm"; m.style.left = (30 + Math.random() * 40) + "%"; m.style.top = "50%"; $("#stage").appendChild(m); setTimeout(() => m.remove(), 2400); }
     UI.live();
     const done = (had && p.foam <= 0) || (!had && p.hygiene >= 98 && !d.paid);
-    if (done) { d.paid = 1; this.gain(4, 0); FX.burst(r.left + r.width / 2, r.top + r.height * .4, "star", 10); UI.toast(p.name + " está limpinho e cheiroso!", "ok"); UI.fx("happy", "Limpinho!"); sl.classList.remove("wet"); }
-    if (done || FB(p.foam) !== b0) { UI.pet(); UI.home(); }
+    if (done) { d.paid = 1; this.gain(4, 0); sl.classList.remove("wet"); UI.fx("happy", "Limpinho!"); UI.foamTip(); setTimeout(() => UI.toast(p.name + " está limpinho e cheiroso!", "ok"), 300); }
+    else if (FB(p.foam) !== b0) UI.foamTick();
   },
   shower() {
     const p = S.pet;
@@ -780,9 +781,9 @@ const Pet = {
     p.foam = clamp(p.foam - 34); p.hygiene = clamp(p.hygiene + 15); p.energy = clamp(p.energy - 1); this.gain(4, 0);
     FX.vib(30); UI.rain();
     const r = $("#v-home .petslot").getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height * .4;
-    FX.burst(cx, cy, "bub", had ? 10 : 5);
-    if (had && p.foam <= 0) { FX.burst(cx, cy, "star", 10); UI.toast(p.name + " está limpinho e cheiroso!", "ok"); UI.fx("happy", "Limpinho!"); } else UI.fx("happy", "+4 XP");
-    Persist.save(); UI.render();
+    FX.burst(cx, cy, "bub", had ? 8 : 4);
+    if (had && p.foam <= 0) { UI.fx("happy", "Limpinho!"); setTimeout(() => UI.toast(p.name + " está limpinho e cheiroso!", "ok"), 300); } else UI.fx("happy", "+4 XP");
+    UI.live(); UI.foamTip(); setTimeout(() => Persist.save(), 300);
   },
   buy(kind, id) {
     if (kind === "food") {
@@ -911,11 +912,17 @@ const TOPO = id => { const v = SLV[id]; return v ? [[35, 131, 22, 1], [165, 131,
 const FOAM = [[100, 70, 15], [60, 146, 13], [140, 146, 13], [48, 126, 10], [152, 126, 10], [84, 164, 12], [116, 164, 12], [78, 76, 11], [122, 76, 11], [40, 110, 8], [160, 110, 8], [100, 176, 11], [36, 148, 9], [164, 148, 9], [56, 62, 9], [144, 62, 9], [52, 90, 7], [148, 90, 7], [70, 182, 9], [130, 182, 9], [100, 156, 8], [58, 168, 8], [142, 168, 8], [100, 188, 7]];
 const FB = f => Math.ceil(f / 100 * FOAM.length);
 let foamN = 0, foamT = 0;
+const foamItem = (i, fresh) => {
+  const [x, y, r] = FOAM[i], f1 = v => v.toFixed(1);
+  return `<g class="fb${fresh ? " fn" : ""}" style="--o:${(i % 6) * .21}s;transform-origin:${x}px ${y}px"><circle cx="${x}" cy="${y}" r="${r}" fill="rgba(170,225,255,.24)" stroke="rgba(110,195,250,.85)" stroke-width="1.8"/><circle cx="${x}" cy="${y}" r="${f1(r + 1.3)}" fill="none" stroke="#fff" stroke-width="1" opacity=".85"/><path d="M${f1(x + r * .66)} ${f1(y - r * .4)}A${f1(r * .78)} ${f1(r * .78)} 0 0 1 ${f1(x - r * .42)} ${f1(y + r * .66)}" fill="none" stroke="rgba(255,150,225,.6)" stroke-width="${Math.max(1.6, r * .2).toFixed(1)}" stroke-linecap="round"/><path d="M${f1(x - r * .66)} ${f1(y + r * .1)}A${f1(r * .66)} ${f1(r * .66)} 0 0 1 ${f1(x - r * .1)} ${f1(y - r * .66)}" fill="none" stroke="#fff" stroke-width="${Math.max(1.8, r * .22).toFixed(1)}" stroke-linecap="round"/><circle cx="${f1(x + r * .4)}" cy="${f1(y - r * .5)}" r="${Math.max(1, r * .1).toFixed(1)}" fill="#fff"/></g>`;
+};
+const foamItems = (a, b, fresh) => { let h = ""; for (let i = a; i < b; i++) h += foamItem(i, fresh); return h; };
+const foamTxt = () => S.pet.foam > 0 ? "Espuma " + Math.round(S.pet.foam) + "%<br>Arraste o chuveiro" : "Ensaboe o pet<br>e enxágue";
 const foamSVG = f => {
   const n = FB(f), now = performance.now(); if (n > foamN) foamT = now; foamN = n; const fresh = now - foamT < 800;
-  const f1 = v => v.toFixed(1);
-  return `<g>${FOAM.slice(0, n).map(([x, y, r], i) => `<g class="fb${fresh && i === n - 1 ? " fn" : ""}" style="--o:${(i % 6) * .21}s;transform-origin:${x}px ${y}px"><circle cx="${x}" cy="${y}" r="${r}" fill="rgba(170,225,255,.24)" stroke="rgba(110,195,250,.85)" stroke-width="1.8"/><circle cx="${x}" cy="${y}" r="${f1(r + 1.3)}" fill="none" stroke="#fff" stroke-width="1" opacity=".85"/><path d="M${f1(x + r * .66)} ${f1(y - r * .4)}A${f1(r * .78)} ${f1(r * .78)} 0 0 1 ${f1(x - r * .42)} ${f1(y + r * .66)}" fill="none" stroke="rgba(255,150,225,.6)" stroke-width="${Math.max(1.6, r * .2).toFixed(1)}" stroke-linecap="round"/><path d="M${f1(x - r * .66)} ${f1(y + r * .1)}A${f1(r * .66)} ${f1(r * .66)} 0 0 1 ${f1(x - r * .1)} ${f1(y - r * .66)}" fill="none" stroke="#fff" stroke-width="${Math.max(1.8, r * .22).toFixed(1)}" stroke-linecap="round"/><circle cx="${f1(x + r * .4)}" cy="${f1(y - r * .5)}" r="${Math.max(1, r * .1).toFixed(1)}" fill="#fff"/></g>`).join("")}</g>`;
+  return `<g class="fgl">${foamItems(0, n - 1, false)}${n ? foamItem(n - 1, fresh) : ""}</g>`;
 };
+
 const FLIES = `<g class="fly"><circle cx="100" cy="38" r="2.6" fill="#3b1a38"/><ellipse cx="97" cy="35" rx="3" ry="1.600" fill="#fff" opacity=".8"/></g><g class="fly" style="animation-duration:2.6s;animation-direction:reverse"><circle cx="152" cy="84" r="2.6" fill="#3b1a38"/></g>`;
 const SPARK = `<g fill="#fff" stroke="#ffd96a" stroke-width="1.5"><path transform="translate(162 84)" d="M0-7L2-2 7 0 2 2 0 7-2 2-7 0-2-2z"/><path transform="translate(40 96) scale(.8)" d="M0-7L2-2 7 0 2 2 0 7-2 2-7 0-2-2z"/><path transform="translate(150 160) scale(.7)" d="M0-7L2-2 7 0 2 2 0 7-2 2-7 0-2-2z"/></g>`;
 const EXK = "#3a2d45", EXH = (x, y, k) => `<path transform="translate(${(x - 12 * k).toFixed(1)} ${(y - 13 * k).toFixed(1)}) scale(${k})" d="M12 21s-8-5.3-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 5.7-8 11-8 11z" fill="#ff4f93" stroke="${EXK}" stroke-width="${(2.6 / k).toFixed(2)}" stroke-linejoin="round"/><ellipse transform="translate(${(x - 12 * k).toFixed(1)} ${(y - 13 * k).toFixed(1)}) scale(${k})" cx="8.2" cy="9.4" rx="2" ry="1.2" fill="#fff" opacity=".9"/>`;
@@ -999,7 +1006,7 @@ const ROOMHTML = {
 
 const HEART = `<svg viewBox="0 0 24 24"><path d="M12 21s-8-5.3-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 5.7-8 11-8 11z" fill="#ff5fa0" stroke="#fff" stroke-width="1.5"/></svg>`;
 const FX = {
-  vib(n) { try { navigator.vibrate && navigator.vibrate(n); } catch (e) {} },
+  vib(n) { const t = performance.now(); if (t - (this._v || 0) < 150) return; this._v = t; try { navigator.vibrate && navigator.vibrate(n); } catch (e) {} },
   burst(x, y, kind, n) {
     for (let i = 0; i < (n || 8); i++) {
       const e = document.createElement("span"), a = Math.random() * 6.283, v = 40 + Math.random() * 60;
@@ -1032,8 +1039,8 @@ const UI = {
     if (size) s.style.width = s.style.height = size + "px"; st.appendChild(s); setTimeout(() => s.remove(), 1000);
   },
   bubble(x, y, n, sp) {
-    const st = $(".view.on .stage"); if (!st) return; const r = st.getBoundingClientRect(), sw = sp || 50; let have = st.querySelectorAll(".sb").length;
-    for (let i = 0; i < n && have < 18; i++, have++) {
+    const st = $(".view.on .stage"); if (!st) return; const r = this.srect(st), sw = sp || 50; let have = st.querySelectorAll(".sb").length;
+    for (let i = 0; i < n && have < 12; i++, have++) {
       const s = document.createElement("span"), z = 12 + Math.random() * 26, t = 1.5 + Math.random() * 1.1;
       s.className = "sb";
       s.style.cssText = `left:${x - r.left + (Math.random() - .5) * sw}px;top:${y - r.top + (Math.random() - .5) * sw * .6}px;--z:${z}px;--t:${t}s;--dy:${-(70 + Math.random() * 90)}px;--sw:${(Math.random() - .5) * 24}px;animation-delay:${Math.random() * .15}s`;
@@ -1041,7 +1048,7 @@ const UI = {
     }
   },
   suds(x, y) {
-    const st = $(".view.on .stage"); if (!st || st.querySelectorAll(".sd").length > 7) return; const r = st.getBoundingClientRect(), s = document.createElement("span");
+    const st = $(".view.on .stage"); if (!st || st.querySelectorAll(".sd").length > 3) return; const r = this.srect(st), s = document.createElement("span");
     s.className = "sd"; s.style.cssText = `left:${x - r.left + (Math.random() - .5) * 40}px;top:${y - r.top + (Math.random() - .5) * 24}px;--z:${34 + Math.random() * 26}px;--rt:${(Math.random() - .5) * 30}deg`;
     s.innerHTML = SUDS; st.appendChild(s); setTimeout(() => s.remove(), 1400);
   },
@@ -1055,12 +1062,20 @@ const UI = {
   },
   fx(mode, text) {
     fxMode = mode; this.pet();
-    $$(".view.on .petslot").forEach(s => {
-      s.classList.remove("bounce"); void s.offsetWidth; s.classList.add("bounce"); clearTimeout(s._bt); s._bt = setTimeout(() => s.classList.remove("bounce"), 800); const q = s.getBoundingClientRect(); FX.burst(q.left + q.width / 2, q.top + q.height * .35, mode === "eat" ? "heart" : "star", mode === "eat" ? 5 : 7); if (mode === "eat") FX.burst(q.left + q.width / 2, q.top + q.height * .5, "crumb", 7);
-      if (text) { const f = document.createElement("span"); f.className = "fl"; f.textContent = text; s.parentNode.appendChild(f); setTimeout(() => f.remove(), 1100); }
-    });
-    setTimeout(() => { fxMode = ""; this.pet(); }, 1300);
+    const sl = $$(".view.on .petslot");
+    requestAnimationFrame(() => sl.forEach(s => { s.classList.remove("bounce"); void s.offsetWidth; s.classList.add("bounce"); clearTimeout(s._bt); s._bt = setTimeout(() => s.classList.remove("bounce"), 800); }));
+    setTimeout(() => sl.forEach(s => { const q = s.getBoundingClientRect(); FX.burst(q.left + q.width / 2, q.top + q.height * .35, mode === "eat" ? "heart" : "star", mode === "eat" ? 5 : 7); if (mode === "eat") FX.burst(q.left + q.width / 2, q.top + q.height * .5, "crumb", 7); }), 150);
+    if (text) setTimeout(() => sl.forEach(s => { const f = document.createElement("span"); f.className = "fl"; f.textContent = text; s.parentNode.appendChild(f); setTimeout(() => f.remove(), 1100); }), 260);
+    clearTimeout(this._fxt); this._fxt = setTimeout(() => { fxMode = ""; this.pet(); }, 1500);
   },
+  foamTick() {
+    const p = S.pet, n = FB(p.foam), s = $("#v-home .petslot"), L = s && s.querySelector(".fgl");
+    if (!L || !foamMine || n < 1) this.pet();
+    else { let c = L.childElementCount; if (n > c) { L.insertAdjacentHTML("beforeend", foamItems(c, n, true)); foamT = performance.now(); } else while (c > n) { L.lastElementChild.remove(); c--; } foamN = n; }
+    this.foamTip();
+  },
+  foamTip() { const e = $("#v-home .ft"); if (e) e.innerHTML = foamTxt(); },
+  srect(st) { const t = performance.now(); if (!this._sr || this._sr.st !== st || t - this._sr.t > 400) this._sr = { st, t, r: st.getBoundingClientRect() }; return this._sr.r; },
   enter(id, key) { const k = this._k2 || (this._k2 = {}); $("#" + id).classList.toggle("enter", k[id] !== key); k[id] = key; },
   go(v) { if (v === "duo" && CLOUD_ON) Cloud.markSeen(); this._k2 = {}; $("#menu").classList.remove("on"); view = v; $$(".view").forEach(e => e.classList.toggle("on", e.id === "v-" + v)); $$(".scroll").forEach(s => s.scrollTop = 0); this.render(); },
   setRoom(r) { room = r; this.render(); },
@@ -1074,9 +1089,14 @@ const UI = {
     $("#xpb").style.width = (p.xp / xpNeed(p.level) * 100) + "%"; $("#pname").textContent = p.name || "Seu pet";
   },
   stats() {
-    const p = S.pet;
-    $("#sbar").innerHTML = STATS.map(([k, n, i]) => { const v = Math.round(p[k]), col = v > 60 ? "#2fbf86" : v > 30 ? "#f2a91d" : "#ff5f50";
-      return `<div class="sg ${v < 20 ? "low" : ""}" role="img" aria-label="${n} ${v}%" title="${n}: ${v}%" style="color:${col}">${ic(i)}<span class="tr"><i style="width:${v}%;background:${col}"></i></span></div>`; }).join("");
+    const p = S.pet, bar = $("#sbar"), col = v => v > 60 ? "#2fbf86" : v > 30 ? "#f2a91d" : "#ff5f50";
+    if (bar.children.length === STATS.length && bar.firstElementChild._st) {
+      STATS.forEach(([k, n], j) => { const el = bar.children[j], v = Math.round(p[k]); if (el._v === v) return; el._v = v; const c = col(v), b = el.querySelector(".tr i"); el.style.color = c; el.classList.toggle("low", v < 20); el.setAttribute("aria-label", n + " " + v + "%"); el.title = n + ": " + v + "%"; b.style.width = v + "%"; b.style.background = c; });
+      return;
+    }
+    bar.innerHTML = STATS.map(([k, n, i]) => { const v = Math.round(p[k]), c = col(v);
+      return `<div class="sg ${v < 20 ? "low" : ""}" role="img" aria-label="${n} ${v}%" title="${n}: ${v}%" style="color:${c}">${ic(i)}<span class="tr"><i style="width:${v}%;background:${c}"></i></span></div>`; }).join("");
+    [...bar.children].forEach((el, j) => { el._st = 1; el._v = Math.round(p[STATS[j][0]]); });
   },
   pet() {
     lastMood = Pet.mood();
@@ -1090,7 +1110,7 @@ const UI = {
     const T = (inner, lab, cls, attr) => `<div class="tl ${cls || ""}" ${attr || ""}>${inner}<span>${lab}</span></div>`;
     let h;
     if (room === "sala") h = `<div class="tool" data-tool="ball">${BALL}</div><div class="tl"><span>Jogue a bola<br>no pet</span></div>`;
-    else if (room === "banheiro") h = `<div class="tool" data-tool="soap">${SOAP}</div><div class="tool" data-tool="shower">${SHOWER}</div><div class="tl"><span>${S.pet.foam > 0 ? "Espuma " + Math.round(S.pet.foam) + "%<br>Arraste o chuveiro" : "Ensaboe o pet<br>e enxágue"}</span></div>`;
+    else if (room === "banheiro") h = `<div class="tool" data-tool="soap">${SOAP}</div><div class="tool" data-tool="shower">${SHOWER}</div><div class="tl"><span class="ft">${foamTxt()}</span></div>`;
     else if (room === "quarto") h = `<button class="tl" data-act="do" data-a="sleep">${tile(S.pet.sleeping ? "sun" : "lamp", "#ffd36b", "#ff9a3d")}<span>${S.pet.sleeping ? "Acender a luz" : "Apagar a luz"}</span></button><div class="tl"><span>${S.pet.sleeping ? "Dormindo..." : "Recupera a<br>energia"}</span></div>`;
     else {
       const fl = foodList(); if (fi >= fl.length) fi = 0;
@@ -1381,12 +1401,12 @@ const Tools = {
   pos(e) { this.d.g.style.transform = `translate(${e.clientX - 32}px,${e.clientY - 72}px) rotate(${this.d.k === "soap" ? -8 : Math.max(-18, Math.min(18, (e.clientX - this.d.x) * 1.2)) - 8}deg) scale(1.2)`; },
   over(e) { const r = $("#v-home .petslot").getBoundingClientRect(); return e.clientX > r.left && e.clientX < r.right && e.clientY > r.top && e.clientY < r.bottom; },
   move(e) {
-    const d = this.d; if (!d) return; this.pos(e); $("#v-home .petslot").classList.toggle("hot", d.k !== "soap" && d.k !== "shower" && this.over(e));
-    d.cx = e.clientX; d.cy = e.clientY; d.over = this.over(e);
+    const d = this.d; if (!d) return; this.pos(e); const ov = this.over(e); $("#v-home .petslot").classList.toggle("hot", d.k !== "soap" && d.k !== "shower" && ov);
+    d.cx = e.clientX; d.cy = e.clientY; d.over = ov;
     if (d.k === "shower" && !d.over) { $("#v-home .petslot").classList.remove("wet"); }
     const dist = Math.hypot(e.clientX - d.x, e.clientY - d.y); d.x = e.clientX; d.y = e.clientY;
     if (Math.hypot(e.clientX - d.sx, e.clientY - d.sy) > 10) d.moved = true;
-    if (d.k === "soap" && d.moved && this.over(e)) { d.acc += dist; if (d.acc > 24) { d.acc = 0; Pet.scrub(e.clientX, e.clientY); } }
+    if (d.k === "soap" && d.moved && ov) { d.acc += dist; if (d.acc > 24) { d.acc = 0; Pet.scrub(e.clientX, e.clientY); } }
   },
   up(e) {
     const d = this.d; if (!d) return; this.d = null; d.g.remove(); const over = this.over(e); $("#v-home .petslot").classList.remove("hot", "wet", "still");
