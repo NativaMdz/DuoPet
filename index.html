@@ -341,7 +341,6 @@ button:active{transform:scale(.93)}
 .bgp i{position:absolute;left:0;right:0;top:0;height:62%;display:block}
 .sv .pc .pic>.bgp{width:60%;height:auto}
 /* ========== 9. CHUVEIRO ARRASTAVEL ========== */
-.ghost.spray::after{content:"";position:absolute;left:14%;top:96%;width:72%;height:96px;background:repeating-linear-gradient(90deg,rgba(150,215,255,.9) 0 3px,rgba(150,215,255,.15) 3px 8px);clip-path:polygon(8% 0,92% 0,100% 100%,0 100%);opacity:.8}
 .wd{position:fixed;width:5px;height:14px;border-radius:5px;background:linear-gradient(#e8f8ff,#7fc8f5);pointer-events:none;z-index:49;animation:wd .6s ease-in both}
 @keyframes wd{from{transform:translateY(0);opacity:1}to{transform:translateY(95px);opacity:0}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.fxp{display:none}}
@@ -390,11 +389,6 @@ button:active{transform:scale(.93)}
 @keyframes fbw{0%,100%{transform:scale(1)}50%{transform:scale(1.05,.96)}}
 @keyframes jig{0%,100%{rotate:0deg;scale:1}20%{rotate:-2.4deg;scale:1.03 .97}45%{rotate:2.2deg;scale:.98 1.02}70%{rotate:-1deg;scale:1.01 .99}}
 @keyframes wet{from{translate:-2px 0;rotate:-1deg}to{translate:2px 0;rotate:1deg}}
-.ghost.rub{animation:rub .26s ease-in-out infinite alternate}
-@keyframes rub{from{rotate:-7deg;translate:-4px 2px}to{rotate:7deg;translate:4px -2px}}
-.ghost.spray::before,.ghost.spray::after{content:"";position:absolute;left:4%;top:90%;width:92%;height:140px;pointer-events:none;clip-path:polygon(28% 0,72% 0,100% 100%,0 100%)}
-.ghost.spray::before{background:linear-gradient(rgba(130,205,255,.7),rgba(130,205,255,0))}
-.ghost.spray::after{opacity:1;background:repeating-conic-gradient(from 158deg at 50% -6%,rgba(235,250,255,1) 0 3.2deg,transparent 3.2deg 6.5deg);}
 .stream{width:160px;margin-left:-80px;background:repeating-conic-gradient(from 158deg at 50% -4%,rgba(225,248,255,.98) 0 3.2deg,transparent 3.2deg 6.5deg);clip-path:polygon(40% 0,60% 0,100% 100%,0 100%);animation:strm 1.5s ease-out forwards}
 .wd,.dr{border-radius:50% 50% 50% 50%/32% 32% 68% 68%;background:linear-gradient(100deg,#fff 0 16%,#9fdcff 20%,#52b0f0);}
 .wd{left:0;top:0;width:7px;height:12px;animation:wd var(--ft,.55s) cubic-bezier(.5,0,.9,.65) both}
@@ -755,9 +749,8 @@ const Pet = {
     const sl = $("#v-home .petslot");
     if (!d.over) { sl.classList.remove("wet"); return; }
     const p = S.pet, g = d.g.classList;
-    if (p.sleeping) { g.remove("spray"); sl.classList.remove("wet"); if (!d.warned) { d.warned = 1; UI.deny(p.name + " está dormindo."); } return; }
-    if (p.hygiene >= 98 && p.foam <= 0) { g.remove("spray"); sl.classList.remove("wet"); if (!d.warned) { d.warned = 1; UI.toast(p.name + " já está limpinho."); } return; }
-    g.add("spray");
+    if (p.sleeping) { sl.classList.remove("wet"); if (!d.warned) { d.warned = 1; UI.deny(p.name + " está dormindo."); } return; }
+    if (p.hygiene >= 98 && p.foam <= 0) { sl.classList.remove("wet"); if (!d.warned) { d.warned = 1; UI.toast(p.name + " já está limpinho."); } return; }
     const had = p.foam > 0, b0 = FB(p.foam);
     p.foam = clamp(p.foam - 5); p.hygiene = clamp(p.hygiene + 1.3); p.energy = clamp(p.energy - .1); p.happy = clamp(p.happy + .2);
     FX.vib(6); d.n = (d.n || 0) + 1;
@@ -771,7 +764,7 @@ const Pet = {
     if (d.n % 8 === 0) { const m = document.createElement("span"); m.className = "stm"; m.style.left = (30 + Math.random() * 40) + "%"; m.style.top = "50%"; $("#stage").appendChild(m); setTimeout(() => m.remove(), 2400); }
     UI.live();
     const done = (had && p.foam <= 0) || (!had && p.hygiene >= 98 && !d.paid);
-    if (done) { d.paid = 1; this.gain(4, 0); FX.burst(r.left + r.width / 2, r.top + r.height * .4, "star", 10); UI.toast(p.name + " está limpinho e cheiroso!", "ok"); UI.fx("happy", "Limpinho!"); g.remove("spray"); sl.classList.remove("wet"); }
+    if (done) { d.paid = 1; this.gain(4, 0); FX.burst(r.left + r.width / 2, r.top + r.height * .4, "star", 10); UI.toast(p.name + " está limpinho e cheiroso!", "ok"); UI.fx("happy", "Limpinho!"); sl.classList.remove("wet"); }
     if (done || FB(p.foam) !== b0) { UI.pet(); UI.home(); }
   },
   shower() {
@@ -910,12 +903,13 @@ const TOP = (id, u) => ({
 const SLV = { camiseta: ["#ff80ae", "#fff", "#c43e7e"], pijama: ["#b3a1fb", "#fff", "#6e57d4"] };
 const TOPO = id => { const v = SLV[id]; return v ? [[35, 131, 22, 1], [165, 131, -22, -1]].map(([x, y, r, k]) => `<g transform="rotate(${r} ${x} ${y})"><ellipse cx="${x}" cy="${y}" rx="15" ry="12.5" fill="${v[0]}"/><path d="M${x - 11} ${y + 5}q11 8 22 0" fill="none" stroke="${v[2]}" stroke-width="2" opacity=".5"/><path d="M${x - 14} ${y + 5}q14 9 28 0" fill="none" stroke="${v[1]}" stroke-width="3.2"/><path d="M${x - 9} ${y - 7}q7-4 13-2" fill="none" stroke="#fff" stroke-width="3" opacity=".5"/></g>`).join("") : ""; };
 
-const FOAM = [[100, 70, 15], [78, 76, 11], [122, 76, 11], [60, 146, 13], [140, 146, 13], [84, 164, 12], [116, 164, 12], [100, 176, 11], [48, 126, 10], [152, 126, 10], [36, 148, 9], [164, 148, 9], [56, 62, 9], [144, 62, 9], [70, 182, 9], [130, 182, 9]];
+const FOAM = [[100, 70, 15], [60, 146, 13], [140, 146, 13], [48, 126, 10], [152, 126, 10], [84, 164, 12], [116, 164, 12], [78, 76, 11], [122, 76, 11], [40, 110, 8], [160, 110, 8], [100, 176, 11], [36, 148, 9], [164, 148, 9], [56, 62, 9], [144, 62, 9], [52, 90, 7], [148, 90, 7], [70, 182, 9], [130, 182, 9], [100, 156, 8], [58, 168, 8], [142, 168, 8], [100, 188, 7]];
 const FB = f => Math.ceil(f / 100 * FOAM.length);
 let foamN = 0, foamT = 0;
 const foamSVG = f => {
   const n = FB(f), now = performance.now(); if (n > foamN) foamT = now; foamN = n; const fresh = now - foamT < 800;
-  return `<g>${FOAM.slice(0, n).map(([x, y, r], i) => `<g class="fb${fresh && i === n - 1 ? " fn" : ""}" style="--o:${(i % 6) * .21}s;transform-origin:${x}px ${y}px"><circle cx="${x}" cy="${y}" r="${r}" fill="#fff" stroke="#8fcdf5" stroke-width="2.2"/><path d="M${(x + r * .66).toFixed(1)} ${(y - r * .4).toFixed(1)}A${(r * .78).toFixed(1)} ${(r * .78).toFixed(1)} 0 0 1 ${(x - r * .42).toFixed(1)} ${(y + r * .66).toFixed(1)}" fill="none" stroke="#d3ecfd" stroke-width="${Math.max(2, r * .26).toFixed(1)}" stroke-linecap="round"/><circle cx="${(x - r * .36).toFixed(1)}" cy="${(y - r * .36).toFixed(1)}" r="${(r * .24).toFixed(1)}" fill="#fff" stroke="none"/><circle cx="${(x + r * .3).toFixed(1)}" cy="${(y - r * .5).toFixed(1)}" r="${(r * .1).toFixed(1)}" fill="#fff" stroke="none"/></g>`).join("")}</g>`;
+  const f1 = v => v.toFixed(1);
+  return `<g>${FOAM.slice(0, n).map(([x, y, r], i) => `<g class="fb${fresh && i === n - 1 ? " fn" : ""}" style="--o:${(i % 6) * .21}s;transform-origin:${x}px ${y}px"><circle cx="${x}" cy="${y}" r="${r}" fill="rgba(170,225,255,.24)" stroke="rgba(110,195,250,.85)" stroke-width="1.8"/><circle cx="${x}" cy="${y}" r="${f1(r + 1.3)}" fill="none" stroke="#fff" stroke-width="1" opacity=".85"/><path d="M${f1(x + r * .66)} ${f1(y - r * .4)}A${f1(r * .78)} ${f1(r * .78)} 0 0 1 ${f1(x - r * .42)} ${f1(y + r * .66)}" fill="none" stroke="rgba(255,150,225,.6)" stroke-width="${Math.max(1.6, r * .2).toFixed(1)}" stroke-linecap="round"/><path d="M${f1(x - r * .66)} ${f1(y + r * .1)}A${f1(r * .66)} ${f1(r * .66)} 0 0 1 ${f1(x - r * .1)} ${f1(y - r * .66)}" fill="none" stroke="#fff" stroke-width="${Math.max(1.8, r * .22).toFixed(1)}" stroke-linecap="round"/><circle cx="${f1(x + r * .4)}" cy="${f1(y - r * .5)}" r="${Math.max(1, r * .1).toFixed(1)}" fill="#fff"/></g>`).join("")}</g>`;
 };
 const FLIES = `<g class="fly"><circle cx="100" cy="38" r="2.6" fill="#3b1a38"/><ellipse cx="97" cy="35" rx="3" ry="1.600" fill="#fff" opacity=".8"/></g><g class="fly" style="animation-duration:2.6s;animation-direction:reverse"><circle cx="152" cy="84" r="2.6" fill="#3b1a38"/></g>`;
 const SPARK = `<g fill="#fff" stroke="#ffd96a" stroke-width="1.5"><path transform="translate(162 84)" d="M0-7L2-2 7 0 2 2 0 7-2 2-7 0-2-2z"/><path transform="translate(40 96) scale(.8)" d="M0-7L2-2 7 0 2 2 0 7-2 2-7 0-2-2z"/><path transform="translate(150 160) scale(.7)" d="M0-7L2-2 7 0 2 2 0 7-2 2-7 0-2-2z"/></g>`;
@@ -1377,13 +1371,12 @@ const Tools = {
     this.d = { k: t.dataset.tool, id: t.dataset.id, g, x: e.clientX, y: e.clientY, sx: e.clientX, sy: e.clientY, moved: false, acc: 0, over: false, cx: e.clientX, cy: e.clientY }; this.pos(e);
     if (this.d.k === "shower") this.d.timer = setInterval(() => Pet.rinse(this.d), 200);
   },
-  pos(e) { this.d.g.style.transform = `translate(${e.clientX - 32}px,${e.clientY - 72}px) rotate(${Math.max(-18, Math.min(18, (e.clientX - this.d.x) * 1.2)) - 8}deg) scale(1.2)`; },
+  pos(e) { this.d.g.style.transform = `translate(${e.clientX - 32}px,${e.clientY - 72}px) rotate(${this.d.k === "soap" ? -8 : Math.max(-18, Math.min(18, (e.clientX - this.d.x) * 1.2)) - 8}deg) scale(1.2)`; },
   over(e) { const r = $("#v-home .petslot").getBoundingClientRect(); return e.clientX > r.left && e.clientX < r.right && e.clientY > r.top && e.clientY < r.bottom; },
   move(e) {
     const d = this.d; if (!d) return; this.pos(e); $("#v-home .petslot").classList.toggle("hot", d.k !== "soap" && d.k !== "shower" && this.over(e));
     d.cx = e.clientX; d.cy = e.clientY; d.over = this.over(e);
-    if (d.k === "shower" && !d.over) { d.g.classList.remove("spray"); $("#v-home .petslot").classList.remove("wet"); }
-    if (d.k === "soap") { d.g.classList.toggle("rub", d.moved && d.over); clearTimeout(d.rt); d.rt = setTimeout(() => d.g.classList.remove("rub"), 140); }
+    if (d.k === "shower" && !d.over) { $("#v-home .petslot").classList.remove("wet"); }
     const dist = Math.hypot(e.clientX - d.x, e.clientY - d.y); d.x = e.clientX; d.y = e.clientY;
     if (Math.hypot(e.clientX - d.sx, e.clientY - d.sy) > 10) d.moved = true;
     if (d.k === "soap" && d.moved && this.over(e)) { d.acc += dist; if (d.acc > 24) { d.acc = 0; Pet.scrub(e.clientX, e.clientY); } }
