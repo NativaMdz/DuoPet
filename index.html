@@ -830,11 +830,11 @@ const SK = "#3b1a38";
 const FUZZ = (x, u) => [...Array(10)].map((_, i) => { const a = i / 10 * 6.283; return `<circle cx="${(x + Math.cos(a) * 15).toFixed(1)}" cy="${(98 + Math.sin(a) * 21).toFixed(1)}" r="6.5" fill="#fff"/>`; }).join("") + `<ellipse cx="${x}" cy="98" rx="15.5" ry="21.5" fill="#fff" stroke="none"/><ellipse cx="${x}" cy="98" rx="9.5" ry="15" fill="url(#${u}hp)" stroke-width="2.6"/><path d="M${x - 5} 90q3-5 8-4" fill="none" stroke="#fff" stroke-width="3" opacity=".7"/>`;
 const HAT = id => ({
   laco: u => `<defs><linearGradient id="${u}hl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffb8d0"/><stop offset=".55" stop-color="#ff6f9b"/><stop offset="1" stop-color="#e03a76"/></linearGradient></defs>
-<path d="M135 68L124 88l11-3 3 9 6-26z" fill="#e8497f"/><path d="M141 68l5 26 4-9 11 3-9-20z" fill="#e8497f"/>
+<g transform="translate(119.5 64) rotate(15) scale(.87) translate(-140 -62)" stroke-width="2.8"><path d="M135 68L124 88l11-3 3 9 6-26z" fill="#e8497f"/><path d="M141 68l5 26 4-9 11 3-9-20z" fill="#e8497f"/>
 <path d="M140 62C122 38 100 46 106 66c4 12 22 10 34-4z" fill="url(#${u}hl)"/><path d="M140 62C158 38 180 46 174 66c-4 12-22 10-34-4z" fill="url(#${u}hl)"/>
 <path d="M112 56q8-8 18-3M168 56q-8-8-18-3" fill="none" stroke="#fff" stroke-width="3.4" opacity=".7"/>
 <g fill="#fff" stroke="none" opacity=".9"><circle cx="118" cy="66" r="2.6"/><circle cx="126" cy="58" r="2.2"/><circle cx="162" cy="66" r="2.6"/><circle cx="154" cy="58" r="2.2"/></g>
-<ellipse cx="140" cy="62" rx="9" ry="10" fill="url(#${u}hl)"/><path d="M135 57q3-4 7-3" fill="none" stroke="#fff" stroke-width="2.6" opacity=".8"/>`,
+<ellipse cx="140" cy="62" rx="9" ry="10" fill="url(#${u}hl)"/><path d="M135 57q3-4 7-3" fill="none" stroke="#fff" stroke-width="2.6" opacity=".8"/></g>`,
   bone: u => `<defs><linearGradient id="${u}hb" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff8496"/><stop offset=".6" stop-color="#ee4a66"/><stop offset="1" stop-color="#c52f4f"/></linearGradient><linearGradient id="${u}hv" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#dd3f5d"/><stop offset="1" stop-color="#a62043"/></linearGradient></defs>
 <g transform="translate(0 -6)"><path d="M60 82C56 42 80 26 100 26s44 16 40 56z" fill="url(#${u}hb)"/>
 <path d="M100 26C88 40 82 60 82 82M100 26c12 14 18 34 18 56" fill="none" stroke="#a62043" stroke-width="2.4" opacity=".7"/>
