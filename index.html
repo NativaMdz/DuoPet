@@ -14,7 +14,7 @@
 <title>DuoPet</title>
 <!-- Versão publicada. A cada publicação o app compara com a versão aberta e se atualiza sozinho.
      (Mesmo que você esqueça de mudar este número, o app também compara o conteúdo do arquivo.) -->
-<script>window.DP_BUILD = "20261031-0009";
+<script>window.DP_BUILD = "20261031-0010";
 window.addEventListener("beforeinstallprompt", function (e) { e.preventDefault(); window.__pwaPrompt = e; });
 window.addEventListener("appinstalled", function () { window.__pwaPrompt = null; });</script>
 <style>
@@ -872,14 +872,43 @@ const FEET = {
   pantufa: `<ellipse cx="70" cy="177" rx="25" ry="14" fill="#ffb3d1"/><ellipse cx="130" cy="177" rx="25" ry="14" fill="#ffb3d1"/><ellipse cx="70" cy="168" rx="18" ry="7" fill="#fff"/><ellipse cx="130" cy="168" rx="18" ry="7" fill="#fff"/><g fill="#ff7fae" stroke-width="2"><circle cx="70" cy="178" r="3.5"/><circle cx="130" cy="178" r="3.5"/></g><path d="M52 183q18 8 36 0M112 183q18 8 36 0" fill="none" stroke="#fff" stroke-width="3" opacity=".7"/>`,
   tenis: `<ellipse cx="70" cy="177" rx="25" ry="14" fill="#fff"/><ellipse cx="130" cy="177" rx="25" ry="14" fill="#fff"/><path d="M45 182q25 12 50 0v4q-25 12-50 0zM105 182q25 12 50 0v4q-25 12-50 0z" fill="#ee5d74"/><path d="M47 178q2-10 14-10 2 8-2 14zM107 178q2-10 14-10 2 8-2 14z" fill="#ff8aa0"/><path d="M68 168l8 3M72 165l8 3M124 168l8 3M128 165l8 3" fill="none" stroke-width="2.4"/>`
 };
+/* Roupas: desenhadas com degradê, brilho, sombra e acabamento (barra, gola, pespontos). */
 const TOP = (id, u) => ({
-  camiseta: `<g clip-path="url(#${u}c)"><path d="M26 147Q100 170 174 147V200H26z" fill="#ff8fb5" stroke="none"/><path d="M26 174Q100 197 174 174" fill="none" stroke="#fff" stroke-width="6"/><path d="M26 147Q100 170 174 147" fill="none"/></g><path d="M62 144q38 20 76 0" fill="none" stroke="#fff" stroke-width="5"/><path d="M100 170c-6-6-12 0-6 5l6 5 6-5c6-5 0-11-6-5z" fill="#fff" stroke-width="2"/>`,
-  gravata: `<path d="M100 157L75 145v24zM100 157l25-12v24z" fill="#7a5af0"/><circle cx="100" cy="157" r="7" fill="#a58cff"/><circle cx="84" cy="157" r="2" fill="#fff" stroke="none"/><circle cx="116" cy="157" r="2" fill="#fff" stroke="none"/><path d="M96 154q3-3 6 0" fill="none" stroke="#fff" stroke-width="2" opacity=".8"/>`,
-  cachecol: `<clipPath id="${u}s"><path d="M26 138Q100 166 174 138V160Q100 190 26 160z"/></clipPath><g clip-path="url(#${u}c)"><g clip-path="url(#${u}s)"><rect x="20" y="130" width="160" height="70" fill="#fff" stroke="none"/><path d="M36 130l10 70M60 130l10 70M84 130l10 70M108 130l10 70M132 130l10 70M156 130l10 70" stroke="#e8445e" stroke-width="9" fill="none"/></g><path d="M26 138Q100 166 174 138M26 160Q100 190 174 160" fill="none"/></g><path d="M116 168l24 2-3 28-24-2z" fill="#fff"/><path d="M114 180l25 2M113 191l25 2" stroke="#e8445e" stroke-width="6" fill="none"/><path d="M114 198v6M120 199v6M126 200v6M132 200v6" stroke-width="2.4" fill="none"/>`,
-  pijama: `<g clip-path="url(#${u}c)"><path d="M26 146Q100 168 174 146V200H26z" fill="#b9a8ff" stroke="none"/><g fill="#ffe56b" stroke="none"><circle cx="48" cy="170" r="3"/><circle cx="152" cy="166" r="3"/><circle cx="62" cy="186" r="2.4"/><circle cx="140" cy="184" r="2.4"/></g><g fill="#fff" stroke="none"><circle cx="100" cy="161" r="3.6"/><circle cx="100" cy="172" r="3.6"/><circle cx="100" cy="183" r="3.6"/></g><path d="M26 146Q100 168 174 146" fill="none"/></g><path d="M62 143q38 20 76 0" fill="none" stroke="#fff" stroke-width="5"/>`
+  camiseta: `<defs><linearGradient id="${u}t" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffb0cf"/><stop offset=".55" stop-color="#ff80ae"/><stop offset="1" stop-color="#ec5c97"/></linearGradient></defs>
+<g clip-path="url(#${u}c)"><path d="M24 126Q100 168 176 126V204H24z" fill="url(#${u}t)" stroke="none"/>
+<path d="M122 148Q178 146 180 202L106 208z" fill="#b3256a" opacity=".2" stroke="none"/>
+<path d="M42 142q6 22 28 32" fill="none" stroke="#fff" stroke-width="4.5" opacity=".38"/>
+<path d="M60 160q-3 9 1 16M140 158q3 9-1 16M100 184v6" fill="none" stroke="#c43e7e" stroke-width="2.2" opacity=".55"/>
+<path d="M39.8 150A67 59 0 0 0 160.2 150" fill="none" stroke="#fff" stroke-width="6.5"/>
+<path d="M44 148.5A62 54 0 0 0 156 148.5" fill="none" stroke="#ffc2db" stroke-width="1.6" stroke-dasharray="3 4" opacity=".9"/></g>
+<ellipse cx="100" cy="124" rx="70" ry="62" fill="none"/>
+<g clip-path="url(#${u}c)"><path d="M24 125Q100 167 176 125V135Q100 179 24 135z" fill="#fff"/><path d="M26 130.2Q100 172.6 174 130.2" fill="none" stroke="#ffc2db" stroke-width="1.8" stroke-dasharray="2.5 4"/></g>
+<path d="M100 177c-7-5-10-8-10-12a5 5 0 0 1 10-2 5 5 0 0 1 10 2c0 4-3 7-10 12z" fill="#fff" stroke-width="2.2"/><path d="M93 164.4q1-2 3.2-1.4" fill="none" stroke="#ffc2db" stroke-width="1.6"/>`,
+  gravata: `<defs><linearGradient id="${u}t" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9a80ff"/><stop offset="1" stop-color="#5b3fd0"/></linearGradient></defs>
+<g stroke-width="3"><path d="M95 158L64 141Q55 158 64 175z" fill="url(#${u}t)"/><path d="M105 158L136 141Q145 158 136 175z" fill="url(#${u}t)"/></g>
+<g fill="none" stroke="#3f2aa3" stroke-width="2" opacity=".6"><path d="M90 156L70 148M90 160L70 168M110 156L130 148M110 160L130 168"/></g>
+<g fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".5"><path d="M68 148q-3 8-1 14M132 148q3 8 1 14"/></g>
+<g fill="#fff" stroke="none"><circle cx="78" cy="154" r="2.4"/><circle cx="82" cy="165" r="2.4"/><circle cx="73" cy="161" r="1.8"/><circle cx="122" cy="154" r="2.4"/><circle cx="118" cy="165" r="2.4"/><circle cx="127" cy="161" r="1.8"/></g>
+<rect x="91" y="148" width="18" height="20" rx="7" fill="#b9a4ff" stroke-width="3"/><path d="M95 153q3-3 7-2" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" opacity=".9"/><path d="M104 163q2-2 3-6" fill="none" stroke="#6a4de0" stroke-width="2" opacity=".5"/>`,
+  cachecol: `<defs><clipPath id="${u}s"><path d="M24 138Q100 166 176 138Q185 148 176 158Q100 192 24 158Q15 148 24 138z"/></clipPath><linearGradient id="${u}h" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".5"/><stop offset=".4" stop-color="#fff" stop-opacity="0"/><stop offset=".65" stop-color="#7a1022" stop-opacity="0"/><stop offset="1" stop-color="#7a1022" stop-opacity=".38"/></linearGradient></defs>
+<g clip-path="url(#${u}s)"><rect x="10" y="128" width="180" height="70" fill="#fff" stroke="none"/><path d="M30 126l11 76M54 126l11 76M78 126l11 76M102 126l11 76M126 126l11 76M150 126l11 76M174 126l11 76" stroke="#e8445e" stroke-width="10" fill="none"/><rect x="10" y="128" width="180" height="70" fill="url(#${u}h)" stroke="none"/><path d="M44 152q4 6 2 12M80 160q3 6 1 12M122 160q-3 6-1 12M158 152q-4 6-2 12" fill="none" stroke="#a31c36" stroke-width="2" opacity=".35"/><path d="M34 146Q100 172 166 146" fill="none" stroke="#fff" stroke-width="3" opacity=".35"/></g>
+<path d="M24 138Q100 166 176 138Q185 148 176 158Q100 192 24 158Q15 148 24 138z" fill="none"/>
+<clipPath id="${u}u"><path d="M112 160l28 3-4 31-28-3z"/></clipPath>
+<path d="M112 160l28 3-4 31-28-3z" fill="#fff"/><g clip-path="url(#${u}u)"><path d="M104 172l40 4M104 184l40 4" stroke="#e8445e" stroke-width="7" fill="none"/><path d="M112 160l28 3-4 31-28-3z" fill="url(#${u}h)" stroke="none"/></g><path d="M112 160l28 3-4 31-28-3z" fill="none"/>
+<g fill="none" stroke-width="4.6"><path d="M113 192v7M119 193v7M125 193.6v7M131 194v7"/></g><g fill="none" stroke="#e8445e" stroke-width="1.8"><path d="M113 192v6M119 193v6M125 193.6v6M131 194v6"/></g>`,
+  pijama: `<defs><linearGradient id="${u}t" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d4c8ff"/><stop offset=".55" stop-color="#b3a1fb"/><stop offset="1" stop-color="#8f79ee"/></linearGradient></defs>
+<g clip-path="url(#${u}c)"><path d="M24 126Q100 168 176 126V204H24z" fill="url(#${u}t)" stroke="none"/>
+<path d="M122 148Q178 146 180 202L106 208z" fill="#5a3fb8" opacity=".2" stroke="none"/>
+<path d="M42 142q6 22 28 32" fill="none" stroke="#fff" stroke-width="4.5" opacity=".4"/>
+<g stroke-width="1.8" stroke-linejoin="round"><path transform="translate(50 166) scale(.5)" d="M0-9L2.6-2.6 9 0 2.6 2.6 0 9-2.6 2.6-9 0-2.6-2.6z" fill="#ffe56b"/><path transform="translate(148 158) scale(.55)" d="M0-9L2.6-2.6 9 0 2.6 2.6 0 9-2.6 2.6-9 0-2.6-2.6z" fill="#ffe56b"/><path transform="translate(134 176) scale(.42)" d="M0-9L2.6-2.6 9 0 2.6 2.6 0 9-2.6 2.6-9 0-2.6-2.6z" fill="#fff"/><path d="M72 152a9 9 0 1 0 7 13 7 7 0 1 1-7-13z" fill="#ffe56b"/></g>
+<path d="M100 158V188" fill="none" stroke="#7a62d8" stroke-width="2.4"/>
+<path d="M39.8 150A67 59 0 0 0 160.2 150" fill="none" stroke="#fff" stroke-width="5.5"/></g>
+<ellipse cx="100" cy="124" rx="70" ry="62" fill="none"/>
+<g clip-path="url(#${u}c)"><path d="M24 125Q100 167 176 125V135Q100 179 24 135z" fill="#8f79ee"/><path d="M24 135Q100 179 176 135" fill="none" stroke="#fff" stroke-width="3"/></g>
+<g fill="#fff" stroke-width="2"><circle cx="100" cy="169" r="3.4"/><circle cx="100" cy="178" r="3.4"/></g><g fill="#c9bcff" stroke="none"><circle cx="99" cy="168" r="1"/><circle cx="99" cy="177" r="1"/></g>`
 }[id] || "");
-const SLV = { camiseta: ["#ff8fb5", "#fff"], pijama: ["#b9a8ff", "#fff"] };
-const TOPO = id => SLV[id] ? `<g transform="rotate(22 35 131)"><ellipse cx="35" cy="131" rx="14" ry="11" fill="${SLV[id][0]}"/><path d="M23 135q12 6 24 0" fill="none" stroke="${SLV[id][1]}" stroke-width="4"/></g><g transform="rotate(-22 165 131)"><ellipse cx="165" cy="131" rx="14" ry="11" fill="${SLV[id][0]}"/><path d="M153 135q12 6 24 0" fill="none" stroke="${SLV[id][1]}" stroke-width="4"/></g>` : "";
+const SLV = { camiseta: ["#ff80ae", "#fff", "#c43e7e"], pijama: ["#b3a1fb", "#fff", "#6e57d4"] };
+const TOPO = id => { const v = SLV[id]; return v ? [[35, 131, 22, 1], [165, 131, -22, -1]].map(([x, y, r, k]) => `<g transform="rotate(${r} ${x} ${y})"><ellipse cx="${x}" cy="${y}" rx="15" ry="12.5" fill="${v[0]}"/><path d="M${x - 11} ${y + 5}q11 8 22 0" fill="none" stroke="${v[2]}" stroke-width="2" opacity=".5"/><path d="M${x - 14} ${y + 5}q14 9 28 0" fill="none" stroke="${v[1]}" stroke-width="3.2"/><path d="M${x - 9} ${y - 7}q7-4 13-2" fill="none" stroke="#fff" stroke-width="3" opacity=".5"/></g>`).join("") : ""; };
 
 const FOAM = [[100, 70, 15], [78, 76, 11], [122, 76, 11], [60, 146, 13], [140, 146, 13], [84, 164, 12], [116, 164, 12], [100, 176, 11], [48, 126, 10], [152, 126, 10], [36, 148, 9], [164, 148, 9], [56, 62, 9], [144, 62, 9], [70, 182, 9], [130, 182, 9]];
 const FB = f => Math.ceil(f / 100 * FOAM.length);
