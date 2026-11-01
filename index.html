@@ -312,7 +312,7 @@ button:active{transform:scale(.93)}
 #toast{transform:translateY(30px) scale(.9);transition:transform .45s var(--spring),opacity .25s}
 .fxp{position:fixed;left:0;top:0;width:20px;height:20px;pointer-events:none;z-index:80;animation:fxp 1s cubic-bezier(.2,.7,.3,1) both}
 .fxp svg{width:100%;height:100%;display:block}
-.fxp.star{background:#ffe56b;clip-path:polygon(50% 0,62% 38%,100% 50%,62% 62%,50% 100%,38% 62%,0 50%,38% 38%)}
+.fxp.star{background:none}
 @keyframes fxp{0%{transform:translate(var(--x),var(--y)) scale(.2);opacity:0}15%{opacity:1}55%{transform:translate(calc(var(--x) + var(--dx)),calc(var(--y) + var(--dy))) scale(var(--s)) rotate(var(--r))}100%{transform:translate(calc(var(--x) + var(--dx)*1.2),calc(var(--y) + var(--dy) + 70px)) scale(calc(var(--s)*.6)) rotate(var(--r));opacity:0}}
 /* ========== 7. DESEMPENHO ========== */
 .rm svg.d{filter:none}
@@ -719,7 +719,7 @@ const Pet = {
     const p = S.pet;
     if (p.sleeping) return "sleep"; if (fxMode) return fxMode;
     if (p.hunger < 25) return "hungry"; if (p.happy < 30) return "sad";
-    if (p.foam > 20 && foamMine) return "happy"; return p.happy > 70 ? "happy" : "normal";
+    if ((foamMine && p.foam > 0) || (Tools.d && (Tools.d.k === "soap" || Tools.d.k === "shower"))) return "happy"; return p.happy > 70 ? "happy" : "normal";
   },
   do(a, foodId) {
     const p = S.pet;
@@ -770,7 +770,7 @@ const Pet = {
     if (d.n % 8 === 0) { const m = document.createElement("span"); m.className = "stm"; m.style.left = (30 + Math.random() * 40) + "%"; m.style.top = "50%"; $("#stage").appendChild(m); setTimeout(() => m.remove(), 2400); }
     UI.live();
     const done = (had && p.foam <= 0) || (!had && p.hygiene >= 98 && !d.paid);
-    if (done) { d.paid = 1; this.gain(4, 0); sl.classList.remove("wet"); UI.fx("happy", "Limpinho!"); UI.foamTip(); setTimeout(() => UI.toast(p.name + " está limpinho e cheiroso!", "ok"), 300); }
+    if (done) { d.paid = 1; this.gain(4, 0); sl.classList.remove("wet"); UI.cleanLook(); UI.fx("happy", "Limpinho!", true); setTimeout(() => UI.toast(p.name + " está limpinho e cheiroso!", "ok"), 300); }
     else if (FB(p.foam) !== b0) UI.foamTick();
   },
   shower() {
@@ -782,8 +782,8 @@ const Pet = {
     FX.vib(30); UI.rain();
     const r = $("#v-home .petslot").getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height * .4;
     FX.burst(cx, cy, "bub", had ? 8 : 4);
-    if (had && p.foam <= 0) { UI.fx("happy", "Limpinho!"); setTimeout(() => UI.toast(p.name + " está limpinho e cheiroso!", "ok"), 300); } else UI.fx("happy", "+4 XP");
-    UI.live(); UI.foamTip(); setTimeout(() => Persist.save(), 300);
+    if (had && p.foam <= 0) { UI.cleanLook(); UI.fx("happy", "Limpinho!", true); setTimeout(() => UI.toast(p.name + " está limpinho e cheiroso!", "ok"), 300); } else { UI.foamTick(); UI.fx("happy", "+4 XP", true); }
+    UI.live(); setTimeout(() => Persist.save(), 300);
   },
   buy(kind, id) {
     if (kind === "food") {
@@ -924,7 +924,7 @@ const foamSVG = f => {
 };
 
 const FLIES = `<g class="fly"><circle cx="100" cy="38" r="2.6" fill="#3b1a38"/><ellipse cx="97" cy="35" rx="3" ry="1.600" fill="#fff" opacity=".8"/></g><g class="fly" style="animation-duration:2.6s;animation-direction:reverse"><circle cx="152" cy="84" r="2.6" fill="#3b1a38"/></g>`;
-const SPARK = `<g fill="#fff" stroke="#ffd96a" stroke-width="1.5"><path transform="translate(162 84)" d="M0-7L2-2 7 0 2 2 0 7-2 2-7 0-2-2z"/><path transform="translate(40 96) scale(.8)" d="M0-7L2-2 7 0 2 2 0 7-2 2-7 0-2-2z"/><path transform="translate(150 160) scale(.7)" d="M0-7L2-2 7 0 2 2 0 7-2 2-7 0-2-2z"/></g>`;
+const SPARK = `<g class="spk" fill="#fff" stroke="#ffd96a" stroke-width="1.5"><path transform="translate(162 84)" d="M0-7L2-2 7 0 2 2 0 7-2 2-7 0-2-2z"/><path transform="translate(40 96) scale(.8)" d="M0-7L2-2 7 0 2 2 0 7-2 2-7 0-2-2z"/><path transform="translate(150 160) scale(.7)" d="M0-7L2-2 7 0 2 2 0 7-2 2-7 0-2-2z"/></g>`;
 const EXK = "#3a2d45", EXH = (x, y, k) => `<path transform="translate(${(x - 12 * k).toFixed(1)} ${(y - 13 * k).toFixed(1)}) scale(${k})" d="M12 21s-8-5.3-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 5.7-8 11-8 11z" fill="#ff4f93" stroke="${EXK}" stroke-width="${(2.6 / k).toFixed(2)}" stroke-linejoin="round"/><ellipse transform="translate(${(x - 12 * k).toFixed(1)} ${(y - 13 * k).toFixed(1)}) scale(${k})" cx="8.2" cy="9.4" rx="2" ry="1.2" fill="#fff" opacity=".9"/>`;
 const EXS = (x, y, k, c) => `<path transform="translate(${x} ${y}) scale(${k})" d="M0-9L2.6-2.6 9 0 2.6 2.6 0 9-2.6 2.6-9 0-2.6-2.6z" fill="${c || "#ffd93d"}" stroke="${EXK}" stroke-width="${(2 / k).toFixed(2)}" stroke-linejoin="round"/>`;
 const EXPR = {
@@ -965,7 +965,8 @@ function petSVG(o, vb, mood) {
   if (!vb && !m0 && S.pet.hygiene < 30) extra += `<g fill="#6b4c30" opacity=".5"><circle cx="56" cy="142" r="6"/><circle cx="144" cy="152" r="7"/><circle cx="120" cy="168" r="4"/><circle cx="84" cy="74" r="4"/><circle cx="110" cy="84" r="3"/></g>`;
   if (!vb && !m0 && o.hygiene < 30 && !o.foam) extra += FLIES;
   if (o === S.pet && !(o.foam > 0) && foamMine) setMine(false);
-  const foam = !vb && !m0 && o.foam > 0 && foamMine ? foamSVG(o.foam) : (!vb && !m0 && !(o.foam > 0) && o.hygiene >= 97 && mood !== "sleep" ? SPARK : "");
+  const real = !vb && !m0;
+  const foam = real && o.foam > 0 && foamMine ? foamSVG(o.foam) : (real && !(o.foam > 0) && o.hygiene >= 97 && mood !== "sleep" ? SPARK + '<g class="fgl"></g>' : real ? '<g class="fgl"></g>' : "");
   const cheeks = mood === "sleep" ? "" : `<ellipse cx="56" cy="128" rx="11" ry="7" fill="#ff7f9f" opacity=".5"/><ellipse cx="144" cy="128" rx="11" ry="7" fill="#ff7f9f" opacity=".5"/>`;
   const G = `url(#${u}g)`, E = `stroke="${SK}" stroke-width="3.4"`;
   return `<svg class="pet${vb ? " np" : ""}" viewBox="${vb || "0 0 200 200"}" role="img" aria-label="Pet"><defs><radialGradient id="${u}g" cx=".36" cy=".26" r=".9"><stop offset="0" stop-color="${l}"/><stop offset=".5" stop-color="${c}"/><stop offset="1" stop-color="${d}"/></radialGradient><clipPath id="${u}c"><ellipse cx="100" cy="124" rx="70" ry="62"/></clipPath></defs>
@@ -1005,12 +1006,13 @@ const ROOMHTML = {
 };
 
 const HEART = `<svg viewBox="0 0 24 24"><path d="M12 21s-8-5.3-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 5.7-8 11-8 11z" fill="#ff5fa0" stroke="#fff" stroke-width="1.5"/></svg>`;
+const STARSVG = `<svg viewBox="0 0 24 24"><path d="M12 0L14.9 9.1 24 12 14.9 14.9 12 24 9.1 14.9 0 12 9.1 9.1z" fill="#ffe56b"/></svg>`;
 const FX = {
   vib(n) { const t = performance.now(); if (t - (this._v || 0) < 150) return; this._v = t; try { navigator.vibrate && navigator.vibrate(n); } catch (e) {} },
   burst(x, y, kind, n) {
     for (let i = 0; i < (n || 8); i++) {
       const e = document.createElement("span"), a = Math.random() * 6.283, v = 40 + Math.random() * 60;
-      e.className = "fxp " + kind; e.innerHTML = kind === "coin" ? COIN : kind === "heart" ? HEART : "";
+      e.className = "fxp " + kind; e.innerHTML = kind === "coin" ? COIN : kind === "heart" ? HEART : kind === "star" ? STARSVG : "";
       e.style.cssText = `--x:${x - 10}px;--y:${y - 10}px;--dx:${Math.cos(a) * v}px;--dy:${Math.sin(a) * v - 40}px;--r:${(Math.random() - .5) * 240}deg;--s:${.7 + Math.random() * .7};animation-delay:${i * 18}ms`;
       document.body.appendChild(e); setTimeout(() => e.remove(), 1300);
     }
@@ -1060,18 +1062,24 @@ const UI = {
     for (let i = 0; i < 3; i++) { const m = document.createElement("span"); m.className = "stm"; m.style.left = (28 + Math.random() * 44) + "%"; m.style.top = (45 + Math.random() * 20) + "%"; m.style.animationDelay = (i * .2) + "s"; st.appendChild(m); setTimeout(() => m.remove(), 2800); }
     const r = $("#v-home .petslot").getBoundingClientRect(); this.bubble(r.left + r.width / 2, r.top + r.height * .5, 5, r.width * .8);
   },
-  fx(mode, text) {
-    fxMode = mode; this.pet();
+  fx(mode, text, skip) {
+    fxMode = mode; if (!skip || Pet.mood() !== lastMood) this.pet();
     const sl = $$(".view.on .petslot");
-    requestAnimationFrame(() => sl.forEach(s => { s.classList.remove("bounce"); void s.offsetWidth; s.classList.add("bounce"); clearTimeout(s._bt); s._bt = setTimeout(() => s.classList.remove("bounce"), 800); }));
+    setTimeout(() => sl.forEach(s => { s.classList.remove("bounce"); void s.offsetWidth; s.classList.add("bounce"); clearTimeout(s._bt); s._bt = setTimeout(() => s.classList.remove("bounce"), 800); }), 80);
     setTimeout(() => sl.forEach(s => { const q = s.getBoundingClientRect(); FX.burst(q.left + q.width / 2, q.top + q.height * .35, mode === "eat" ? "heart" : "star", mode === "eat" ? 5 : 7); if (mode === "eat") FX.burst(q.left + q.width / 2, q.top + q.height * .5, "crumb", 7); }), 150);
     if (text) setTimeout(() => sl.forEach(s => { const f = document.createElement("span"); f.className = "fl"; f.textContent = text; s.parentNode.appendChild(f); setTimeout(() => f.remove(), 1100); }), 260);
-    clearTimeout(this._fxt); this._fxt = setTimeout(() => { fxMode = ""; this.pet(); }, 1500);
+    clearTimeout(this._fxt); this._fxt = setTimeout(() => { fxMode = ""; if (Pet.mood() !== lastMood) this.pet(); }, 1500);
   },
   foamTick() {
     const p = S.pet, n = FB(p.foam), s = $("#v-home .petslot"), L = s && s.querySelector(".fgl");
     if (!L || !foamMine || n < 1) this.pet();
-    else { let c = L.childElementCount; if (n > c) { L.insertAdjacentHTML("beforeend", foamItems(c, n, true)); foamT = performance.now(); } else while (c > n) { L.lastElementChild.remove(); c--; } foamN = n; }
+    else { let c = L.childElementCount; if (n > c) { if (!c) { const k = s.querySelector(".spk"); if (k) k.remove(); } L.insertAdjacentHTML("beforeend", foamItems(c, n - 1, false) + foamItem(n - 1, true)); foamT = performance.now(); } else while (c > n) { L.lastElementChild.remove(); c--; } foamN = n; }
+    this.foamTip();
+  },
+  cleanLook() {
+    const s = $("#v-home .petslot"), svg = s && s.firstElementChild, L = svg && svg.querySelector(".fgl");
+    if (!L) return this.pet();
+    L.innerHTML = ""; foamN = 0; if (S.pet.hygiene >= 97 && !svg.querySelector(".spk")) L.insertAdjacentHTML("beforebegin", SPARK);
     this.foamTip();
   },
   foamTip() { const e = $("#v-home .ft"); if (e) e.innerHTML = foamTxt(); },
@@ -1100,7 +1108,7 @@ const UI = {
   },
   pet() {
     lastMood = Pet.mood();
-    $$(".petslot").forEach(s => { const pv = s.closest(".pv"); s.innerHTML = petSVG(null, null, pv ? "happy" : ""); s.classList.toggle("sleep", S.pet.sleeping && !pv); s.classList.toggle("away", !pv && S.pet.sleeping && room !== "quarto"); });
+    $$(".petslot").forEach(s => { if (!s.closest(".view.on")) return; const pv = s.closest(".pv"); s.innerHTML = petSVG(null, null, pv ? "happy" : ""); s.classList.toggle("sleep", S.pet.sleeping && !pv); s.classList.toggle("away", !pv && S.pet.sleeping && room !== "quarto"); });
     $$(".stage").forEach(s => s.classList.toggle("night", S.pet.sleeping && !s.classList.contains("pv")));
   },
   live() { this.head(); this.stats(); if (Pet.mood() !== lastMood) this.pet(); },
@@ -1395,11 +1403,11 @@ const Tools = {
     const t = e.target.closest(".tool"); if (!t) return; e.preventDefault();
     const g = document.createElement("div"); g.className = "ghost"; g.innerHTML = t.querySelector("svg").outerHTML; document.body.appendChild(g);
     this.d = { k: t.dataset.tool, id: t.dataset.id, g, x: e.clientX, y: e.clientY, sx: e.clientX, sy: e.clientY, moved: false, acc: 0, over: false, cx: e.clientX, cy: e.clientY }; this.pos(e);
-    if (this.d.k === "soap" || this.d.k === "shower") $("#v-home .petslot").classList.add("still");
+    if (this.d.k === "soap" || this.d.k === "shower") { $("#v-home .petslot").classList.add("still"); this._pr = null; if (Pet.mood() !== lastMood) setTimeout(() => UI.pet(), 40); }
     if (this.d.k === "shower") this.d.timer = setInterval(() => Pet.rinse(this.d), 200);
   },
   pos(e) { this.d.g.style.transform = `translate(${e.clientX - 32}px,${e.clientY - 72}px) rotate(${this.d.k === "soap" ? -8 : Math.max(-18, Math.min(18, (e.clientX - this.d.x) * 1.2)) - 8}deg) scale(1.2)`; },
-  over(e) { const r = $("#v-home .petslot").getBoundingClientRect(); return e.clientX > r.left && e.clientX < r.right && e.clientY > r.top && e.clientY < r.bottom; },
+  over(e) { const t = performance.now(); if (!this._pr || t - this._pt > 300) { this._pr = $("#v-home .petslot").getBoundingClientRect(); this._pt = t; } const r = this._pr; return e.clientX > r.left && e.clientX < r.right && e.clientY > r.top && e.clientY < r.bottom; },
   move(e) {
     const d = this.d; if (!d) return; this.pos(e); const ov = this.over(e); $("#v-home .petslot").classList.toggle("hot", d.k !== "soap" && d.k !== "shower" && ov);
     d.cx = e.clientX; d.cy = e.clientY; d.over = ov;
