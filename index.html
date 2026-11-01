@@ -14,7 +14,7 @@
 <title>DuoPet</title>
 <!-- Versão publicada. A cada publicação o app compara com a versão aberta e se atualiza sozinho.
      (Mesmo que você esqueça de mudar este número, o app também compara o conteúdo do arquivo.) -->
-<script>window.DP_BUILD = "20261031-0007";
+<script>window.DP_BUILD = "20261031-0009";
 window.addEventListener("beforeinstallprompt", function (e) { e.preventDefault(); window.__pwaPrompt = e; });
 window.addEventListener("appinstalled", function () { window.__pwaPrompt = null; });</script>
 <style>
@@ -42,7 +42,7 @@ svg.i{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2.2;stro
 .d{position:absolute}.lamp{cursor:pointer}
 .beam{position:absolute;left:6%;top:12%;width:44%;height:56%;background:linear-gradient(rgba(255,255,255,.4),transparent);clip-path:polygon(0 0,70% 0,100% 100%,20% 100%);pointer-events:none}
 .rug{position:absolute;left:50%;top:71%;width:78%;height:15%;transform:translateX(-50%);border-radius:50%;background:radial-gradient(ellipse,#ffc9d5,#ff9db2);opacity:.85;box-shadow:inset 0 0 0 6px rgba(255,255,255,.5)}
-.slot{position:absolute;left:50%;top:calc(50% - 14px);transform:translate(-50%,-50%);width:min(78%,45vh);max-width:320px;cursor:pointer;z-index:3}
+.slot{position:absolute;left:50%;top:calc(50% + clamp(-14px,(100vh - 640px) * .33 - 14px,9%));transform:translate(-50%,-50%);width:min(78%,45vh);max-width:320px;cursor:pointer;z-index:3}
 .pv{flex:none;height:230px;background:linear-gradient(#ffe9dc 0 66%,#ecc9a2 66%);border-bottom-left-radius:28px;border-bottom-right-radius:28px;box-shadow:var(--sh)}
 .pv .slot{width:min(52%,200px);top:52%}
 .pet{display:block;width:100%;transform-origin:50% 100%;animation:breathe 3.2s ease-in-out infinite;overflow:visible}
@@ -377,44 +377,34 @@ button:active{transform:scale(.93)}
 .upd{position:fixed;left:12px;right:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 12px);max-width:456px;margin:0 auto;z-index:90;display:flex;align-items:center;gap:10px;padding:10px 12px 10px 16px;border-radius:20px;color:#fff;font-weight:800;font-size:14px;background:linear-gradient(#5a2aa8,#37157a);border:3px solid #a46bf2;box-shadow:0 0 12px rgba(168,110,255,.55),0 5px 0 #26095a}
 .upd span{flex:1}.upd .btn{padding:8px 14px}
 /* ========== 11. BANHO (bolhas, espuma, chuveiro) ========== */
-.sb{position:absolute;z-index:5;width:var(--z);height:var(--z);margin:calc(var(--z)/-2) 0 0 calc(var(--z)/-2);pointer-events:none;animation:sbRise var(--t) cubic-bezier(.3,.55,.4,1) both,sbSw calc(var(--t)/2.2) ease-in-out infinite alternate}
-.sb::before{content:"";position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 30% 26%,#fff 0 8%,rgba(255,255,255,0) 17%),radial-gradient(circle at 72% 78%,rgba(255,255,255,.9) 0 5%,rgba(255,255,255,0) 9%),radial-gradient(circle,rgba(255,255,255,.05) 50%,rgba(130,215,255,.4) 74%,rgba(255,160,230,.45) 89%,rgba(255,255,255,.95) 100%);box-shadow:inset -3px -4px 8px rgba(255,150,225,.3),inset 3px 3px 7px rgba(110,215,255,.35),0 0 0 1.5px rgba(255,255,255,.85);animation:sbPop var(--t) ease-in-out both}
-@keyframes sbRise{from{translate:0 0}to{translate:0 var(--dy)}}
-@keyframes sbSw{from{transform:translateX(calc(var(--sw)*-1))}to{transform:translateX(var(--sw))}}
-@keyframes sbPop{0%{transform:scale(0);opacity:0}9%{transform:scale(1.2);opacity:1}18%{transform:scale(.93)}28%{transform:scale(1)}86%{transform:scale(1);opacity:1}93%{transform:scale(1.22,1.1);opacity:.95}100%{transform:scale(1.55);opacity:0}}
+.sb{position:absolute;z-index:5;width:var(--z);height:var(--z);margin:calc(var(--z)/-2) 0 0 calc(var(--z)/-2);pointer-events:none;animation:sbRise var(--t) ease-out both}
+.sb::before{content:"";position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 30% 26%,#fff 0 8%,rgba(255,255,255,0) 17%),radial-gradient(circle at 72% 78%,rgba(255,255,255,.9) 0 5%,rgba(255,255,255,0) 9%),radial-gradient(circle,rgba(255,255,255,.05) 50%,rgba(130,215,255,.4) 74%,rgba(255,160,230,.45) 89%,rgba(255,255,255,.95) 100%);box-shadow:0 0 0 1.5px rgba(255,255,255,.85);animation:sbPop var(--t) ease-out both}
+@keyframes sbRise{from{transform:translate(0,0)}to{transform:translate(var(--sw),var(--dy))}}
+@keyframes sbPop{0%{transform:scale(0);opacity:0}12%{transform:scale(1.12);opacity:1}24%{transform:scale(1)}88%{transform:scale(1);opacity:1}100%{transform:scale(1.4);opacity:0}}
 .sd{position:absolute;z-index:5;width:var(--z);margin:calc(var(--z)*-.35) 0 0 calc(var(--z)/-2);pointer-events:none;animation:sdIn 1.3s both}
 .sd svg{display:block;width:100%;height:auto;overflow:visible}
 @keyframes sdIn{0%{transform:scale(0) rotate(var(--rt));opacity:0}14%{transform:scale(1.22) rotate(var(--rt));opacity:1}26%{transform:scale(.94) rotate(var(--rt))}38%{transform:scale(1) rotate(var(--rt))}75%{opacity:1}100%{transform:translateY(16px) scale(.85) rotate(var(--rt));opacity:0}}
 .fxp.bub{border:0;border-radius:50%;background:radial-gradient(circle at 30% 26%,#fff 0 10%,rgba(255,255,255,0) 18%),radial-gradient(circle,rgba(255,255,255,.08) 50%,rgba(130,215,255,.4) 75%,rgba(255,160,230,.45) 90%,#fff);box-shadow:inset -2px -3px 6px rgba(255,150,225,.3),0 0 0 1.5px rgba(255,255,255,.85)}
-.fb{animation:fbw 2.6s ease-in-out var(--o,0s) infinite}
-.fb.fn{animation:fbIn .55s cubic-bezier(.3,1.7,.5,1) both,fbw 2.6s ease-in-out .55s infinite}
+.fb.fn{animation:fbIn .3s ease-out both}
 @keyframes fbIn{from{transform:scale(0)}to{transform:scale(1)}}
 @keyframes fbw{0%,100%{transform:scale(1)}50%{transform:scale(1.05,.96)}}
-.slot.jig{animation:jig .34s ease-in-out}
 @keyframes jig{0%,100%{rotate:0deg;scale:1}20%{rotate:-2.4deg;scale:1.03 .97}45%{rotate:2.2deg;scale:.98 1.02}70%{rotate:-1deg;scale:1.01 .99}}
-.slot.wet{animation:wet .15s linear infinite alternate}
 @keyframes wet{from{translate:-2px 0;rotate:-1deg}to{translate:2px 0;rotate:1deg}}
 .ghost.rub{animation:rub .26s ease-in-out infinite alternate}
 @keyframes rub{from{rotate:-7deg;translate:-4px 2px}to{rotate:7deg;translate:4px -2px}}
-.ghost.spray{animation:wet .12s linear infinite alternate}
 .ghost.spray::before,.ghost.spray::after{content:"";position:absolute;left:4%;top:90%;width:92%;height:140px;pointer-events:none;clip-path:polygon(28% 0,72% 0,100% 100%,0 100%)}
 .ghost.spray::before{background:linear-gradient(rgba(130,205,255,.7),rgba(130,205,255,0))}
-.ghost.spray::after{opacity:1;background:repeating-conic-gradient(from 158deg at 50% -6%,rgba(235,250,255,1) 0 3.2deg,transparent 3.2deg 6.5deg);-webkit-mask-image:linear-gradient(180deg,#000 0 14px,transparent 14px 30px);mask-image:linear-gradient(180deg,#000 0 14px,transparent 14px 30px);-webkit-mask-size:100% 30px;mask-size:100% 30px;-webkit-mask-repeat:repeat-y;mask-repeat:repeat-y;animation:flow .36s linear infinite}
-@keyframes flow{to{-webkit-mask-position:0 30px;mask-position:0 30px}}
-.stream{width:160px;margin-left:-80px;background:repeating-conic-gradient(from 158deg at 50% -4%,rgba(225,248,255,.98) 0 3.2deg,transparent 3.2deg 6.5deg);clip-path:polygon(40% 0,60% 0,100% 100%,0 100%);-webkit-mask-image:linear-gradient(180deg,#000 0 14px,transparent 14px 30px);mask-image:linear-gradient(180deg,#000 0 14px,transparent 14px 30px);-webkit-mask-size:100% 30px;mask-size:100% 30px;-webkit-mask-repeat:repeat-y;mask-repeat:repeat-y;animation:strm 1.5s ease-out forwards,flow .36s linear infinite}
-.wd,.dr{border-radius:50% 50% 50% 50%/32% 32% 68% 68%;background:linear-gradient(100deg,#fff 0 16%,#9fdcff 20%,#52b0f0);box-shadow:inset -1px -2px 2px rgba(40,120,200,.35)}
+.ghost.spray::after{opacity:1;background:repeating-conic-gradient(from 158deg at 50% -6%,rgba(235,250,255,1) 0 3.2deg,transparent 3.2deg 6.5deg);}
+.stream{width:160px;margin-left:-80px;background:repeating-conic-gradient(from 158deg at 50% -4%,rgba(225,248,255,.98) 0 3.2deg,transparent 3.2deg 6.5deg);clip-path:polygon(40% 0,60% 0,100% 100%,0 100%);animation:strm 1.5s ease-out forwards}
+.wd,.dr{border-radius:50% 50% 50% 50%/32% 32% 68% 68%;background:linear-gradient(100deg,#fff 0 16%,#9fdcff 20%,#52b0f0);}
 .wd{left:0;top:0;width:7px;height:12px;animation:wd var(--ft,.55s) cubic-bezier(.5,0,.9,.65) both}
 @keyframes wd{0%{transform:translate(0,0) scaleY(.6);opacity:0}12%{opacity:1;transform:translate(calc(var(--wx,0px)*.1),6px) scaleY(1)}90%{opacity:1}100%{transform:translate(var(--wx,0px),var(--fall,100px)) scaleY(1.5);opacity:0}}
 .dr{width:7px;height:13px;animation:drop .85s cubic-bezier(.5,0,.9,.65) both}
 @keyframes drop{0%{opacity:0;transform:translateY(0) scaleY(.7)}10%{opacity:1}100%{transform:translateY(330px) scaleY(1.5);opacity:.15}}
 .spl{position:fixed;width:18px;height:6px;margin:-3px 0 0 -9px;border:2px solid rgba(255,255,255,.95);border-radius:50%;pointer-events:none;z-index:49;animation:spl .45s ease-out both}
-.spl::before,.spl::after{content:"";position:absolute;left:50%;top:50%;width:4px;height:4px;margin:-2px;border-radius:50%;background:#bfe6ff;--sx:11px;animation:spd .45s ease-out both}
-.spl::after{--sx:-11px}
 @keyframes spl{from{transform:scale(.3);opacity:1}to{transform:scale(1.8,1.4);opacity:0}}
-@keyframes spd{0%{transform:translate(0,0)}40%{transform:translate(calc(var(--sx)*.6),-12px)}100%{transform:translate(var(--sx),3px);opacity:0}}
-.stm{width:62px;height:62px;margin:-31px 0 0 -31px;filter:blur(5px);background:radial-gradient(circle,rgba(255,255,255,.85),rgba(255,255,255,0) 68%);animation:stm2 2.2s ease-out both,stmw .9s ease-in-out infinite alternate}
+.stm{width:62px;height:62px;margin:-31px 0 0 -31px;background:radial-gradient(circle,rgba(255,255,255,.7),rgba(255,255,255,0) 68%);animation:stm2 2.2s ease-out both}
 @keyframes stm2{0%{opacity:0;transform:translateY(0) scale(.5)}20%{opacity:.85}100%{opacity:0;transform:translateY(-95px) scale(1.9)}}
-@keyframes stmw{from{translate:-8px 0}to{translate:8px 0}}
 </style>
 </head>
 <body>
@@ -626,7 +616,7 @@ const COSM = [
   { id: "menta", t: "cor", n: "Menta", p: 30, c: "#a8e6cf" }, { id: "ceu", t: "cor", n: "Céu", p: 40, c: "#a9d6f7" },
   { id: "nohat", t: "hat", n: "Sem chapéu", p: 0 }, { id: "laco", t: "hat", n: "Laço", p: 30 }, { id: "bone", t: "hat", n: "Boné", p: 40 },
   { id: "gorro", t: "hat", n: "Gorro", p: 50 }, { id: "festa", t: "hat", n: "Festa", p: 60 }, { id: "abafador", t: "hat", n: "Abafador", p: 80 }, { id: "coroa", t: "hat", n: "Coroa", p: 120 },
-  { id: "noexpr", t: "expr", n: "Normal", p: 0 }, { id: "brilho", t: "expr", n: "Entusiasmo", p: 60 }, { id: "bravo", t: "expr", n: "Bravo", p: 70 },
+  { id: "noexpr", t: "expr", n: "Normal", p: 0 }, { id: "brilho", t: "expr", n: "Olhos Brilhantes", p: 60 }, { id: "bravo", t: "expr", n: "Bravo", p: 70 },
   { id: "apaixonado", t: "expr", n: "Apaixonado", p: 70 }, { id: "sonolento", t: "expr", n: "Sonolento", p: 60 },
   { id: "noface", t: "face", n: "Sem acessório", p: 0 }, { id: "oculos", t: "face", n: "Óculos", p: 50 }, { id: "sol", t: "face", n: "Óculos de sol", p: 70 },
   { id: "notop", t: "top", n: "Sem roupa", p: 0 }, { id: "gravata", t: "top", n: "Gravata", p: 35 }, { id: "camiseta", t: "top", n: "Camiseta", p: 45 },
@@ -757,7 +747,7 @@ const Pet = {
     if (p.hygiene >= 100 && p.foam >= 100) return;
     const b0 = FB(p.foam);
     p.foam = clamp(p.foam + 6); p.hygiene = clamp(p.hygiene + 3); p.happy = clamp(p.happy + .3); p.energy = clamp(p.energy - .2);
-    UI.suds(x, y); UI.bubble(x, y, 2 + (Math.random() * 3 | 0)); UI.jig(); FX.vib(8); UI.live();
+    UI.suds(x, y); UI.bubble(x, y, 1 + (Math.random() * 2 | 0)); FX.vib(8); UI.live();
     if (FB(p.foam) !== b0) { UI.pet(); UI.home(); }
     if (p.foam >= 100 && b0 < FOAM.length) UI.toast(p.name + " está coberto de espuma! Use o chuveiro.", "ok");
   },
@@ -767,18 +757,18 @@ const Pet = {
     const p = S.pet, g = d.g.classList;
     if (p.sleeping) { g.remove("spray"); sl.classList.remove("wet"); if (!d.warned) { d.warned = 1; UI.deny(p.name + " está dormindo."); } return; }
     if (p.hygiene >= 98 && p.foam <= 0) { g.remove("spray"); sl.classList.remove("wet"); if (!d.warned) { d.warned = 1; UI.toast(p.name + " já está limpinho."); } return; }
-    g.add("spray"); sl.classList.add("wet");
+    g.add("spray");
     const had = p.foam > 0, b0 = FB(p.foam);
     p.foam = clamp(p.foam - 5); p.hygiene = clamp(p.hygiene + 1.3); p.energy = clamp(p.energy - .1); p.happy = clamp(p.happy + .2);
     FX.vib(6); d.n = (d.n || 0) + 1;
-    for (let i = 0; i < 4; i++) {
-      const w = document.createElement("span"), fall = 70 + Math.random() * 70, wx = (Math.random() - .5) * 50, ft = .36 + fall / 340, lx = d.cx - 26 + Math.random() * 52, ly = d.cy - 8, dl = i * 45;
+    for (let i = 0; i < 2; i++) {
+      const w = document.createElement("span"), fall = 70 + Math.random() * 70, wx = (Math.random() - .5) * 50, ft = .36 + fall / 340, lx = d.cx - 26 + Math.random() * 52, ly = d.cy - 8, dl = i * 90;
       w.className = "wd"; w.style.cssText = `left:${lx}px;top:${ly}px;--fall:${fall}px;--wx:${wx}px;--ft:${ft}s;animation-delay:${dl}ms`; document.body.appendChild(w);
-      setTimeout(() => { w.remove(); const q = document.createElement("span"); q.className = "spl"; q.style.cssText = `left:${lx + wx + 3}px;top:${ly + fall}px`; document.body.appendChild(q); setTimeout(() => q.remove(), 520); }, ft * 1000 + dl);
+      setTimeout(() => { w.remove(); if (i) return; const q = document.createElement("span"); q.className = "spl"; q.style.cssText = `left:${lx + wx + 3}px;top:${ly + fall}px`; document.body.appendChild(q); setTimeout(() => q.remove(), 520); }, ft * 1000 + dl);
     }
     const r = sl.getBoundingClientRect();
-    if (d.n % 2 === 0) UI.bubble(r.left + r.width * (.25 + Math.random() * .5), r.top + r.height * .55, 1, 40);
-    if (d.n % 4 === 0) { const m = document.createElement("span"); m.className = "stm"; m.style.left = (30 + Math.random() * 40) + "%"; m.style.top = "50%"; $("#stage").appendChild(m); setTimeout(() => m.remove(), 2400); }
+    if (d.n % 4 === 0) UI.bubble(r.left + r.width * (.25 + Math.random() * .5), r.top + r.height * .55, 1, 40);
+    if (d.n % 8 === 0) { const m = document.createElement("span"); m.className = "stm"; m.style.left = (30 + Math.random() * 40) + "%"; m.style.top = "50%"; $("#stage").appendChild(m); setTimeout(() => m.remove(), 2400); }
     UI.live();
     const done = (had && p.foam <= 0) || (!had && p.hygiene >= 98 && !d.paid);
     if (done) { d.paid = 1; this.gain(4, 0); FX.burst(r.left + r.width / 2, r.top + r.height * .4, "star", 10); UI.toast(p.name + " está limpinho e cheiroso!", "ok"); UI.fx("happy", "Limpinho!"); g.remove("spray"); sl.classList.remove("wet"); }
@@ -1014,25 +1004,25 @@ const UI = {
   },
   bubble(x, y, n, sp) {
     const st = $(".view.on .stage"); if (!st) return; const r = st.getBoundingClientRect(), sw = sp || 50; let have = st.querySelectorAll(".sb").length;
-    for (let i = 0; i < n && have < 36; i++, have++) {
+    for (let i = 0; i < n && have < 18; i++, have++) {
       const s = document.createElement("span"), z = 12 + Math.random() * 26, t = 1.5 + Math.random() * 1.1;
       s.className = "sb";
-      s.style.cssText = `left:${x - r.left + (Math.random() - .5) * sw}px;top:${y - r.top + (Math.random() - .5) * sw * .6}px;--z:${z}px;--t:${t}s;--dy:${-(70 + Math.random() * 90)}px;--sw:${6 + Math.random() * 8}px;animation-delay:${Math.random() * .15}s`;
+      s.style.cssText = `left:${x - r.left + (Math.random() - .5) * sw}px;top:${y - r.top + (Math.random() - .5) * sw * .6}px;--z:${z}px;--t:${t}s;--dy:${-(70 + Math.random() * 90)}px;--sw:${(Math.random() - .5) * 24}px;animation-delay:${Math.random() * .15}s`;
       st.appendChild(s); setTimeout(() => s.remove(), t * 1000 + 450);
     }
   },
   suds(x, y) {
-    const st = $(".view.on .stage"); if (!st || st.querySelectorAll(".sd").length > 14) return; const r = st.getBoundingClientRect(), s = document.createElement("span");
+    const st = $(".view.on .stage"); if (!st || st.querySelectorAll(".sd").length > 7) return; const r = st.getBoundingClientRect(), s = document.createElement("span");
     s.className = "sd"; s.style.cssText = `left:${x - r.left + (Math.random() - .5) * 40}px;top:${y - r.top + (Math.random() - .5) * 24}px;--z:${34 + Math.random() * 26}px;--rt:${(Math.random() - .5) * 30}deg`;
     s.innerHTML = SUDS; st.appendChild(s); setTimeout(() => s.remove(), 1400);
   },
   jig() { const s = $("#v-home .petslot"); if (!s) return; s.classList.remove("jig"); void s.offsetWidth; s.classList.add("jig"); },
   rain() {
     const st = $("#stage");
-    for (let i = 0; i < 26; i++) { const d = document.createElement("span"); d.className = "dr"; d.style.left = (26 + Math.random() * 48) + "%"; d.style.animationDelay = (Math.random() * .7) + "s"; st.appendChild(d); setTimeout(() => d.remove(), 1800); }
+    for (let i = 0; i < 12; i++) { const d = document.createElement("span"); d.className = "dr"; d.style.left = (26 + Math.random() * 48) + "%"; d.style.animationDelay = (Math.random() * .7) + "s"; st.appendChild(d); setTimeout(() => d.remove(), 1800); }
     const w = document.createElement("div"); w.className = "stream"; st.appendChild(w); setTimeout(() => w.remove(), 1500);
-    for (let i = 0; i < 5; i++) { const m = document.createElement("span"); m.className = "stm"; m.style.left = (28 + Math.random() * 44) + "%"; m.style.top = (45 + Math.random() * 20) + "%"; m.style.animationDelay = (i * .2) + "s"; st.appendChild(m); setTimeout(() => m.remove(), 2800); }
-    const r = $("#v-home .petslot").getBoundingClientRect(); this.bubble(r.left + r.width / 2, r.top + r.height * .5, 9, r.width * .8);
+    for (let i = 0; i < 3; i++) { const m = document.createElement("span"); m.className = "stm"; m.style.left = (28 + Math.random() * 44) + "%"; m.style.top = (45 + Math.random() * 20) + "%"; m.style.animationDelay = (i * .2) + "s"; st.appendChild(m); setTimeout(() => m.remove(), 2800); }
+    const r = $("#v-home .petslot").getBoundingClientRect(); this.bubble(r.left + r.width / 2, r.top + r.height * .5, 5, r.width * .8);
   },
   fx(mode, text) {
     fxMode = mode; this.pet();
@@ -1381,6 +1371,7 @@ const Stage = {
   on: false, pet: false, sx: 0, sy: 0, lx: 0, ly: 0, moved: 0, acc: 0,
   down(e) { if (e.target.closest(".hud,.menu,.tcard,.dock")) return; this.on = true; this.sx = this.lx = e.clientX; this.sy = this.ly = e.clientY; this.pet = !!e.target.closest(".slot"); this.moved = this.acc = 0; },
   move(e) {
+    if (Tools.d) return;
     const s = $("#v-home .petslot"), r = s.getBoundingClientRect();
     s.style.setProperty("--ex", clamp((e.clientX - r.left - r.width / 2) / 30, -4, 4)); s.style.setProperty("--ey", clamp((e.clientY - r.top - r.height / 2) / 30, -3, 4));
     if (!this.on || !this.pet || Tools.d) return;
