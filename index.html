@@ -402,6 +402,60 @@ button:active{transform:scale(.93)}
 @keyframes spl{from{transform:scale(.3);opacity:1}to{transform:scale(1.8,1.4);opacity:0}}
 .stm{width:62px;height:62px;margin:-31px 0 0 -31px;background:radial-gradient(circle,rgba(255,255,255,.7),rgba(255,255,255,0) 68%);animation:stm2 2.2s ease-out both}
 @keyframes stm2{0%{opacity:0;transform:translateY(0) scale(.5)}20%{opacity:.85}100%{opacity:0;transform:translateY(-95px) scale(1.9)}}
+/* ========== JOGOS ========== */
+.menu.on .mi:nth-child(4){animation-delay:.15s}
+.gs{display:none}.gs.on{display:block}#gPlay.on{display:flex}
+#gPlay{flex:1;min-height:0;flex-direction:column;gap:10px;padding:12px max(12px,env(safe-area-inset-right)) calc(env(safe-area-inset-bottom,0px) + 14px) max(12px,env(safe-area-inset-left));position:relative}
+.ghud{min-height:52px;display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.gp{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;min-height:52px;border-radius:16px;color:#fff;background:linear-gradient(#5a2aa8,#37157a);border:2.5px solid #a46bf2;box-shadow:0 3px 0 #26095a,inset 0 2px 0 rgba(255,255,255,.2)}
+.gp small{font-size:10px;font-weight:800;letter-spacing:.3px;text-transform:uppercase;color:#d9c3ff}
+.gp b{display:flex;align-items:center;gap:3px;font-size:18px;font-weight:900;text-shadow:0 2px 0 #26095a}.gp b svg{width:18px;height:18px}
+.ls{display:flex;gap:1px}.ls svg{width:17px;height:17px}
+.gbar{position:relative;flex:none;height:30px;border-radius:15px;overflow:hidden;background:rgba(40,8,90,.4);border:2.5px solid rgba(255,255,255,.3)}
+.gbar i{position:absolute;inset:0;transform-origin:left;transform:scaleX(0);background:linear-gradient(#ffe97a,#ffb23e)}
+.gbar.run i{animation:gbar var(--t) linear forwards}@keyframes gbar{from{transform:scaleX(1)}to{transform:scaleX(0)}}
+.gbar span{position:relative;display:block;text-align:center;line-height:25px;font-size:14px;font-weight:900;color:#fff;text-shadow:0 2px 0 #26095a}
+.gboard{flex:1;min-height:0;overflow:hidden;display:grid;grid-template-columns:repeat(var(--cols,3),var(--cw,80px));gap:8px;justify-content:center;align-content:center;padding:8px;border-radius:26px;background:rgba(255,255,255,.12);border:2.5px dashed rgba(255,255,255,.35)}
+.mc{position:relative;width:var(--cw);height:calc(var(--cw)*1.25);perspective:700px;padding:0;touch-action:manipulation}
+.mc-in{position:absolute;inset:0;transform-style:preserve-3d;transition:transform .38s cubic-bezier(.3,1.45,.5,1) var(--d,0ms)}
+.mc.up .mc-in{transform:rotateY(180deg)}
+.mc-b,.mc-f{position:absolute;inset:0;display:grid;place-items:center;overflow:hidden;border-radius:calc(var(--cw)*.2);backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.mc-b{background:radial-gradient(circle at 30% 18%,#9a62ea,#4b1c8c 75%);border:3px solid #b98cff;box-shadow:0 4px 0 #26095a,inset 0 2px 0 rgba(255,255,255,.35)}
+.mc-b::after{content:"";position:absolute;inset:24%;background:var(--pw) center/contain no-repeat;opacity:.5}
+.mc-b::before{content:"";position:absolute;left:14%;right:14%;top:7%;height:13%;border-radius:50%;background:rgba(255,255,255,.28)}
+.mc-f{transform:rotateY(180deg);background:linear-gradient(#fffaf4,#ffe3ee);border:3px solid #fff;box-shadow:0 0 0 2.5px #5a2a9a,0 4px 0 rgba(40,8,90,.4)}
+.mc-f svg{width:76%;height:76%;filter:drop-shadow(0 3px 2px rgba(60,0,60,.2))}
+.mc.ok .mc-f{background:linear-gradient(#f7fff2,#d3f6dc);box-shadow:0 0 0 2.5px #2fa57c,0 0 14px rgba(47,191,134,.75),0 4px 0 rgba(10,80,50,.4)}
+.mc.ok .mc-in{animation:mcPop .5s ease}@keyframes mcPop{0%,100%{transform:rotateY(180deg) scale(1)}45%{transform:rotateY(180deg) scale(1.14)}}
+.mc.bad{animation:mcShake .4s}@keyframes mcShake{20%,60%{transform:translateX(-5px)}40%,80%{transform:translateX(5px)}}
+.gfoot{display:flex;gap:10px;flex:none}
+.gb{flex:1;display:block;padding:12px 10px;border-radius:18px;font-size:16px;font-weight:900;color:#fff;text-align:center;background:linear-gradient(#ff6fbd,#e0207f);border:3px solid #a8104f;box-shadow:0 4px 0 #a8104f,inset 0 2px 0 rgba(255,255,255,.45);text-shadow:0 2px 0 rgba(120,0,50,.5);transition:transform .1s}
+.gb.alt{background:linear-gradient(#8d55e0,#5a2aa8);border-color:#26095a;box-shadow:0 4px 0 #26095a,inset 0 2px 0 rgba(255,255,255,.3);text-shadow:0 2px 0 #26095a}
+.gb:active{transform:translateY(3px);box-shadow:0 1px 0 #26095a}.gb[hidden]{display:none}
+.gg{display:block;width:100%;margin-top:6px;padding:16px 12px 14px;text-align:center;border-radius:28px;background:linear-gradient(#fff3ee,#fbe3ee 60%,#f6d6ea);border:3px solid #fff;box-shadow:0 0 0 2.5px #5a2a9a,0 8px 0 rgba(40,8,90,.35),0 12px 18px rgba(30,0,70,.3),inset 0 0 18px rgba(255,170,220,.45)}
+.gg:active{transform:scale(.98)}
+.gmini{display:flex;justify-content:center;gap:12px;margin:2px 0 14px}.gmini .mc{--cw:58px;pointer-events:none}
+.gmini .mc:nth-child(1){transform:rotate(-9deg) translateY(4px)}.gmini .mc:nth-child(3){transform:rotate(9deg) translateY(4px)}
+.gg .gt b{display:block;font-size:23px;font-weight:900;color:#3a1a78}.gg .gt span{font-size:13px;font-weight:700;color:#6a4a8e}
+.chips{display:flex;gap:8px;justify-content:center;margin:12px 0}
+.chip{display:flex;align-items:center;gap:4px;padding:5px 12px;border-radius:14px;background:rgba(214,170,236,.42);font-size:13px;font-weight:900;color:#3a1a78}.chip svg{width:16px;height:16px}
+.gsoon{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:20px;padding:15px;border-radius:22px;background:rgba(255,255,255,.14);border:2.5px dashed rgba(255,255,255,.4);font-weight:800;color:#f1e6ff}
+.ghint{margin-top:14px;text-align:center;font-size:13px;font-weight:700;line-height:1.45;color:#f1e6ff;text-shadow:0 1px 0 rgba(40,8,90,.6)}
+.gsum{display:flex;justify-content:center;gap:8px;margin:0 0 16px}
+.glv{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px 10px}
+.lv{position:relative;aspect-ratio:1/1.08;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border-radius:20px;font-size:27px;font-weight:900;color:#fff;background:linear-gradient(#8d55e0,#5a2aa8);border:3px solid #a46bf2;box-shadow:0 5px 0 #26095a,inset 0 2px 0 rgba(255,255,255,.3);text-shadow:0 2px 0 #26095a}
+.lv:active{transform:translateY(3px);box-shadow:0 2px 0 #26095a}.lv .ls svg{width:14px;height:14px}
+.lv.cur{background:linear-gradient(#ff6fbd,#e0207f);border-color:#ffd0ea;box-shadow:0 5px 0 #a8104f,0 0 14px rgba(255,79,168,.8),inset 0 2px 0 rgba(255,255,255,.5);animation:lvPulse 1.3s ease-in-out infinite}
+@keyframes lvPulse{50%{transform:scale(1.07)}}
+.lv.lock{color:#ded7ee;background:linear-gradient(#a99dc0,#766b90);border-color:#c3b9d6;box-shadow:0 5px 0 #433b57;text-shadow:none}.lv svg.i{width:26px;height:26px}
+.gres{position:absolute;inset:0;z-index:5;display:none;align-items:center;justify-content:center;padding:22px;background:rgba(30,8,70,.58)}
+.gres.on{display:flex;animation:in .25s ease}
+.gcard{width:100%;max-width:340px;padding:22px 18px 18px;text-align:center;border-radius:30px;background:linear-gradient(#fff3ee,#fbe3ee 60%,#f6d6ea);border:3px solid #fff;box-shadow:0 0 0 3px #5a2a9a,0 10px 0 rgba(40,8,90,.35),0 18px 30px rgba(30,0,70,.4)}
+.gcard h2{font-size:26px;font-weight:900;color:#3a1a78}.gcard p{margin:6px 0 12px;font-size:14px;font-weight:700;color:#6a4a8e}.gcard small{display:block;margin:10px 0 2px;font-size:12px;font-weight:700;line-height:1.4;color:#6a4a8e}
+.gstars{display:flex;justify-content:center;gap:4px;margin:10px 0 2px}.gstar svg{width:60px;height:60px;filter:drop-shadow(0 4px 0 rgba(60,20,0,.22))}.gstar:not(.on){opacity:.55}
+.gstar.on{animation:starIn .55s cubic-bezier(.3,1.6,.5,1) both;animation-delay:calc(var(--n)*.22s + .15s)}@keyframes starIn{from{transform:scale(0) rotate(-40deg);opacity:0}to{transform:none;opacity:1}}
+.gcoin{display:inline-flex;align-items:center;gap:8px;padding:6px 20px 6px 14px;border-radius:26px;font-size:30px;font-weight:900;color:#5a2d00;background:linear-gradient(#ffe97a,#ffc62e 55%,#f59e10);border:3px solid #8a4a12;box-shadow:0 4px 0 #8a4a12,inset 0 2px 0 rgba(255,255,255,.6)}.gcoin svg{width:34px;height:34px}
+.gacts{display:flex;flex-direction:column;gap:10px;margin-top:14px}.gacts .flex{gap:10px}
 </style>
 </head>
 <body>
@@ -414,7 +468,7 @@ button:active{transform:scale(.93)}
 <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></symbol>
 <symbol id="i-care" viewBox="0 0 24 24"><path d="M12 21s-8-5.3-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 5.7-8 11-8 11z"/></symbol>
 <symbol id="i-drop" viewBox="0 0 24 24"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/></symbol>
-<symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 3L5 14h6l-1 7 8-11h-6z"/></symbol>
+<symbol id="i-game" viewBox="0 0 24 24"><path d="M6 8h12a4 4 0 0 1 3.9 4.9l-.8 3.6a2.4 2.4 0 0 1-4.1 1.1L15 15.5H9l-2 2.1a2.4 2.4 0 0 1-4.1-1.1l-.8-3.6A4 4 0 0 1 6 8z"/><path d="M8 10.2v3.6M6.2 12h3.6"/><circle cx="15.6" cy="11.2" r=".7"/><circle cx="17.8" cy="12.8" r=".7"/></symbol><symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 3L5 14h6l-1 7 8-11h-6z"/></symbol>
 <symbol id="i-shop" viewBox="0 0 24 24"><g stroke="#7a3d18" stroke-width="1.25" stroke-linejoin="round" stroke-linecap="round"><path d="M4 9 5.5 4h13L20 9z" fill="#fff8df"/><path d="M5.5 4 4 9h4.5L9 4z" fill="#ff6f91"/><path d="M9 4 8.5 9h4L12 4z" fill="#ffd34f"/><path d="M12 4 12.5 9h4L15 4z" fill="#ff8a45"/><path d="M15 4 16 9h4l-1.5-5z" fill="#7fd9a0"/><path d="M4 9a2.7 2.7 0 0 0 5.3 0 2.7 2.7 0 0 0 5.4 0A2.7 2.7 0 0 0 20 9" fill="#ff6f91"/><path d="M5 11.5V21h14v-9.5z" fill="#ffe5b8"/><rect x="9.5" y="14" width="5" height="7" rx="1" fill="#9b70ed"/><path d="M6.5 13h2" stroke="#fff" stroke-width="1.4"/></g></symbol>
 <symbol id="i-hanger" viewBox="0 0 24 24"><g stroke="#87436d" stroke-width="1.35" stroke-linejoin="round" stroke-linecap="round"><path d="M12 8a2.5 2.5 0 1 0-2.5-2.5" fill="none" stroke="#9a70df" stroke-width="2"/><path d="M12 8v2.5L3 17a1.5 1.5 0 0 0 1 2.7h16a1.5 1.5 0 0 0 1-2.7l-9-6.5z" fill="#fff0f6"/><path d="M4.2 17.8 12 12.2l7.8 5.6" fill="none" stroke="#ff75a8" stroke-width="2.2"/><path d="M7 19.5h10" fill="none" stroke="#ffd36b" stroke-width="1.5"/></g></symbol>
 <symbol id="i-users" viewBox="0 0 24 24"><g stroke="#5145a6" stroke-width="1.35" stroke-linejoin="round" stroke-linecap="round"><circle cx="8.5" cy="7.5" r="3.5" fill="#ffd36b"/><path d="M2 19.5a6.5 6.5 0 0 1 13 0v.5H2z" fill="#ff8eb8"/><circle cx="17" cy="8.5" r="2.8" fill="#8edcff"/><path d="M15.2 14.5a5 5 0 0 1 6.3 4.8v.7h-5" fill="#a9a0ff"/><path d="M6.5 7a2 2 0 0 1 2.5-1.6M16 7.5a1.5 1.5 0 0 1 1.5-.8" fill="none" stroke="#fff" stroke-width="1.2"/></g></symbol>
@@ -466,6 +520,7 @@ button:active{transform:scale(.93)}
         <button class="mi" data-act="go" data-v="shop"><span class="app" style="--a:#ffd36b;--b:#ff9a3d"><svg class="i"><use href="#i-shop"/></svg></span>Loja</button>
         <button class="mi" data-act="go" data-v="care"><span class="app" style="--a:#ff9ec0;--b:#ff6f9b"><svg class="i"><use href="#i-hanger"/></svg></span>Armário</button>
         <button class="mi" data-act="go" data-v="duo"><span class="app" style="--a:#a9c4ff;--b:#7a8cf5"><svg class="i"><use href="#i-users"/></svg></span><span>Dupla<small id="menuDuo">convite pendente</small></span></button>
+        <button class="mi" data-act="go" data-v="games"><span class="app" style="--a:#7fe3b0;--b:#2fbf86"><svg class="i"><use href="#i-game"/></svg></span>Jogos</button>
       </div>
       <div class="tcard" id="tcard"></div>
       <nav class="dock" id="dock" aria-label="Cômodos"></nav>
@@ -481,7 +536,7 @@ button:active{transform:scale(.93)}
 
   <!-- LOJA -->
   <section class="view sv" id="v-shop">
-    <div class="top"><button class="back" data-act="go" data-v="home" aria-label="Voltar"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><h1><span class="sico"><svg viewBox="0 0 24 24"><use href="#t-shop"/></svg></span>Loja<i class="spk"></i></h1><div class="coins"><span data-ci></span><b id="sCoins"></b><button class="plus" data-act="coinhint" aria-label="Como ganhar moedas"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="4.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button></div></div>
+    <div class="top"><button class="back" data-act="go" data-v="home" aria-label="Voltar"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><h1><span class="sico"><svg viewBox="0 0 24 24"><use href="#t-shop"/></svg></span>Loja<i class="spk"></i></h1><div class="coins"><span data-ci></span><b id="sCoins"></b><button class="plus" data-act="go" data-v="games" aria-label="Ganhar moedas jogando"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="4.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button></div></div>
     <div class="tabs" id="sTabs"></div>
     <div class="scroll"><div class="grid g2 sg2" id="sGrid"></div></div>
   </section>
@@ -512,6 +567,20 @@ button:active{transform:scale(.93)}
       <div class="card" id="accCard"><h2>Conta</h2><p id="accTxt"></p>
         <button class="btn red block" data-act="leave">Sair da dupla</button>
         <button class="btn red block" data-act="logout">Sair da conta</button></div>
+    </div>
+  </section>
+
+  <!-- JOGOS -->
+  <section class="view sv" id="v-games">
+    <div class="top"><button class="back" data-act="gback" aria-label="Voltar"><svg class="i"><use href="#i-back"/></svg></button><h1><span class="sico"><svg class="i"><use href="#i-game"/></svg></span><span id="gTitle">Jogos</span></h1><div class="coins"><span data-ci></span><b id="gCoins"></b></div></div>
+    <div class="gs scroll" id="gMenu"></div>
+    <div class="gs scroll" id="gLevels"></div>
+    <div class="gs" id="gPlay">
+      <div class="ghud" id="gHud"></div>
+      <div class="gbar" id="gBar"><i></i><span id="gMsg"></span></div>
+      <div class="gboard" id="gBoard"></div>
+      <div class="gfoot"><button class="gb alt" data-act="gretry">Reiniciar</button><button class="gb" data-act="gskip" id="gSkip">Já decorei!</button></div>
+      <div class="gres" id="gRes"></div>
     </div>
   </section>
 
@@ -1085,7 +1154,7 @@ const UI = {
   foamTip() { const e = $("#v-home .ft"); if (e) e.innerHTML = foamTxt(); },
   srect(st) { const t = performance.now(); if (!this._sr || this._sr.st !== st || t - this._sr.t > 400) this._sr = { st, t, r: st.getBoundingClientRect() }; return this._sr.r; },
   enter(id, key) { const k = this._k2 || (this._k2 = {}); $("#" + id).classList.toggle("enter", k[id] !== key); k[id] = key; },
-  go(v) { if (v === "duo" && CLOUD_ON) Cloud.markSeen(); this._k2 = {}; $("#menu").classList.remove("on"); view = v; $$(".view").forEach(e => e.classList.toggle("on", e.id === "v-" + v)); $$(".scroll").forEach(s => s.scrollTop = 0); this.render(); },
+  go(v) { if (v === "duo" && CLOUD_ON) Cloud.markSeen(); this._k2 = {}; $("#menu").classList.remove("on"); view = v; $$(".view").forEach(e => e.classList.toggle("on", e.id === "v-" + v)); $$(".scroll").forEach(s => s.scrollTop = 0); if (v !== "games") Games.stop(); this.render(); if (v === "games") Games.enter(); },
   setRoom(r) { room = r; this.render(); },
   openName(first) {
     $("#mTitle").textContent = first ? "Bem-vindos ao DuoPet" : "Renomear pet"; $("#nameInp").value = first ? "" : S.pet.name;
@@ -1093,7 +1162,7 @@ const UI = {
   },
   head() {
     const p = S.pet;
-    FX.num($("#hCoins"), S.coins); FX.num($("#sCoins"), S.coins); $("#lnum").textContent = "Nv " + p.level;
+    FX.num($("#hCoins"), S.coins); FX.num($("#sCoins"), S.coins); FX.num($("#gCoins"), S.coins); $("#lnum").textContent = "Nv " + p.level;
     $("#xpb").style.width = (p.xp / xpNeed(p.level) * 100) + "%"; $("#pname").textContent = p.name || "Seu pet";
   },
   stats() {
@@ -1447,12 +1516,126 @@ const Stage = {
   }
 };
 
+/* ========== M. JOGOS (minigames para ganhar moedas) ========== */
+const uq = (h, p) => h.replace(/id="([A-Za-z0-9]+)"/g, (m, a) => `id="${a}${p}"`).replace(/url\(#([A-Za-z0-9]+)\)/g, (m, a) => `url(#${a}${p})`);
+const MHEART = `<svg viewBox="0 0 24 24"><path d="M12 21s-8-5.3-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 5.7-8 11-8 11z" fill="#ff5fa0" stroke="#a82466" stroke-width="1.6" stroke-linejoin="round"/><path d="M7.5 8.5q1-1.6 2.6-1.3" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></svg>`;
+const STARI = on => `<svg viewBox="0 0 24 24"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6L2.5 9.4l6.6-.8z" fill="${on ? "#ffd23f" : "#d9cde8"}" stroke="${on ? "#b8730a" : "#a999c2"}" stroke-width="1.6" stroke-linejoin="round"/></svg>`;
+/* 12 desenhos que já existem no jogo: comidas, sabonete, chuveiro, bola, coração e moeda */
+const MEM_ICONS = [() => foodSVG("maca"), () => foodSVG("biscoito"), () => foodSVG("sanduiche"), () => foodSVG("bolo"), () => foodSVG("sorvete"), () => foodSVG("pizza"), () => foodSVG("salsicha"),
+  p => uq(SOAP, p), () => SHOWER, p => uq(BALL, p), () => MHEART, () => COIN];
+/* [cartas, segundos para decorar] */
+const MEM_LEVELS = [[6, 3.5], [8, 3.5], [8, 3], [12, 4], [12, 3.5], [12, 3], [16, 4.5], [16, 4], [16, 3.5], [20, 5], [20, 4.5], [20, 4], [24, 5.5], [24, 5], [24, 4.5], [24, 4], [24, 3.5], [24, 3.2], [24, 3], [24, 2.6]];
+const memBase = l => 6 + 2 * l;
+const memReward = (l, st) => memBase(l) + (st - 1) * Math.ceil(memBase(l) * .25);
+const memStars = (l, pairs, miss) => { const m3 = Math.max(1, Math.round(pairs * Math.max(.2, .7 - .025 * (l - 1)))); return miss <= m3 ? 3 : miss <= m3 * 2 + 1 ? 2 : 1; };
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.random() * (i + 1) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; };
+let uqn = 0;
+const Games = {
+  d: null, sc: "menu", G: null, tm: [],
+  data() { if (!this.d) { let o = {}; try { o = JSON.parse(localStorage.getItem("dp_games_v1") || "{}"); } catch (e) {} this.d = { mem: { st: (o.mem && o.mem.st) || {} } }; } return this.d.mem; },
+  persist() { try { localStorage.setItem("dp_games_v1", JSON.stringify(this.d)); } catch (e) {} },
+  stars() { return Object.values(this.data().st).reduce((a, b) => a + b, 0); },
+  unlocked() { const st = this.data().st; let u = 1; while (st[u] && u < MEM_LEVELS.length) u++; return u; },
+  later(fn, ms) { this.tm.push(setTimeout(fn, ms)); },
+  stop() { this.tm.forEach(clearTimeout); this.tm = []; if (this.G) this.G.phase = "stop"; },
+  enter() { this.stop(); this.show("menu"); },
+  show(sc) {
+    this.sc = sc; $("#gMenu").classList.toggle("on", sc === "menu"); $("#gLevels").classList.toggle("on", sc === "levels"); $("#gPlay").classList.toggle("on", sc === "play");
+    $("#gTitle").textContent = sc === "menu" ? "Jogos" : sc === "levels" ? "Memória" : "Fase " + this.G.lv;
+    $("#gRes").classList.remove("on"); if (sc === "menu") this.menu(); if (sc === "levels") this.levels();
+    $$("#v-games .scroll").forEach(s => s.scrollTop = 0);
+  },
+  back() { if (this.sc === "play") { this.stop(); this.show("levels"); } else if (this.sc === "levels") this.show("menu"); else UI.go("home"); },
+  card(k, up, i) { return `<span class="mc ${up ? "up" : ""}"><span class="mc-in"><span class="mc-b"></span><span class="mc-f">${MEM_ICONS[k]("m" + (++uqn))}</span></span></span>`; },
+  menu() {
+    const n = MEM_LEVELS.length, cur = Math.min(this.unlocked(), n);
+    $("#gMenu").innerHTML = `<button class="gg" data-act="gopen"><div class="gmini">${this.card(0, 1)}${this.card(7, 0)}${this.card(4, 1)}</div>
+      <div class="gt"><b>Jogo da Memória</b><span>Decore os desenhos e encontre os pares.</span></div>
+      <div class="chips"><span class="chip">Fase ${cur}/${n}</span><span class="chip">${STARI(1)}${this.stars()}/${n * 3}</span></div><span class="gb">Jogar</span></button>
+      <div class="gsoon">${ic("lock")}<span>Mais jogos em breve</span></div>
+      <p class="ghint">Cada fase rende moedas. Quanto menos erros, mais estrelas e mais moedas! Repetir uma fase vale 20% do prêmio.</p>`;
+  },
+  levels() {
+    const st = this.data().st, u = this.unlocked(), n = MEM_LEVELS.length;
+    $("#gLevels").innerHTML = `<div class="gsum"><span class="chip">${STARI(1)}${this.stars()}/${n * 3}</span><span class="chip">${COIN}Fase ${u}: até ${memReward(u, 3)}</span></div><div class="glv">${MEM_LEVELS.map((_, i) => {
+      const l = i + 1, s = st[l] || 0, lock = l > u, cur = l === u && !s;
+      return `<button class="lv ${lock ? "lock" : cur ? "cur" : ""}" ${lock ? "disabled" : ""} data-act="glevel" data-l="${l}" aria-label="Fase ${l}${lock ? " bloqueada" : ""}">${lock ? ic("lock") : l}${lock ? "" : `<span class="ls">${[1, 2, 3].map(k => STARI(k <= s)).join("")}</span>`}</button>`;
+    }).join("")}</div>`;
+  },
+  start(l) {
+    this.stop(); const [cards, pv] = MEM_LEVELS[l - 1], pairs = cards / 2;
+    const ids = shuffle([...Array(MEM_ICONS.length).keys()]).slice(0, pairs), deck = shuffle([...ids, ...ids]);
+    this.G = { lv: l, n: cards, pairs, deck, up: [], done: [], first: -1, lock: false, tries: 0, found: 0, phase: "pre", fin: false };
+    this.show("play");
+    $("#gBoard").innerHTML = deck.map((k, i) => `<button class="mc" data-i="${i}" style="--d:${i * 35}ms" aria-label="Carta ${i + 1}"><span class="mc-in"><span class="mc-b"></span><span class="mc-f">${MEM_ICONS[k]("c" + i)}</span></span></button>`).join("");
+    this.hud(); this.bar("Decore os desenhos!", pv); $("#gSkip").hidden = false; this.layout(); requestAnimationFrame(() => this.layout());
+    this.later(() => $$("#gBoard .mc").forEach(c => c.classList.add("up")), 350);
+    this.later(() => this.hide(), 350 + pv * 1000 + cards * 35);
+  },
+  hide() {
+    const g = this.G; if (!g || g.phase !== "pre") return; g.phase = "hid"; $("#gSkip").hidden = true;
+    $$("#gBoard .mc").forEach(c => { c.classList.remove("up"); });
+    this.later(() => { $$("#gBoard .mc").forEach(c => c.style.setProperty("--d", "0ms")); g.phase = "play"; this.bar("Encontre os pares!", 0); }, 450 + g.n * 35);
+  },
+  bar(msg, secs) { const b = $("#gBar"); b.classList.remove("run"); void b.offsetWidth; b.style.setProperty("--t", secs + "s"); if (secs) b.classList.add("run"); $("#gMsg").textContent = msg; },
+  layout() {
+    const b = $("#gBoard"), g = this.G; if (!g || !b.clientWidth) return;
+    const W = b.clientWidth - 16, H = b.clientHeight - 16, gap = 8; let best = null;
+    for (let c = 2; c <= 6; c++) { if (g.n % c) continue; const r = g.n / c, w = Math.min((W - gap * (c - 1)) / c, (H - gap * (r - 1)) / r * .8, 112); if (!best || w > best.w + .5 || (Math.abs(w - best.w) <= .5 && r < best.r)) best = { c, r, w }; }
+    b.style.setProperty("--cols", best.c); b.style.setProperty("--cw", Math.floor(best.w) + "px");
+  },
+  hud() {
+    const g = this.G, miss = g.tries - g.found, st = memStars(g.lv, g.pairs, miss);
+    $("#gHud").innerHTML = `<span class="gp"><small>Pares</small><b>${g.found}/${g.pairs}</b></span><span class="gp"><small>Erros</small><b>${miss}</b></span><span class="gp"><small>Estrelas</small><span class="ls">${[1, 2, 3].map(k => STARI(k <= st)).join("")}</span></span><span class="gp"><small>Prêmio</small><b>${COIN}${memReward(g.lv, st)}</b></span>`;
+  },
+  flip(i, up) { const c = $$("#gBoard .mc")[i]; if (c) c.classList.toggle("up", up); this.G.up[i] = up; },
+  tap(i) {
+    const g = this.G; if (!g || g.phase !== "play" || g.lock || g.up[i] || g.done[i]) return;
+    this.flip(i, true); FX.vib(6);
+    if (g.first < 0) { g.first = i; return; }
+    const a = g.first, b = i, cs = $$("#gBoard .mc"); g.first = -1; g.tries++;
+    if (g.deck[a] === g.deck[b]) {
+      g.done[a] = g.done[b] = true; g.found++; this.hud();
+      this.later(() => { cs[a].classList.add("ok"); cs[b].classList.add("ok"); FX.vib(12); }, 380);
+      if (g.found === g.pairs) this.later(() => this.finish(), 1100);
+    } else {
+      g.lock = true; this.hud();
+      this.later(() => { cs[a].classList.add("bad"); cs[b].classList.add("bad"); }, 380);
+      this.later(() => { cs[a].classList.remove("bad"); cs[b].classList.remove("bad"); this.flip(a, false); this.flip(b, false); g.lock = false; }, 950);
+    }
+  },
+  finish() {
+    const g = this.G; if (!g || g.fin) return; g.fin = true; g.phase = "end";
+    const miss = g.tries - g.found, st = memStars(g.lv, g.pairs, miss), D = this.data(), old = D.st[g.lv] || 0;
+    const coins = old ? Math.round(memBase(g.lv) * .2) + (st > old ? memReward(g.lv, st) - memReward(g.lv, old) : 0) : memReward(g.lv, st);
+    if (st > old) D.st[g.lv] = st; this.persist();
+    Pet.gain(3 + Math.floor(g.lv / 2), coins); S.pet.happy = clamp(S.pet.happy + 4); Persist.save(); UI.live();
+    const next = g.lv < MEM_LEVELS.length;
+    $("#gRes").innerHTML = `<div class="gcard"><h2>${st === 3 ? "Perfeito!" : st === 2 ? "Muito bem!" : "Fase concluída!"}</h2>
+      <div class="gstars">${[1, 2, 3].map(k => `<span class="gstar ${k <= st ? "on" : ""}" style="--n:${k}">${STARI(k <= st)}</span>`).join("")}</div>
+      <p>${g.tries} jogadas · ${miss} ${miss === 1 ? "erro" : "erros"}</p><div class="gcoin">+${coins}${COIN}</div>
+      <small>${old ? "Repetição: 20% do prêmio, mais o que você melhorar." : st < 3 ? "Com menos erros você ganha mais estrelas e moedas." : "Fase perfeita!"}${next ? "" : " Você completou todas as fases!"}</small>
+      <div class="gacts">${next ? `<button class="gb" data-act="gnext">Próxima fase</button>` : ""}<div class="flex"><button class="gb alt" data-act="gretry">Repetir</button><button class="gb alt" data-act="glevels">Fases</button></div></div></div>`;
+    $("#gRes").classList.add("on"); FX.vib([20, 40, 20]);
+    this.later(() => FX.burst(innerWidth / 2, innerHeight * .3, "coin", 4 + st * 2), 500);
+  }
+};
+document.addEventListener("pointerdown", e => { const c = e.target.closest("#gBoard .mc"); if (c) Games.tap(+c.dataset.i); });
+window.addEventListener("resize", () => { if (Games.sc === "play") Games.layout(); });
+
 /* ========== J. EVENTOS ========== */
 document.addEventListener("click", async e => {
   const mn = $("#menu"); if (mn.classList.contains("on") && !e.target.closest("#menu,#mbtn")) mn.classList.remove("on");
   const el = e.target.closest("[data-act]"); if (!el) return; const d = el.dataset;
   switch (d.act) {
     case "go": UI.go(d.v); break;
+    case "gback": Games.back(); break;
+    case "gopen": Games.show("levels"); break;
+    case "glevel": Games.start(+d.l); break;
+    case "glevels": Games.show("levels"); break;
+    case "gnext": Games.start(Games.G.lv + 1); break;
+    case "gretry": Games.start(Games.G.lv); break;
+    case "gskip": Games.hide(); break;
     case "menu": $("#menu").classList.toggle("on"); break;
     case "room": UI.setRoom(d.r); break;
     case "fprev": case "fnext": { const n = foodList().length; if (n) { fi = (fi + (d.act === "fnext" ? 1 : n - 1)) % n; UI.home(); } break; }
