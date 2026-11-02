@@ -404,6 +404,8 @@ button:active{transform:scale(.93)}
 @keyframes stm2{0%{opacity:0;transform:translateY(0) scale(.5)}20%{opacity:.85}100%{opacity:0;transform:translateY(-95px) scale(1.9)}}
 /* ========== JOGOS ========== */
 .menu.on .mi:nth-child(4){animation-delay:.15s}
+#v-games h1{font-size:clamp(20px,6vw,28px);white-space:nowrap}
+#v-games .coins{font-size:20px;gap:5px}#v-games .coins [data-ci] svg{width:28px;height:28px}
 .gs{display:none}.gs.on{display:block}#gPlay.on{display:flex}
 #gPlay{flex:1;min-height:0;flex-direction:column;gap:10px;padding:12px max(12px,env(safe-area-inset-right)) calc(env(safe-area-inset-bottom,0px) + 14px) max(12px,env(safe-area-inset-left));position:relative}
 .ghud{min-height:52px;display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
@@ -439,6 +441,7 @@ button:active{transform:scale(.93)}
 .gg .gt b{display:block;font-size:23px;font-weight:900;color:#3a1a78}.gg .gt span{font-size:13px;font-weight:700;color:#6a4a8e}
 .chips{display:flex;gap:8px;justify-content:center;margin:12px 0}
 .chip{display:flex;align-items:center;gap:4px;padding:5px 12px;border-radius:14px;background:rgba(214,170,236,.42);font-size:13px;font-weight:900;color:#3a1a78}.chip svg{width:16px;height:16px}
+.gsoon svg{width:30px;height:30px;flex:none}
 .gsoon{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:20px;padding:15px;border-radius:22px;background:rgba(255,255,255,.14);border:2.5px dashed rgba(255,255,255,.4);font-weight:800;color:#f1e6ff}
 .ghint{margin-top:14px;text-align:center;font-size:13px;font-weight:700;line-height:1.45;color:#f1e6ff;text-shadow:0 1px 0 rgba(40,8,90,.6)}
 .gsum{display:flex;justify-content:center;gap:8px;margin:0 0 16px}
@@ -447,7 +450,7 @@ button:active{transform:scale(.93)}
 .lv:active{transform:translateY(3px);box-shadow:0 2px 0 #26095a}.lv .ls svg{width:14px;height:14px}
 .lv.cur{background:linear-gradient(#ff6fbd,#e0207f);border-color:#ffd0ea;box-shadow:0 5px 0 #a8104f,0 0 14px rgba(255,79,168,.8),inset 0 2px 0 rgba(255,255,255,.5);animation:lvPulse 1.3s ease-in-out infinite}
 @keyframes lvPulse{50%{transform:scale(1.07)}}
-.lv.lock{color:#ded7ee;background:linear-gradient(#a99dc0,#766b90);border-color:#c3b9d6;box-shadow:0 5px 0 #433b57;text-shadow:none}.lv svg.i{width:26px;height:26px}
+.lv.lock{color:#ded7ee;background:linear-gradient(#a99dc0,#766b90);border-color:#c3b9d6;box-shadow:0 5px 0 #433b57;text-shadow:none}.lv>svg{width:32px;height:32px;filter:drop-shadow(0 2px 0 rgba(40,20,70,.35))}
 .gres{position:absolute;inset:0;z-index:5;display:none;align-items:center;justify-content:center;padding:22px;background:rgba(30,8,70,.58)}
 .gres.on{display:flex;animation:in .25s ease}
 .gcard{width:100%;max-width:340px;padding:22px 18px 18px;text-align:center;border-radius:30px;background:linear-gradient(#fff3ee,#fbe3ee 60%,#f6d6ea);border:3px solid #fff;box-shadow:0 0 0 3px #5a2a9a,0 10px 0 rgba(40,8,90,.35),0 18px 30px rgba(30,0,70,.4)}
@@ -468,7 +471,7 @@ button:active{transform:scale(.93)}
 <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></symbol>
 <symbol id="i-care" viewBox="0 0 24 24"><path d="M12 21s-8-5.3-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 5.7-8 11-8 11z"/></symbol>
 <symbol id="i-drop" viewBox="0 0 24 24"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/></symbol>
-<symbol id="i-game" viewBox="0 0 24 24"><path d="M6 8h12a4 4 0 0 1 3.9 4.9l-.8 3.6a2.4 2.4 0 0 1-4.1 1.1L15 15.5H9l-2 2.1a2.4 2.4 0 0 1-4.1-1.1l-.8-3.6A4 4 0 0 1 6 8z"/><path d="M8 10.2v3.6M6.2 12h3.6"/><circle cx="15.6" cy="11.2" r=".7"/><circle cx="17.8" cy="12.8" r=".7"/></symbol><symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 3L5 14h6l-1 7 8-11h-6z"/></symbol>
+<symbol id="i-game" viewBox="0 0 24 24"><g stroke="#1f5d49" stroke-width="1.3" stroke-linejoin="round" stroke-linecap="round"><path d="M6.2 7.5h11.6a4.2 4.2 0 0 1 4.1 5.1l-.9 3.8a2.5 2.5 0 0 1-4.3 1.1L14.9 15.3H9.1l-1.8 2.2a2.5 2.5 0 0 1-4.3-1.1l-.9-3.8a4.2 4.2 0 0 1 4.1-5.1z" fill="#fff8df"/><path d="M8.2 9.4v4.6M5.9 11.7h4.6" fill="none" stroke="#7a62c9" stroke-width="2.2"/><circle cx="15.5" cy="10.9" r="1.4" fill="#ffd36b"/><circle cx="18.1" cy="13" r="1.4" fill="#ff6f91"/><path d="M12.1 9.2h1.2" fill="none" stroke="#9fd8bd" stroke-width="1.2"/></g></symbol><symbol id="t-game" viewBox="0 0 24 24"><g stroke="#3b1a78" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"><path d="M6.2 7.5h11.6a4.2 4.2 0 0 1 4.1 5.1l-.9 3.8a2.5 2.5 0 0 1-4.3 1.1L14.9 15.3H9.1l-1.8 2.2a2.5 2.5 0 0 1-4.3-1.1l-.9-3.8a4.2 4.2 0 0 1 4.1-5.1z" fill="#7fe3b0"/><path d="M7.6 9.1h1.6v2h2v1.6h-2v2H7.6v-2h-2v-1.6h2z" fill="#fff" stroke-width="1.1"/><circle cx="15.4" cy="10.8" r="1.5" fill="#ffd96a" stroke-width="1.1"/><circle cx="18.2" cy="13.1" r="1.5" fill="#ff4fa8" stroke-width="1.1"/><path d="M6.2 8.9h6.6" fill="none" stroke="#fff" stroke-width="1.1" opacity=".7"/></g></symbol><symbol id="g-lock" viewBox="0 0 24 24"><g stroke-linejoin="round" stroke-linecap="round"><path d="M7.8 11V8a4.2 4.2 0 0 1 8.4 0v3" fill="none" stroke="#3b1a78" stroke-width="4"/><path d="M7.8 11V8a4.2 4.2 0 0 1 8.4 0v3" fill="none" stroke="#dfe5f7" stroke-width="1.6"/><rect x="4.5" y="10.5" width="15" height="10.5" rx="2.6" fill="#ffd36b" stroke="#3b1a78" stroke-width="1.5"/><path d="M7.2 13.3h3" fill="none" stroke="#fff" stroke-width="1.3" opacity=".75"/><circle cx="12" cy="15.2" r="1.5" fill="#3b1a78"/><path d="M12 15.6v2.4" stroke="#3b1a78" stroke-width="1.8" fill="none"/></g></symbol><symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 3L5 14h6l-1 7 8-11h-6z"/></symbol>
 <symbol id="i-shop" viewBox="0 0 24 24"><g stroke="#7a3d18" stroke-width="1.25" stroke-linejoin="round" stroke-linecap="round"><path d="M4 9 5.5 4h13L20 9z" fill="#fff8df"/><path d="M5.5 4 4 9h4.5L9 4z" fill="#ff6f91"/><path d="M9 4 8.5 9h4L12 4z" fill="#ffd34f"/><path d="M12 4 12.5 9h4L15 4z" fill="#ff8a45"/><path d="M15 4 16 9h4l-1.5-5z" fill="#7fd9a0"/><path d="M4 9a2.7 2.7 0 0 0 5.3 0 2.7 2.7 0 0 0 5.4 0A2.7 2.7 0 0 0 20 9" fill="#ff6f91"/><path d="M5 11.5V21h14v-9.5z" fill="#ffe5b8"/><rect x="9.5" y="14" width="5" height="7" rx="1" fill="#9b70ed"/><path d="M6.5 13h2" stroke="#fff" stroke-width="1.4"/></g></symbol>
 <symbol id="i-hanger" viewBox="0 0 24 24"><g stroke="#87436d" stroke-width="1.35" stroke-linejoin="round" stroke-linecap="round"><path d="M12 8a2.5 2.5 0 1 0-2.5-2.5" fill="none" stroke="#9a70df" stroke-width="2"/><path d="M12 8v2.5L3 17a1.5 1.5 0 0 0 1 2.7h16a1.5 1.5 0 0 0 1-2.7l-9-6.5z" fill="#fff0f6"/><path d="M4.2 17.8 12 12.2l7.8 5.6" fill="none" stroke="#ff75a8" stroke-width="2.2"/><path d="M7 19.5h10" fill="none" stroke="#ffd36b" stroke-width="1.5"/></g></symbol>
 <symbol id="i-users" viewBox="0 0 24 24"><g stroke="#5145a6" stroke-width="1.35" stroke-linejoin="round" stroke-linecap="round"><circle cx="8.5" cy="7.5" r="3.5" fill="#ffd36b"/><path d="M2 19.5a6.5 6.5 0 0 1 13 0v.5H2z" fill="#ff8eb8"/><circle cx="17" cy="8.5" r="2.8" fill="#8edcff"/><path d="M15.2 14.5a5 5 0 0 1 6.3 4.8v.7h-5" fill="#a9a0ff"/><path d="M6.5 7a2 2 0 0 1 2.5-1.6M16 7.5a1.5 1.5 0 0 1 1.5-.8" fill="none" stroke="#fff" stroke-width="1.2"/></g></symbol>
@@ -572,7 +575,7 @@ button:active{transform:scale(.93)}
 
   <!-- JOGOS -->
   <section class="view sv" id="v-games">
-    <div class="top"><button class="back" data-act="gback" aria-label="Voltar"><svg class="i"><use href="#i-back"/></svg></button><h1><span class="sico"><svg class="i"><use href="#i-game"/></svg></span><span id="gTitle">Jogos</span></h1><div class="coins"><span data-ci></span><b id="gCoins"></b></div></div>
+    <div class="top"><button class="back" data-act="gback" aria-label="Voltar"><svg class="i"><use href="#i-back"/></svg></button><h1><span class="sico"><svg viewBox="0 0 24 24"><use href="#t-game"/></svg></span><span id="gTitle">Jogos</span></h1><div class="coins"><span data-ci></span><b id="gCoins"></b><button class="plus" data-act="go" data-v="shop" aria-label="Abrir a loja"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="4.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button></div></div>
     <div class="gs scroll" id="gMenu"></div>
     <div class="gs scroll" id="gLevels"></div>
     <div class="gs" id="gPlay">
@@ -1519,6 +1522,7 @@ const Stage = {
 /* ========== M. JOGOS (minigames para ganhar moedas) ========== */
 const uq = (h, p) => h.replace(/id="([A-Za-z0-9]+)"/g, (m, a) => `id="${a}${p}"`).replace(/url\(#([A-Za-z0-9]+)\)/g, (m, a) => `url(#${a}${p})`);
 const MHEART = `<svg viewBox="0 0 24 24"><path d="M12 21s-8-5.3-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 5.7-8 11-8 11z" fill="#ff5fa0" stroke="#a82466" stroke-width="1.6" stroke-linejoin="round"/><path d="M7.5 8.5q1-1.6 2.6-1.3" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></svg>`;
+const LOCKI = `<svg viewBox="0 0 24 24"><use href="#g-lock"/></svg>`;
 const STARI = on => `<svg viewBox="0 0 24 24"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6L2.5 9.4l6.6-.8z" fill="${on ? "#ffd23f" : "#d9cde8"}" stroke="${on ? "#b8730a" : "#a999c2"}" stroke-width="1.6" stroke-linejoin="round"/></svg>`;
 /* 12 desenhos que já existem no jogo: comidas, sabonete, chuveiro, bola, coração e moeda */
 const MEM_ICONS = [() => foodSVG("maca"), () => foodSVG("biscoito"), () => foodSVG("sanduiche"), () => foodSVG("bolo"), () => foodSVG("sorvete"), () => foodSVG("pizza"), () => foodSVG("salsicha"),
@@ -1552,14 +1556,14 @@ const Games = {
     $("#gMenu").innerHTML = `<button class="gg" data-act="gopen"><div class="gmini">${this.card(0, 1)}${this.card(7, 0)}${this.card(4, 1)}</div>
       <div class="gt"><b>Jogo da Memória</b><span>Decore os desenhos e encontre os pares.</span></div>
       <div class="chips"><span class="chip">Fase ${cur}/${n}</span><span class="chip">${STARI(1)}${this.stars()}/${n * 3}</span></div><span class="gb">Jogar</span></button>
-      <div class="gsoon">${ic("lock")}<span>Mais jogos em breve</span></div>
+      <div class="gsoon">${LOCKI}<span>Mais jogos em breve</span></div>
       <p class="ghint">Cada fase rende moedas. Quanto menos erros, mais estrelas e mais moedas! Repetir uma fase vale 20% do prêmio.</p>`;
   },
   levels() {
     const st = this.data().st, u = this.unlocked(), n = MEM_LEVELS.length;
     $("#gLevels").innerHTML = `<div class="gsum"><span class="chip">${STARI(1)}${this.stars()}/${n * 3}</span><span class="chip">${COIN}Fase ${u}: até ${memReward(u, 3)}</span></div><div class="glv">${MEM_LEVELS.map((_, i) => {
       const l = i + 1, s = st[l] || 0, lock = l > u, cur = l === u && !s;
-      return `<button class="lv ${lock ? "lock" : cur ? "cur" : ""}" ${lock ? "disabled" : ""} data-act="glevel" data-l="${l}" aria-label="Fase ${l}${lock ? " bloqueada" : ""}">${lock ? ic("lock") : l}${lock ? "" : `<span class="ls">${[1, 2, 3].map(k => STARI(k <= s)).join("")}</span>`}</button>`;
+      return `<button class="lv ${lock ? "lock" : cur ? "cur" : ""}" ${lock ? "disabled" : ""} data-act="glevel" data-l="${l}" aria-label="Fase ${l}${lock ? " bloqueada" : ""}">${lock ? LOCKI : l}${lock ? "" : `<span class="ls">${[1, 2, 3].map(k => STARI(k <= s)).join("")}</span>`}</button>`;
     }).join("")}</div>`;
   },
   start(l) {
