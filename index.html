@@ -747,7 +747,7 @@ const Pet = {
     const b0 = FB(p.foam);
     if (!foamMine) setMine(true);
     p.foam = clamp(p.foam + 6); p.hygiene = clamp(p.hygiene + 3); p.happy = clamp(p.happy + .3); p.energy = clamp(p.energy - .2);
-    UI.suds(x, y); UI.bubble(x, y, 1 + (Math.random() * 2 | 0)); FX.vib(8); UI.live();
+    UI.bubble(x, y, 1 + (Math.random() * 2 | 0)); FX.vib(8); UI.live();
     if (FB(p.foam) !== b0) UI.foamTick();
     if (p.foam >= 100 && b0 < FOAM.length) UI.toast(p.name + " está coberto de espuma! Use o chuveiro.", "ok");
   },
@@ -770,7 +770,7 @@ const Pet = {
     if (d.n % 8 === 0) { const m = document.createElement("span"); m.className = "stm"; m.style.left = (30 + Math.random() * 40) + "%"; m.style.top = "50%"; $("#stage").appendChild(m); setTimeout(() => m.remove(), 2400); }
     UI.live();
     const done = (had && p.foam <= 0) || (!had && p.hygiene >= 98 && !d.paid);
-    if (done) { d.paid = 1; this.gain(4, 0); sl.classList.remove("wet"); UI.cleanLook(); UI.fx("happy", "Limpinho!", true); setTimeout(() => UI.toast(p.name + " está limpinho e cheiroso!", "ok"), 300); }
+    if (done) { d.paid = 1; this.gain(4, 0); sl.classList.remove("wet"); UI.cleanLook(); UI.fx("happy", "Limpinho!", true, true); setTimeout(() => UI.toast(p.name + " está limpinho e cheiroso!", "ok"), 300); }
     else if (FB(p.foam) !== b0) UI.foamTick();
   },
   shower() {
@@ -782,7 +782,7 @@ const Pet = {
     FX.vib(30); UI.rain();
     const r = $("#v-home .petslot").getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height * .4;
     FX.burst(cx, cy, "bub", had ? 8 : 4);
-    if (had && p.foam <= 0) { UI.cleanLook(); UI.fx("happy", "Limpinho!", true); setTimeout(() => UI.toast(p.name + " está limpinho e cheiroso!", "ok"), 300); } else { UI.foamTick(); UI.fx("happy", "+4 XP", true); }
+    if (had && p.foam <= 0) { UI.cleanLook(); UI.fx("happy", "Limpinho!", true, true); setTimeout(() => UI.toast(p.name + " está limpinho e cheiroso!", "ok"), 300); } else { UI.foamTick(); UI.fx("happy", "+4 XP", true, true); }
     UI.live(); setTimeout(() => Persist.save(), 300);
   },
   buy(kind, id) {
@@ -1062,11 +1062,11 @@ const UI = {
     for (let i = 0; i < 3; i++) { const m = document.createElement("span"); m.className = "stm"; m.style.left = (28 + Math.random() * 44) + "%"; m.style.top = (45 + Math.random() * 20) + "%"; m.style.animationDelay = (i * .2) + "s"; st.appendChild(m); setTimeout(() => m.remove(), 2800); }
     const r = $("#v-home .petslot").getBoundingClientRect(); this.bubble(r.left + r.width / 2, r.top + r.height * .5, 5, r.width * .8);
   },
-  fx(mode, text, skip) {
+  fx(mode, text, skip, quiet) {
     fxMode = mode; if (!skip || Pet.mood() !== lastMood) this.pet();
     const sl = $$(".view.on .petslot");
     setTimeout(() => sl.forEach(s => { s.classList.remove("bounce"); void s.offsetWidth; s.classList.add("bounce"); clearTimeout(s._bt); s._bt = setTimeout(() => s.classList.remove("bounce"), 800); }), 80);
-    setTimeout(() => sl.forEach(s => { const q = s.getBoundingClientRect(); FX.burst(q.left + q.width / 2, q.top + q.height * .35, mode === "eat" ? "heart" : "star", mode === "eat" ? 5 : 7); if (mode === "eat") FX.burst(q.left + q.width / 2, q.top + q.height * .5, "crumb", 7); }), 150);
+    if (!quiet) setTimeout(() => sl.forEach(s => { const q = s.getBoundingClientRect(); FX.burst(q.left + q.width / 2, q.top + q.height * .35, mode === "eat" ? "heart" : "star", mode === "eat" ? 5 : 7); if (mode === "eat") FX.burst(q.left + q.width / 2, q.top + q.height * .5, "crumb", 7); }), 150);
     if (text) setTimeout(() => sl.forEach(s => { const f = document.createElement("span"); f.className = "fl"; f.textContent = text; s.parentNode.appendChild(f); setTimeout(() => f.remove(), 1100); }), 260);
     clearTimeout(this._fxt); this._fxt = setTimeout(() => { fxMode = ""; if (Pet.mood() !== lastMood) this.pet(); }, 1500);
   },
