@@ -401,7 +401,7 @@ button:active{transform:scale(.93)}
 .stm{width:62px;height:62px;margin:-31px 0 0 -31px;background:radial-gradient(circle,rgba(255,255,255,.7),rgba(255,255,255,0) 68%);animation:stm2 2.2s ease-out both}
 @keyframes stm2{0%{opacity:0;transform:translateY(0) scale(.5)}20%{opacity:.85}100%{opacity:0;transform:translateY(-95px) scale(1.9)}}
 /* ========== JOGOS ========== */
-.menu.on .mi:nth-child(4){animation-delay:.15s}
+.menu.on .mi:nth-child(4){animation-delay:.15s}.menu.on .mi:nth-child(5){animation-delay:.2s}
 #v-games h1{font-size:clamp(20px,6vw,28px);white-space:nowrap}
 #v-games .coins{font-size:20px;gap:5px}#v-games .coins [data-ci] svg{width:28px;height:28px}
 .gs{display:none}.gs.on{display:block}#gPlay.on{display:flex}
@@ -501,8 +501,6 @@ button:active{transform:scale(.93)}
 #g2Area:has(.sh-q){display:flex;flex-direction:column;gap:12px}.sh-opts{flex:1;min-height:0;display:grid;grid-template-columns:1fr 1fr;grid-auto-rows:1fr;gap:10px}
 .sh-o{display:grid;place-items:center;border-radius:22px;background:linear-gradient(#fffaf4,#ffe3ee);border:3px solid #fff;box-shadow:0 0 0 2.5px #5a2a9a,0 5px 0 rgba(40,8,90,.4);touch-action:manipulation}.sh-o svg{width:50%;height:80%}.sh-o:active{transform:translateY(3px)}
 .sh-o.good{background:linear-gradient(#f7fff2,#bff2cc);box-shadow:0 0 0 2.5px #2fa57c,0 0 14px rgba(47,191,134,.75)}.sh-o.bad{background:linear-gradient(#fff2f2,#ffc2c2);box-shadow:0 0 0 2.5px #d6403f;animation:mcShake .4s}
-/* botão de mute (injetado via JS) */
-#dpMute{font-size:20px}
 </style>
 </head>
 <body>
@@ -525,6 +523,7 @@ button:active{transform:scale(.93)}
 <symbol id="i-back" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></symbol>
 <symbol id="i-next" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></symbol>
 <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+<symbol id="i-sound" viewBox="0 0 24 24"><path d="M4 9.5v5h3.6L12.5 19V5L7.6 9.5z"/><path d="M16 9.2a4 4 0 0 1 0 5.6M18.6 6.6a7.6 7.6 0 0 1 0 10.8"/></symbol>
 <linearGradient id="gLeaf" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#9aec6e"/><stop offset="1" stop-color="#2e9a3c"/></linearGradient>
 <radialGradient id="gApple" cx=".35" cy=".3" r=".85"><stop offset="0" stop-color="#ff8a98"/><stop offset=".55" stop-color="#ec1d38"/><stop offset="1" stop-color="#9c0b25"/></radialGradient>
 <radialGradient id="gCookie" cx=".35" cy=".3" r=".85"><stop offset="0" stop-color="#fad27f"/><stop offset=".7" stop-color="#dc9238"/><stop offset="1" stop-color="#b3641f"/></radialGradient>
@@ -568,6 +567,7 @@ button:active{transform:scale(.93)}
         <button class="mi" data-act="go" data-v="care"><span class="app" style="--a:#ff9ec0;--b:#ff6f9b"><svg class="i"><use href="#i-hanger"/></svg></span>Armário</button>
         <button class="mi" data-act="go" data-v="duo"><span class="app" style="--a:#a9c4ff;--b:#7a8cf5"><svg class="i"><use href="#i-users"/></svg></span><span>Dupla<small id="menuDuo">convite pendente</small></span></button>
         <button class="mi" data-act="go" data-v="games"><span class="app" style="--a:#7fe3b0;--b:#2fbf86"><svg class="i"><use href="#i-game"/></svg></span>Jogos</button>
+        <button class="mi" data-act="sound"><span class="app" style="--a:#c9b6ff;--b:#8d6cf0"><svg class="i"><use href="#i-sound"/></svg></span><span>Som<small id="menuSnd">efeitos e música</small></span></button>
       </div>
       <div class="tcard" id="tcard"></div>
       <nav class="dock" id="dock" aria-label="Cômodos"></nav>
@@ -844,8 +844,7 @@ const Pet = {
   advance(ms) { if (advanceState(S, ms)) return "woke"; },
   gain(xp, coins) {
     const p = S.pet; S.coins += coins || 0; p.xp += xp;
-    if (coins > 0) Audio.sfx("coins");
-    while (p.xp >= xpNeed(p.level)) { p.xp -= xpNeed(p.level); p.level++; S.coins += 20; const lv = p.level; setTimeout(() => { Audio.sfx("level"); FX.burst(innerWidth / 2, innerHeight * .35, "star", 14); FX.burst(innerWidth / 2, innerHeight * .35, "coin", 5); UI.toast(p.name + " chegou ao nível " + lv + "! Bônus: 20 moedas.", "ok"); }, 700); }
+    while (p.xp >= xpNeed(p.level)) { p.xp -= xpNeed(p.level); p.level++; S.coins += 20; Sfx.p("level"); const lv = p.level; setTimeout(() => { FX.burst(innerWidth / 2, innerHeight * .35, "star", 14); FX.burst(innerWidth / 2, innerHeight * .35, "coin", 5); UI.toast(p.name + " chegou ao nível " + lv + "! Bônus: 20 moedas.", "ok"); }, 700); }
   },
   mood() {
     const p = S.pet;
@@ -861,15 +860,14 @@ const Pet = {
       if (!id || !S.food[id]) return UI.deny("Sem comida. Compre na loja.");
       if (p.hunger >= 95) return UI.deny(p.name + " já está satisfeito.");
       const f = FOODS[id]; S.food[id]--; p.hunger = clamp(p.hunger + f.hu); p.happy = clamp(p.happy + f.ha);
-      Audio.sfx("eat"); this.gain(8, 0); UI.fx("eat", "+8 XP"); UI.toast(p.name + " comeu " + f.n + ".", "ok");
+      Sfx.p("eat"); this.gain(8, 0); UI.fx("eat", "+8 XP"); UI.toast(p.name + " comeu " + f.n + ".", "ok");
     } else if (a === "play") {
       if (p.energy < 20) return UI.deny(p.name + " está cansado demais para brincar.");
       p.happy = clamp(p.happy + 25); p.energy = clamp(p.energy - 15); p.hunger = clamp(p.hunger - 8); p.hygiene = clamp(p.hygiene - 8);
-      Audio.sfx("play"); this.gain(10, 5); UI.fx("happy", "+10 XP  +5"); UI.toast("Brincadeira divertida! +5 moedas.", "ok");
+      Sfx.p("play"); this.gain(10, 5); UI.fx("happy", "+10 XP  +5"); UI.toast("Brincadeira divertida! +5 moedas.", "ok");
     } else if (a === "sleep") {
       if (!p.sleeping && p.energy >= 95) return UI.deny(p.name + " não está com sono.");
-      p.sleeping = !p.sleeping; Audio.sfx(p.sleeping ? "sleep" : "wake");
-      UI.toast(p.sleeping ? p.name + " foi dormir." : p.name + " acordou.", "ok");
+      p.sleeping = !p.sleeping; Sfx.p(p.sleeping ? "sleep" : "wake"); UI.toast(p.sleeping ? p.name + " foi dormir." : p.name + " acordou.", "ok");
     }
     Persist.save(); UI.render();
   },
@@ -880,8 +878,7 @@ const Pet = {
     const b0 = FB(p.foam);
     if (!foamMine) setMine(true);
     p.foam = clamp(p.foam + 6); p.hygiene = clamp(p.hygiene + 3); p.happy = clamp(p.happy + .3); p.energy = clamp(p.energy - .2);
-    Audio.sfx("bubble");
-    UI.bubble(x, y, 1 + (Math.random() * 2 | 0)); FX.vib(8); UI.live();
+    UI.bubble(x, y, 1 + (Math.random() * 2 | 0)); Sfx.p("scrub"); FX.vib(8); UI.live();
     if (FB(p.foam) !== b0) UI.foamTick();
     if (p.foam >= 100 && b0 < FOAM.length) UI.toast(p.name + " está coberto de espuma! Use o chuveiro.", "ok");
   },
@@ -893,7 +890,7 @@ const Pet = {
     if (p.hygiene >= 98 && p.foam <= 0) { sl.classList.remove("wet"); if (!d.warned) { d.warned = 1; UI.toast(p.name + " já está limpinho."); } return; }
     const had = p.foam > 0, b0 = FB(p.foam);
     p.foam = clamp(p.foam - 5); p.hygiene = clamp(p.hygiene + 1.3); p.energy = clamp(p.energy - .1); p.happy = clamp(p.happy + .2);
-    FX.vib(6); d.n = (d.n || 0) + 1;
+    FX.vib(6); Sfx.p("water"); d.n = (d.n || 0) + 1;
     for (let i = 0; i < 2; i++) {
       const w = document.createElement("span"), fall = 70 + Math.random() * 70, wx = (Math.random() - .5) * 50, ft = .36 + fall / 340, lx = d.cx - 26 + Math.random() * 52, ly = d.cy - 8, dl = i * 90;
       w.className = "wd"; w.style.cssText = `left:${lx}px;top:${ly}px;--fall:${fall}px;--wx:${wx}px;--ft:${ft}s;animation-delay:${dl}ms`; document.body.appendChild(w);
@@ -913,7 +910,7 @@ const Pet = {
     if (p.hygiene >= 98 && p.foam <= 0) return UI.deny(p.name + " já está limpinho.");
     const had = p.foam > 0;
     p.foam = clamp(p.foam - 34); p.hygiene = clamp(p.hygiene + 15); p.energy = clamp(p.energy - 1); this.gain(4, 0);
-    Audio.sfx("shower"); FX.vib(30); UI.rain();
+    FX.vib(30); Sfx.p("shower"); UI.rain();
     const r = $("#v-home .petslot").getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height * .4;
     FX.burst(cx, cy, "bub", had ? 8 : 4);
     if (had && p.foam <= 0) { UI.cleanLook(); UI.fx("happy", "Limpinho!", true, true); setTimeout(() => UI.toast(p.name + " está limpinho e cheiroso!", "ok"), 300); } else { UI.foamTick(); UI.fx("happy", "+4 XP", true, true); }
@@ -922,23 +919,20 @@ const Pet = {
   buy(kind, id) {
     if (kind === "food") {
       const f = FOODS[id]; if (S.coins < f.p) return UI.deny("Moedas insuficientes.");
-      S.coins -= f.p; S.food[id]++; Audio.sfx("buy"); UI.toast(f.n + " comprado.", "ok");
+      S.coins -= f.p; S.food[id]++; UI.toast(f.n + " comprado.", "ok");
     } else {
       const c = COSM.find(x => x.id === id);
       if (has(id)) return UI.deny("Você já tem este item.");
       if (S.coins < c.p) return UI.deny("Moedas insuficientes.");
-      S.coins -= c.p; S.owned.push(id); if (c.t === "bg") { S.bg[c.room] = id; drawn = ""; }
-      Audio.sfx("buy");
-      UI.toast(c.n + (c.t === "bg" ? " aplicado!" : " adquirido. Equipe no Armário (quarto)."), "ok");
+      S.coins -= c.p; S.owned.push(id); if (c.t === "bg") { S.bg[c.room] = id; drawn = ""; } UI.toast(c.n + (c.t === "bg" ? " aplicado!" : " adquirido. Equipe no Armário (quarto)."), "ok");
     }
     Persist.save(); UI.render();
   },
   equip(id) {
     const c = COSM.find(x => x.id === id);
     if (!has(id)) { UI.deny("Item bloqueado. Compre na loja."); tabS = c.t; return UI.go("shop"); }
-    if (c.t === "bg") { S.bg[c.room] = id; drawn = ""; Audio.sfx("click"); UI.toast(c.n + " aplicado.", "ok"); Persist.save(); return UI.render(); }
-    S.pet[c.t === "cor" ? "color" : c.t] = id.startsWith("no") ? "" : id;
-    Audio.sfx("click"); UI.fx("happy", ""); Persist.save(); UI.render();
+    if (c.t === "bg") { S.bg[c.room] = id; drawn = ""; Sfx.p("equip"); UI.toast(c.n + " aplicado.", "ok"); Persist.save(); return UI.render(); }
+    S.pet[c.t === "cor" ? "color" : c.t] = id.startsWith("no") ? "" : id; Sfx.p("equip"); UI.fx("happy", ""); Persist.save(); UI.render();
   },
   rename(v) {
     v = (v || "").trim();
@@ -1299,9 +1293,101 @@ function sceneSVG(rm, id, pv) {
 
 const HEART = `<svg viewBox="0 0 24 24"><path d="M12 21s-8-5.3-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 5.7-8 11-8 11z" fill="#ff5fa0" stroke="#fff" stroke-width="1.5"/></svg>`;
 const STARSVG = `<svg viewBox="0 0 24 24"><path d="M12 0L14.9 9.1 24 12 14.9 14.9 12 24 9.1 14.9 0 12 9.1 9.1z" fill="#ffe56b"/></svg>`;
+/* ========== SOM (Web Audio: tudo sintetizado, sem arquivos) ========== */
+const Sfx = {
+  ctx: null, fx: true, mu: true, _t: {}, bt: 0, step: 0, W: { water: 160, pet: 400, scrub: 90, pad: 0, mup: 120, flip: 40 },
+  cfg() { try { const o = JSON.parse(localStorage.getItem("dp_sound") || "{}"); this.fx = o.fx !== false; this.mu = o.mu !== false; } catch (e) {} this.label(); },
+  save() { try { localStorage.setItem("dp_sound", JSON.stringify({ fx: this.fx, mu: this.mu })); } catch (e) {} this.label(); },
+  label() { const e = document.getElementById("menuSnd"); if (e) e.textContent = this.fx && this.mu ? "efeitos e música" : this.fx ? "só efeitos" : "desligado"; },
+  cycle() { const n = ((this.fx && this.mu ? 0 : this.fx ? 1 : 2) + 1) % 3; this.fx = n < 2; this.mu = n === 0; this.save(); this.p("ok"); },
+  boot() {
+    const wake = () => {
+      if (!this.ctx) {
+        try {
+          const C = window.AudioContext || window.webkitAudioContext; if (!C) return; const c = this.ctx = new C();
+          this.o = c.createDynamicsCompressor(); this.o.connect(c.destination);
+          this.g = c.createGain(); this.g.gain.value = .8; this.g.connect(this.o); this.mg = c.createGain(); this.mg.gain.value = 0; this.mg.connect(this.o);
+          const n = this.nb = c.createBuffer(1, c.sampleRate, c.sampleRate), d = n.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+          setInterval(() => this.music(), 450);
+        } catch (e) { this.ctx = null; return; }
+      }
+      if (this.ctx.state !== "running") this.ctx.resume().catch(() => {});
+    };
+    document.addEventListener("pointerdown", e => {
+      wake(); const b = e.target.closest("button,[data-act]");
+      if (b && !b.disabled && !b.closest("#gBoard,#g2Area,.tool") && !/^(room|buy|equip|do|shower|gclaim|sound)$/.test(b.dataset.act || "")) this.p("tap");
+    }, true);
+    document.addEventListener("visibilitychange", () => { const c = this.ctx; if (!c) return; if (document.hidden) c.suspend().catch(() => {}); else c.resume().catch(() => {}); });
+  },
+  p(n, a) {
+    if (!this.fx || !this.ctx || document.hidden) return; const f = this.S[n]; if (!f) return;
+    const now = performance.now(); if (now - (this._t[n] || 0) < (n in this.W ? this.W[n] : 60)) return; this._t[n] = now;
+    try { f.call(this, this.ctx.currentTime + .01, a); } catch (e) {}
+  },
+  tone(t, f, d, ty, v, f2, dst) {
+    const c = this.ctx, o = c.createOscillator(), g = c.createGain(); o.type = ty || "sine"; o.frequency.setValueAtTime(f, t); if (f2) o.frequency.exponentialRampToValueAtTime(f2, t + d);
+    g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(v || .2, t + .012); g.gain.exponentialRampToValueAtTime(.0001, t + d);
+    o.connect(g); g.connect(dst || this.g); o.start(t); o.stop(t + d + .03);
+  },
+  noise(t, d, v, f, f2, q, ty) {
+    const c = this.ctx, s = c.createBufferSource(), b = c.createBiquadFilter(), g = c.createGain(); s.buffer = this.nb; s.loop = true; b.type = ty || "bandpass"; b.Q.value = q || 1;
+    b.frequency.setValueAtTime(f, t); if (f2) b.frequency.exponentialRampToValueAtTime(f2, t + d);
+    g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(v, t + .02); g.gain.exponentialRampToValueAtTime(.0001, t + d);
+    s.connect(b); b.connect(g); g.connect(this.g); s.start(t, Math.random()); s.stop(t + d + .03);
+  },
+  seq(t, a, d, ty, v, gap) { a.forEach((f, i) => this.tone(t + i * gap, f, d, ty, v)); },
+  S: {
+    tap(t) { this.tone(t, 900, .05, "triangle", .08, 600); },
+    ok(t) { this.seq(t, [660, 880], .12, "sine", .16, .08); },
+    warn(t) { this.tone(t, 220, .2, "square", .09, 140); this.tone(t + .09, 180, .2, "square", .08, 110); },
+    eat(t) { for (let i = 0; i < 3; i++) { this.noise(t + i * .16, .09, .5, 1100, 500, 2); this.tone(t + i * .16, 180, .08, "sine", .22, 90); } this.seq(t + .55, [520, 780], .1, "sine", .12, .07); },
+    play(t) { this.tone(t, 280, .22, "sine", .22, 640); this.seq(t + .15, [660, 784, 988, 1175], .1, "triangle", .13, .075); },
+    sleep(t) { this.seq(t, [659, 523, 440, 330], .5, "sine", .13, .32); },
+    wake(t) { this.seq(t, [330, 440, 523, 659], .3, "sine", .13, .16); },
+    pet(t) { this.tone(t, 760, .16, "sine", .1, 1000); this.tone(t + .1, 1000, .14, "sine", .07, 1250); },
+    scrub(t) { this.noise(t, .09, .22, 3500, 1800, 3, "highpass"); this.tone(t, 1500 + Math.random() * 500, .05, "sine", .06, 900); },
+    water(t) { this.noise(t, .26, .16, 2600, 3200, .6); },
+    shower(t) { this.noise(t, 1.1, .2, 2200, 3400, .5); },
+    pop(t) { this.tone(t, 500 + Math.random() * 300, .06, "sine", .14, 1100); },
+    clean(t) { this.seq(t + .02, [1175, 1568, 2093], .22, "sine", .09, .09); },
+    coin(t) { this.tone(t, 988, .07, "square", .06); this.tone(t + .07, 1319, .22, "square", .06); },
+    star(t) { this.seq(t, [1319, 1568, 1976], .16, "sine", .1, .06); },
+    heart(t) { this.tone(t, 880, .22, "sine", .09, 1040); },
+    level(t) { this.seq(t, [523, 659, 784, 1047, 1319], .3, "triangle", .15, .11); },
+    equip(t) { this.noise(t, .16, .22, 700, 2200, 1.2); this.tone(t + .08, 780, .08, "triangle", .08); },
+    room(t) { this.noise(t, .26, .2, 400, 1800, .9); },
+    flip(t) { this.tone(t, 520, .05, "square", .05, 780); },
+    match(t) { this.seq(t, [784, 1047], .16, "sine", .15, .09); },
+    miss(t) { this.tone(t, 300, .3, "sawtooth", .07, 150); },
+    win(t) { this.seq(t, [523, 659, 784, 659, 784, 1047], .26, "triangle", .15, .12); },
+    lose(t) { this.seq(t, [392, 330, 262], .3, "triangle", .14, .2); },
+    end(t) { this.tone(t, 440, .8, "sine", .2); this.tone(t, 880, .8, "sine", .08); },
+    bonk(t) { this.tone(t, 320, .12, "sine", .26, 120); this.noise(t, .05, .2, 900, 400, 1); },
+    gold(t) { this.S.bonk.call(this, t); this.seq(t + .05, [1319, 1760, 2349], .16, "sine", .1, .06); },
+    bomb(t) { this.noise(t, .5, .6, 900, 120, .7, "lowpass"); this.tone(t, 110, .45, "sawtooth", .14, 40); },
+    mup(t) { this.tone(t, 420, .06, "sine", .04, 620); },
+    pad(t, p) { this.tone(t, [330, 392, 494, 587][p] || 440, .35, "triangle", .2); }
+  },
+  /* música de fundo: acordes suaves + melodia pentatônica aleatória; mais baixa quando o pet dorme, some dentro dos jogos */
+  music() {
+    const c = this.ctx; if (!c || c.state !== "running") return;
+    const play = this.mu && !document.hidden && !(view === "games" && /^play/.test(Games.sc)), sl = S.pet.sleeping;
+    this.mg.gain.setTargetAtTime(play ? (sl ? .35 : 1) : 0, c.currentTime, .6);
+    if (!play) { this.bt = 0; return; }
+    const now = c.currentTime; if (this.bt < now) this.bt = now + .1;
+    const CH = [[261.6, 329.6, 392], [220, 261.6, 329.6], [174.6, 220, 261.6], [196, 246.9, 293.7]], SC = [523.3, 587.3, 659.3, 784, 880, 1046.5], B = .75;
+    while (this.bt < now + 1.6) {
+      const t = this.bt, s = this.step++;
+      if (s % 4 === 0) CH[(s / 4) % 4].forEach(f => this.tone(t, f / 2, B * 4.2, "sine", .06, 0, this.mg));
+      if (!sl && Math.random() < .55) this.tone(t, SC[Math.random() * SC.length | 0], B * 1.6, "sine", .05, 0, this.mg);
+      this.bt += B;
+    }
+  }
+};
 const FX = {
   vib(n) { const t = performance.now(); if (t - (this._v || 0) < 150) return; this._v = t; try { navigator.vibrate && navigator.vibrate(n); } catch (e) {} },
   burst(x, y, kind, n) {
+    Sfx.p(kind === "coin" ? "coin" : kind === "star" ? "star" : kind === "heart" ? "heart" : kind === "bub" ? "pop" : "");
     for (let i = 0; i < (n || 8); i++) {
       const e = document.createElement("span"), a = Math.random() * 6.283, v = 40 + Math.random() * 60;
       e.className = "fxp " + kind; e.innerHTML = kind === "coin" ? COIN : kind === "heart" ? HEART : kind === "star" ? STARSVG : "";
@@ -1325,7 +1411,7 @@ const FX = {
 /* ========== H. INTERFACE ========== */
 const UI = {
   timer: 0,
-  toast(msg, kind) { const t = $("#toast"); t.textContent = msg; t.className = "show " + (kind || ""); clearTimeout(this.timer); this.timer = setTimeout(() => t.className = "", 2400); },
+  toast(msg, kind) { if (kind === "warn") Sfx.p("warn"); const t = $("#toast"); t.textContent = msg; t.className = "show " + (kind || ""); clearTimeout(this.timer); this.timer = setTimeout(() => t.className = "", 2400); },
   deny(msg) { this.toast(msg, "warn"); const r = $(".view.on .stage"); if (r) { r.classList.remove("shake"); void r.offsetWidth; r.classList.add("shake"); } return false; },
   puff(x, y, html, cls, size) {
     const st = $(".view.on .stage"); if (!st) return; const r = st.getBoundingClientRect(), s = document.createElement("span");
@@ -1368,7 +1454,7 @@ const UI = {
     else { let c = L.childElementCount; if (n > c) { if (!c) { const k = s.querySelector(".spk"); if (k) k.remove(); } L.insertAdjacentHTML("beforeend", foamItems(c, n - 1, false) + foamItem(n - 1, true)); foamT = performance.now(); } else while (c > n) { L.lastElementChild.remove(); c--; } foamN = n; }
     this.foamTip();
   },
-  cleanLook() {
+  cleanLook() { Sfx.p("clean");
     const s = $("#v-home .petslot"), svg = s && s.firstElementChild, L = svg && svg.querySelector(".fgl");
     if (!L) return this.pet();
     L.innerHTML = ""; foamN = 0; if (S.pet.hygiene >= 97 && !svg.querySelector(".spk")) L.insertAdjacentHTML("beforebegin", SPARK);
@@ -1378,7 +1464,7 @@ const UI = {
   srect(st) { const t = performance.now(); if (!this._sr || this._sr.st !== st || t - this._sr.t > 400) this._sr = { st, t, r: st.getBoundingClientRect() }; return this._sr.r; },
   enter(id, key) { const k = this._k2 || (this._k2 = {}); $("#" + id).classList.toggle("enter", k[id] !== key); k[id] = key; },
   go(v) { if (v === "duo" && CLOUD_ON) Cloud.markSeen(); this._k2 = {}; $("#menu").classList.remove("on"); view = v; $$(".view").forEach(e => e.classList.toggle("on", e.id === "v-" + v)); $$(".scroll").forEach(s => s.scrollTop = 0); if (v !== "games") Games.stop(); this.render(); if (v === "games") Games.enter(); },
-  setRoom(r) { room = r; this.render(); },
+  setRoom(r) { if (r !== room) Sfx.p("room"); room = r; this.render(); },
   openName(first) {
     $("#mTitle").textContent = first ? "Bem-vindos ao DuoPet" : "Renomear pet"; $("#nameInp").value = first ? "" : S.pet.name;
     $("#mCancel").style.display = first ? "none" : ""; $("#modal").classList.add("on"); setTimeout(() => $("#nameInp").focus(), 60);
@@ -1725,12 +1811,12 @@ const Stage = {
     s.style.setProperty("--ex", clamp((e.clientX - r.left - r.width / 2) / 30, -4, 4)); s.style.setProperty("--ey", clamp((e.clientY - r.top - r.height / 2) / 30, -3, 4));
     if (!this.on || !this.pet || Tools.d) return;
     const dist = Math.hypot(e.clientX - this.lx, e.clientY - this.ly); this.lx = e.clientX; this.ly = e.clientY; this.moved += dist; this.acc += dist;
-    if (this.moved > 10 && this.acc > 60) { this.acc = 0; if (S.pet.sleeping) return; S.pet.happy = clamp(S.pet.happy + 2); UI.puff(e.clientX, e.clientY, `<svg viewBox="0 0 24 24"><path d="M12 21s-8-5.3-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 5.7-8 11-8 11z" fill="currentColor"/></svg>`, "ht"); UI.live(); }
+    if (this.moved > 10 && this.acc > 60) { this.acc = 0; if (S.pet.sleeping) return; S.pet.happy = clamp(S.pet.happy + 2); Sfx.p("pet"); UI.puff(e.clientX, e.clientY, `<svg viewBox="0 0 24 24"><path d="M12 21s-8-5.3-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 5.7-8 11-8 11z" fill="currentColor"/></svg>`, "ht"); UI.live(); }
   },
   up(e) {
     if (!this.on) return; this.on = false;
     if (this.pet) {
-      if (this.moved < 10) { if (S.pet.sleeping) UI.toast("Shh... " + S.pet.name + " está dormindo.", "warn"); else { S.pet.happy = clamp(S.pet.happy + 1.5); UI.fx("happy", ""); } }
+      if (this.moved < 10) { if (S.pet.sleeping) UI.toast("Shh... " + S.pet.name + " está dormindo.", "warn"); else { S.pet.happy = clamp(S.pet.happy + 1.5); Sfx.p("pet"); UI.fx("happy", ""); } }
       Persist.save();
     } else {
       const dx = e.clientX - this.sx, dy = e.clientY - this.sy;
@@ -1791,7 +1877,7 @@ const Vault = {
   ready() { return VAULT.goals.some((g, i) => this.can(i)); },
   claim(i) {
     if (!this.can(i)) return; const r = VAULT.rew[i]; this.get().cl.push(this.key(i)); S.coins += r.c; if (r.xp) Pet.gain(r.xp, 0);
-    Persist.save(); UI.head(); UI.stats(); FX.vib([30, 40, 30]); FX.burst(innerWidth / 2, innerHeight * .32, "coin", 10); UI.toast("Baú aberto! +" + r.c + " moedas" + (r.xp ? " e +" + r.xp + " XP" : "") + ".", "ok");
+    Persist.save(); UI.head(); UI.stats(); Sfx.p("win"); FX.vib([30, 40, 30]); FX.burst(innerWidth / 2, innerHeight * .32, "coin", 10); UI.toast("Baú aberto! +" + r.c + " moedas" + (r.xp ? " e +" + r.xp + " XP" : "") + ".", "ok");
   },
   names() { const me = this.mine(), tot = this.total(), rows = [{ n: "Você", v: me }]; if (CLOUD_ON && DUO.members.length > 1) rows.push({ n: Cloud.partner() || "Parceiro(a)", v: tot - me }); else if (tot - me > 0) rows.push({ n: "Parceiro(a)", v: tot - me }); return rows; }
 };
@@ -1889,16 +1975,16 @@ const Games = {
   flip(i, up) { const c = $$("#gBoard .mc")[i]; if (c) c.classList.toggle("up", up); this.G.up[i] = up; },
   tap(i) {
     const g = this.G; if (!g || g.phase !== "play" || g.lock || g.up[i] || g.done[i]) return;
-    this.flip(i, true); FX.vib(6);
+    this.flip(i, true); Sfx.p("flip"); FX.vib(6);
     if (g.first < 0) { g.first = i; return; }
     const a = g.first, b = i, cs = $$("#gBoard .mc"); g.first = -1; g.tries++;
     if (g.deck[a] === g.deck[b]) {
       g.done[a] = g.done[b] = true; g.found++; this.hud();
-      this.later(() => { cs[a].classList.add("ok"); cs[b].classList.add("ok"); FX.vib(12); }, 380);
+      this.later(() => { cs[a].classList.add("ok"); cs[b].classList.add("ok"); Sfx.p("match"); FX.vib(12); }, 380);
       if (g.found === g.pairs) this.later(() => this.finish(), 1100);
     } else {
       g.lock = true; this.hud();
-      this.later(() => { cs[a].classList.add("bad"); cs[b].classList.add("bad"); }, 380);
+      this.later(() => { cs[a].classList.add("bad"); cs[b].classList.add("bad"); Sfx.p("miss"); }, 380);
       this.later(() => { cs[a].classList.remove("bad"); cs[b].classList.remove("bad"); this.flip(a, false); this.flip(b, false); g.lock = false; }, 950);
     }
   },
@@ -1907,7 +1993,6 @@ const Games = {
     const miss = g.tries - g.found, st = memStars(g.lv, g.pairs, miss), D = this.data(), old = D.st[g.lv] || 0;
     const coins = old ? Math.round(memBase(g.lv) * .2) + (st > old ? memReward(g.lv, st) - memReward(g.lv, old) : 0) : memReward(g.lv, st);
     if (st > old) D.st[g.lv] = st; this.persist();
-    Audio.sfx(st === 3 ? "victory" : "win");
     Pet.gain(3 + Math.floor(g.lv / 2), coins); S.pet.happy = clamp(S.pet.happy + 4); const vp = Vault.add(st); Persist.save(); UI.live();
     const next = g.lv < MEM_LEVELS.length;
     this.result("#gRes", { title: st === 3 ? "Perfeito!" : st === 2 ? "Muito bem!" : "Fase concluída!", stars: st, sub: `${g.tries} jogadas · ${miss} ${miss === 1 ? "erro" : "erros"}`, coins, vp, note: (old ? "Repetição: 20% do prêmio, mais o que você melhorar." : st < 3 ? "Com menos erros você ganha mais estrelas e moedas." : "Fase perfeita!") + (next ? "" : " Você completou todas as fases!"), acts: `${next ? `<button class="gb" data-act="gnext">Próxima fase</button>` : ""}<div class="flex"><button class="gb alt" data-act="gretry">Repetir</button><button class="gb alt" data-act="glevels">Fases</button></div>` });
@@ -1916,7 +2001,7 @@ const Games = {
     $(sel).innerHTML = `<div class="gcard"><h2>${o.title}</h2><div class="gstars">${[1, 2, 3].map(k => `<span class="gstar ${k <= o.stars ? "on" : ""}" style="--n:${k}">${STARI(k <= o.stars)}</span>`).join("")}</div>
       <p>${o.sub}</p><div class="gcoin">+${o.coins}${COIN}</div>${o.vp ? `<div class="gvp">${chestSVG(0)}<span>+${o.vp} ${o.vp === 1 ? "estrela" : "estrelas"} no cofre da dupla</span></div>` : ""}
       <small>${o.note}</small><div class="gacts">${o.acts}</div></div>`;
-    $(sel).classList.add("on"); FX.vib([20, 40, 20]); this.later(() => FX.burst(innerWidth / 2, innerHeight * .3, "coin", 3 + o.stars * 2), 500);
+    $(sel).classList.add("on"); Sfx.p(o.stars ? "win" : "lose"); FX.vib([20, 40, 20]); this.later(() => FX.burst(innerWidth / 2, innerHeight * .3, "coin", 3 + o.stars * 2), 500);
   },
   /* ----- jogos rápidos (toupeira, sequência, sombra) ----- */
   start2(key) {
@@ -1929,7 +2014,6 @@ const Games = {
     Pet.gain(1 + stars * 2, coins); S.pet.happy = clamp(S.pet.happy + stars * 2); const vp = Vault.add(stars); Persist.save(); UI.live(); return { coins, vp, red };
   },
   end2(key, stars, sub, score) {
-    Audio.sfx(stars >= 2 ? "victory" : stars === 1 ? "win" : "lose");
     const P = this.payout(key, stars, score);
     this.result("#g2Res", { title: stars === 3 ? "Perfeito!" : stars === 2 ? "Muito bem!" : stars === 1 ? "Boa!" : "Quase lá!", stars, sub, coins: P.coins, vp: P.vp, note: P.red ? "Você já jogou bastante hoje: moedas reduzidas." : stars < 3 ? "Jogue de novo para ganhar mais estrelas." : "Você mandou muito bem!", acts: `<button class="gb" data-act="g2retry">Jogar de novo</button><button class="gb alt" data-act="gback">Voltar aos jogos</button>` });
   }
@@ -1950,7 +2034,7 @@ const MoleG = {
     const p = Math.min(1, Math.max(0, (performance.now() - g.t0) / g.dur)), free = [...Array(9).keys()].filter(i => !g.st[i]);
     if (free.length) {
       const i = free[Math.random() * free.length | 0], r = Math.random(), type = r < .14 ? "gold" : r > .82 && p > .1 ? "bomb" : "mole", up = type === "gold" ? 720 : 1200 - p * 560, st = { type, hit: false };
-      g.st[i] = st; const h = this.hole(i); h.className = "hole up " + type; h.querySelector(".mo").innerHTML = SPR[type]; gm.later(() => this.down(i, st, true), up);
+      g.st[i] = st; const h = this.hole(i); h.className = "hole up " + type; Sfx.p("mup"); h.querySelector(".mo").innerHTML = SPR[type]; gm.later(() => this.down(i, st, true), up);
     }
     gm.later(() => this.spawn(), 780 - p * 390 + Math.random() * 160);
   },
@@ -1958,15 +2042,15 @@ const MoleG = {
   pop(h, txt, bad) { const r = h.getBoundingClientRect(), a = this.area.getBoundingClientRect(), e = document.createElement("span"); e.className = "gpop" + (bad ? " bad" : ""); e.textContent = txt; e.style.left = r.left - a.left + r.width / 2 + "px"; e.style.top = r.top - a.top + r.height * .25 + "px"; this.area.appendChild(e); setTimeout(() => e.remove(), 700); },
   hit(i) {
     const g = this.g, st = g.st[i]; if (!st || st.hit || g.over) return; st.hit = true; const h = this.hole(i);
-    if (st.type === "bomb") { Audio.sfx("bomb"); g.score = Math.max(0, g.score - 3); g.combo = 0; this.pop(h, "-3", 1); FX.vib(50); this.area.classList.remove("shk"); void this.area.offsetWidth; this.area.classList.add("shk"); }
-    else { Audio.sfx("hit"); g.combo++; g.hits++; let pts = st.type === "gold" ? 3 : 1; if (g.combo % 5 === 0) pts++; g.score += pts; this.pop(h, "+" + pts); FX.vib(10); }
+    if (st.type === "bomb") { g.score = Math.max(0, g.score - 3); g.combo = 0; this.pop(h, "-3", 1); Sfx.p("bomb"); FX.vib(50); this.area.classList.remove("shk"); void this.area.offsetWidth; this.area.classList.add("shk"); }
+    else { g.combo++; g.hits++; let pts = st.type === "gold" ? 3 : 1; if (g.combo % 5 === 0) pts++; g.score += pts; this.pop(h, "+" + pts); Sfx.p(st.type === "gold" ? "gold" : "bonk"); FX.vib(10); }
     h.classList.add("hit"); this.hud(Math.max(0, Math.ceil((g.dur - (performance.now() - g.t0)) / 1000)));
     this.gm.later(() => { h.classList.remove("hit"); this.down(i, st); }, 170);
   },
   finish() {
     const g = this.g; if (g.over) return; g.over = true; this.area.querySelectorAll(".hole").forEach(h => h.classList.remove("up"));
     const stars = g.score >= 36 ? 3 : g.score >= 22 ? 2 : g.score >= 10 ? 1 : 0;
-    this.gm.bar2("Tempo esgotado!", 0); this.gm.later(() => this.gm.end2("mole", stars, `${g.score} pontos · ${g.hits} acertos`, g.score), 700);
+    Sfx.p("end"); this.gm.bar2("Tempo esgotado!", 0); this.gm.later(() => this.gm.end2("mole", stars, `${g.score} pontos · ${g.hits} acertos`, g.score), 700);
   }
 };
 /* ----- Siga a sequência ----- */
@@ -1977,7 +2061,7 @@ const SeqG = {
     this.hud(); gm.bar2("Prepare-se...", 0); gm.later(() => this.next(), 900);
   },
   hud() { const g = this.g, st = g.done >= 9 ? 3 : g.done >= 6 ? 2 : g.done >= 3 ? 1 : 0; this.gm.hud2(`<span class="gp"><small>Rodada</small><b>${Math.max(1, g.round)}</b></span><span class="gp"><small>Recorde</small><b>${Math.max(this.gm.best("seq"), g.done)}</b></span><span class="gp"><small>Estrelas</small><span class="ls">${[1, 2, 3].map(k => STARI(k <= st)).join("")}</span></span>`, "c3"); },
-  flash(p, ms) { const b = this.area.querySelectorAll(".pad")[p]; if (!b) return; b.classList.add("on"); Audio.pad(p); FX.vib(6); this.gm.later(() => b.classList.remove("on"), ms); },
+  flash(p, ms) { const b = this.area.querySelectorAll(".pad")[p]; if (!b) return; b.classList.add("on"); Sfx.p("pad", p); FX.vib(6); this.gm.later(() => b.classList.remove("on"), ms); },
   next() {
     const g = this.g, gm = this.gm; if (g.over) return; g.round++; g.seq.push(Math.random() * 4 | 0); g.pos = 0; g.phase = "show"; this.hud(); const r = $("#sR"); if (r) r.textContent = g.round; gm.bar2("Observe...", 0);
     const sp = Math.max(260, 560 - g.round * 24);
@@ -1986,8 +2070,8 @@ const SeqG = {
   },
   tap(p) {
     const g = this.g, gm = this.gm; if (g.phase !== "you" || g.over) return; this.flash(p, 160);
-    if (p === g.seq[g.pos]) { g.pos++; if (g.pos === g.seq.length) { Audio.sfx("good"); g.phase = "wait"; g.done = g.round; this.hud(); gm.bar2("Muito bem!", 0); gm.later(() => this.next(), 900); } }
-    else { Audio.sfx("bad"); g.over = true; g.phase = "end"; this.area.classList.remove("shk"); void this.area.offsetWidth; this.area.classList.add("shk"); FX.vib(60); gm.bar2("Ops! Errou.", 0); gm.later(() => this.finish(), 1000); }
+    if (p === g.seq[g.pos]) { g.pos++; if (g.pos === g.seq.length) { g.phase = "wait"; g.done = g.round; this.hud(); gm.bar2("Muito bem!", 0); gm.later(() => Sfx.p("ok"), 250); gm.later(() => this.next(), 900); } }
+    else { g.over = true; g.phase = "end"; this.area.classList.remove("shk"); void this.area.offsetWidth; this.area.classList.add("shk"); Sfx.p("lose"); FX.vib(60); gm.bar2("Ops! Errou.", 0); gm.later(() => this.finish(), 1000); }
   },
   finish() { const g = this.g, st = g.done >= 9 ? 3 : g.done >= 6 ? 2 : g.done >= 3 ? 1 : 0; this.gm.end2("seq", st, `${g.done} ${g.done === 1 ? "rodada completa" : "rodadas completas"}`, g.done); }
 };
@@ -2009,7 +2093,7 @@ const ShG = {
   pick(j) {
     const g = this.g, gm = this.gm; if (g.locked || g.over) return; g.locked = true; clearTimeout(g.tmr);
     const ok = j === g.pos, bs = this.area.querySelectorAll(".sh-o"); bs[g.pos].classList.add("good"); $("#shQ").classList.add("ok");
-    if (ok) { Audio.sfx("good"); g.score++; FX.vib(12); } else { Audio.sfx("bad"); g.lives--; if (bs[j]) bs[j].classList.add("bad"); FX.vib(50); }
+    if (ok) { g.score++; Sfx.p("match"); FX.vib(12); } else { g.lives--; Sfx.p("miss"); if (bs[j]) bs[j].classList.add("bad"); FX.vib(50); }
     gm.bar2(ok ? "Acertou!" : j < 0 ? "Tempo esgotado!" : "Era essa!", 0); this.hud();
     gm.later(() => g.lives <= 0 ? this.finish() : this.next(), 1100);
   },
@@ -2042,6 +2126,7 @@ document.addEventListener("click", async e => {
     case "gvault": Games.show("vault"); break;
     case "gclaim": Vault.claim(+d.i); Games.vaultView(); break;
     case "menu": $("#menu").classList.toggle("on"); break;
+    case "sound": Sfx.cycle(); break;
     case "room": UI.setRoom(d.r); break;
     case "fprev": case "fnext": { const n = foodList().length; if (n) { fi = (fi + (d.act === "fnext" ? 1 : n - 1)) % n; UI.home(); } break; }
     case "shower": Pet.shower(); break;
@@ -2156,7 +2241,7 @@ function tick() {
   const now = Clock.now(), ms = now - S.t, r = Pet.advance(ms);
   if (BASE) { advanceState(BASE, ms); BASE.t = now; }
   S.t = now;
-  if (r === "woke") UI.toast(S.pet.name + " acordou descansado.", "ok");
+  if (r === "woke") { Sfx.p("wake"); UI.toast(S.pet.name + " acordou descansado.", "ok"); }
   if (!Tools.d && (view === "home" || view === "care" || view === "shop" || view === "inv" || view === "duo")) UI.render();
 }
 setInterval(tick, 5000);
@@ -2164,152 +2249,8 @@ document.addEventListener("visibilitychange", () => {
   if (!document.hidden) tick(); else if (CLOUD_ON) { Cloud.cache(); Cloud.flush(); } else Persist.save();
 });
 window.addEventListener("pagehide", () => { if (CLOUD_ON) Cloud.cache(); else Persist.save(); });
-
-/* ========== N. ÁUDIO (sons sintetizados, zero arquivos) ==========
-   Web Audio API: todos os sons são gerados por osciladores/ruído — não há .mp3/.ogg.
-   Comportamento:
-   - Áudio só liga no primeiro gesto do usuário (política dos navegadores).
-   - Mute persistente em localStorage; botão injetado no HUD.
-   - Cada som tem throttle próprio (120ms) para não repetir em rajada.
-   - Respeita prefers-reduced-motion (desliga automático).
-*/
-const Audio = {
-  ctx: null, master: null, muted: false, ready: false,
-  _last: {},
-  init() {
-    if (this.ctx) return;
-    const C = window.AudioContext || window.webkitAudioContext;
-    if (!C) return;
-    try { this.ctx = new C(); } catch (e) { return; }
-    this.master = this.ctx.createGain();
-    this.master.gain.value = 0.35;
-    this.master.connect(this.ctx.destination);
-    try { this.muted = localStorage.getItem("dp_mute") === "1"; } catch (e) {}
-    if (matchMedia("(prefers-reduced-motion: reduce)").matches) this.muted = true;
-    this.applyMute();
-    this.ready = true;
-  },
-  resume() { if (this.ctx && this.ctx.state === "suspended") this.ctx.resume().catch(() => {}); },
-  applyMute() { if (this.master) this.master.gain.value = this.muted ? 0 : 0.35; },
-  toggle() {
-    this.muted = !this.muted;
-    try { localStorage.setItem("dp_mute", this.muted ? "1" : "0"); } catch (e) {}
-    this.applyMute();
-    UI.toast(this.muted ? "Som desligado." : "Som ligado.", "ok");
-    const b = document.getElementById("dpMute");
-    if (b) { b.textContent = this.muted ? "🔇" : "🔊"; b.setAttribute("aria-pressed", this.muted ? "true" : "false"); }
-  },
-  /* Oscilador com envelope ADSR curto. */
-  tone(freq, dur, type, vol, when) {
-    if (!this.ctx || this.muted) return;
-    const t = (when ?? this.ctx.currentTime);
-    const o = this.ctx.createOscillator(), g = this.ctx.createGain();
-    o.type = type || "sine";
-    o.frequency.setValueAtTime(freq, t);
-    g.gain.setValueAtTime(0.0001, t);
-    g.gain.exponentialRampToValueAtTime(vol ?? 0.5, t + 0.012);
-    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-    o.connect(g).connect(this.master);
-    o.start(t); o.stop(t + dur + 0.02);
-  },
-  /* Glissando (freq inicial -> freq final). */
-  slide(f1, f2, dur, type, vol, when) {
-    if (!this.ctx || this.muted) return;
-    const t = (when ?? this.ctx.currentTime);
-    const o = this.ctx.createOscillator(), g = this.ctx.createGain();
-    o.type = type || "sine";
-    o.frequency.setValueAtTime(f1, t);
-    o.frequency.exponentialRampToValueAtTime(Math.max(20, f2), t + dur);
-    g.gain.setValueAtTime(0.0001, t);
-    g.gain.exponentialRampToValueAtTime(vol ?? 0.5, t + 0.015);
-    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-    o.connect(g).connect(this.master);
-    o.start(t); o.stop(t + dur + 0.02);
-  },
-  /* Ruído (para splash do chuveiro). */
-  noise(dur, vol, filterFreq) {
-    if (!this.ctx || this.muted) return;
-    const t = this.ctx.currentTime, sr = this.ctx.sampleRate, n = Math.floor(sr * dur);
-    const buf = this.ctx.createBuffer(1, n, sr), d = buf.getChannelData(0);
-    for (let i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / n);
-    const src = this.ctx.createBufferSource(); src.buffer = buf;
-    const f = this.ctx.createBiquadFilter(); f.type = "bandpass"; f.frequency.value = filterFreq || 1200; f.Q.value = 1.1;
-    const g = this.ctx.createGain(); g.gain.value = vol ?? 0.4;
-    src.connect(f).connect(g).connect(this.master);
-    src.start(t); src.stop(t + dur);
-  },
-  /* Um "som" por nome. Throttle evita repetir em rajada. */
-  sfx(name) {
-    if (!this.ready || this.muted) return;
-    const now = performance.now();
-    if (now - (this._last[name] || 0) < 120) return;
-    this._last[name] = now;
-    this.init(); this.resume();
-    const t = this.ctx.currentTime;
-    switch (name) {
-      case "eat": this.tone(420, 0.08, "square", 0.25, t); this.tone(300, 0.1, "square", 0.2, t + 0.07); break;
-      case "play": this.slide(520, 880, 0.14, "sine", 0.4, t); this.tone(1040, 0.09, "sine", 0.3, t + 0.1); break;
-      case "sleep": this.slide(620, 280, 0.55, "sine", 0.35, t); break;
-      case "wake": this.tone(440, 0.15, "sine", 0.35, t); this.tone(660, 0.15, "sine", 0.35, t + 0.12); this.tone(880, 0.2, "sine", 0.3, t + 0.24); break;
-      case "bubble": this.tone(880 + Math.random() * 220, 0.05, "sine", 0.15, t); break;
-      case "shower": this.noise(0.45, 0.35, 1800); this.noise(0.3, 0.22, 3200); break;
-      case "buy": this.tone(1320, 0.07, "triangle", 0.35, t); this.tone(1760, 0.09, "triangle", 0.3, t + 0.06); break;
-      case "coins": this.tone(880, 0.06, "triangle", 0.28, t); this.tone(1320, 0.07, "triangle", 0.25, t + 0.06); this.tone(1760, 0.09, "triangle", 0.22, t + 0.12); break;
-      case "level": [523, 659, 784, 1047].forEach((f, i) => this.tone(f, 0.14, "triangle", 0.35, t + i * 0.09)); break;
-      case "click": this.tone(1000, 0.03, "sine", 0.15, t); break;
-      case "hit": this.slide(660, 990, 0.09, "square", 0.3, t); break;
-      case "bomb": this.slide(220, 60, 0.35, "sawtooth", 0.45, t); this.noise(0.2, 0.3, 500); break;
-      case "good": this.tone(660, 0.08, "sine", 0.28, t); this.tone(990, 0.1, "sine", 0.25, t + 0.07); break;
-      case "bad": this.slide(320, 180, 0.22, "square", 0.35, t); break;
-      case "win": this.tone(659, 0.12, "triangle", 0.3, t); this.tone(988, 0.14, "triangle", 0.28, t + 0.13); break;
-      case "victory": [523, 659, 784, 1047, 1319].forEach((f, i) => this.tone(f, 0.15, "triangle", 0.32, t + i * 0.1)); break;
-      case "lose": this.tone(392, 0.15, "sine", 0.25, t); this.tone(330, 0.18, "sine", 0.22, t + 0.16); this.tone(262, 0.3, "sine", 0.2, t + 0.32); break;
-      case "sparkle": this.tone(1200, 0.08, "sine", 0.22, t); this.tone(1600, 0.08, "sine", 0.22, t + 0.06); this.tone(2200, 0.12, "sine", 0.2, t + 0.12); break;
-    }
-  },
-  /* Pad com pitch distinto por botão (jogo da sequência). */
-  pad(i) { if (!this.ready || this.muted) return; this.init(); this.resume(); const base = [262, 330, 392, 523][i] || 440; this.tone(base, 0.18, "sine", 0.35); this.tone(base * 2, 0.15, "sine", 0.18); }
-};
-
-/* ---- Botão de mute injetado no HUD (sem tocar no HTML) ---- */
-(function injectMute() {
-  const hud = document.querySelector(".hud .hrow");
-  if (!hud) return;
-  const b = document.createElement("button");
-  b.id = "dpMute"; b.type = "button";
-  b.setAttribute("aria-label", "Ligar/desligar som");
-  b.setAttribute("aria-pressed", "false");
-  b.style.cssText = "width:42px;border-radius:14px;display:grid;place-items:center;font-size:20px;background:linear-gradient(#5a2aa8,#37157a);border:3px solid #a46bf2;box-shadow:0 0 10px rgba(168,110,255,.55),0 4px 0 #26095a,inset 0 2px 0 rgba(255,255,255,.22);color:#fff;flex:none";
-  b.textContent = (localStorage.getItem("dp_mute") === "1") ? "🔇" : "🔊";
-  b.addEventListener("click", e => { e.stopPropagation(); Audio.init(); Audio.toggle(); });
-  hud.appendChild(b);
-})();
-
-/* ---- Desbloqueia áudio no primeiro gesto + clique global de botões ---- */
-document.addEventListener("pointerdown", function once(e) {
-  Audio.init(); Audio.resume();
-  document.removeEventListener("pointerdown", once, true);
-}, true);
-document.addEventListener("click", e => {
-  const t = e.target.closest("button.tab, button.price, button.gb, button.tile, button.dk, button.back, .mi, .lv, .tool, .arr");
-  if (t) Audio.sfx("click");
-}, true);
-
-/* ---- Pausa áudio quando aba escondida ---- */
-document.addEventListener("visibilitychange", () => {
-  if (!Audio.ctx) return;
-  if (document.hidden) { try { Audio.ctx.suspend(); } catch (e) {} }
-  else { try { Audio.ctx.resume(); } catch (e) {} }
-});
-
-/* ---- Gancho do cofre: som ao abrir baú ---- */
-const _vaultClaim = Vault.claim;
-Vault.claim = function (i) { Audio.sfx("sparkle"); return _vaultClaim.call(this, i); };
-
-/* ================================================================ */
-
 (function init() {
-  FX.guard();
+  FX.guard(); Sfx.cfg(); Sfx.boot();
   $("#bootPet").innerHTML = petSVG({ color: "pessego", hat: "", face: "", top: "", feet: "" }, null, "happy");
   if (CLOUD_ON) { UI.render(); Cloud.boot(); return; }          // com Firebase: o login decide o que aparece
   Persist.init(); UI.go("home");                                  // modo local
