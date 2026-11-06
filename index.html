@@ -14,7 +14,7 @@
 <title>DuoPet</title>
 <!-- Versão publicada. A cada publicação o app compara com a versão aberta e se atualiza sozinho.
      (Mesmo que você esqueça de mudar este número, o app também compara o conteúdo do arquivo.) -->
-<script>window.DP_BUILD = "20261103-0001";
+<script>window.DP_BUILD = "20261106-0001";
 window.addEventListener("beforeinstallprompt", function (e) { e.preventDefault(); window.__pwaPrompt = e; });
 window.addEventListener("appinstalled", function () { window.__pwaPrompt = null; });</script>
 <style>
@@ -1295,7 +1295,12 @@ const HEART = `<svg viewBox="0 0 24 24"><path d="M12 21s-8-5.3-8-11a4.5 4.5 0 0 
 const STARSVG = `<svg viewBox="0 0 24 24"><path d="M12 0L14.9 9.1 24 12 14.9 14.9 12 24 9.1 14.9 0 12 9.1 9.1z" fill="#ffe56b"/></svg>`;
 /* ========== SOM (Web Audio: tudo sintetizado, sem arquivos) ========== */
 const Sfx = {
-  ctx: null, fx: true, mu: true, _t: {}, bt: 0, step: 0, W: { water: 160, pet: 400, scrub: 90, pad: 0, mup: 120, flip: 40 },
+  ctx: null, fx: true, mu: true, _t: {}, bt: 0, step: 0, v: 0, vz: 1, MAXV: 22,
+  /* ducking: some a música por instantes quando toca um som importante [nível, duração em s] */
+  D: { level: [.3, 1.6], win: [.3, 1.8], lose: [.4, 1.2], ok: [.55, .6], end: [.4, 1], bomb: [.5, .6] },
+  /* sons com leve variação de tom a cada disparo (evita o efeito "metralhadora" de repetição) */
+  VAR: /^(tap|pop|eat|scrub|water|bonk|flip|mup|coin|heart|pet|equip|room|star)$/,
+  W: { water: 160, pet: 400, scrub: 90, pad: 0, mup: 120, flip: 40 },
   cfg() { try { const o = JSON.parse(localStorage.getItem("dp_sound") || "{}"); this.fx = o.fx !== false; this.mu = o.mu !== false; } catch (e) {} this.label(); },
   save() { try { localStorage.setItem("dp_sound", JSON.stringify({ fx: this.fx, mu: this.mu })); } catch (e) {} this.label(); },
   label() { const e = document.getElementById("menuSnd"); if (e) e.textContent = this.fx && this.mu ? "efeitos e música" : this.fx ? "só efeitos" : "desligado"; },
@@ -1305,8 +1310,23 @@ const Sfx = {
       if (!this.ctx) {
         try {
           const C = window.AudioContext || window.webkitAudioContext; if (!C) return; const c = this.ctx = new C();
-          this.o = c.createDynamicsCompressor(); this.o.connect(c.destination);
-          this.g = c.createGain(); this.g.gain.value = .8; this.g.connect(this.o); this.mg = c.createGain(); this.mg.gain.value = 0; this.mg.connect(this.o);
+          /* saída: limitador (teto de pico ~ -1 dBFS) -> volume final */
+          const lim = this.o = c.createDynamicsCompressor(); lim.threshold.value = -10; lim.knee.value = 8; lim.ratio.value = 12; lim.attack.value = .003; lim.release.value = .18;
+          const out = c.createGain(); out.gain.value = .89; lim.connect(out); out.connect(c.destination);
+          /* barra de efeitos: filtro suave tira o chiado dos sons agudos antes do limitador */
+          const sf = c.createBiquadFilter(); sf.type = "lowpass"; sf.frequency.value = 8500; sf.Q.value = .5; sf.connect(lim);
+          this.g = c.createGain(); this.g.gain.value = .8; this.g.connect(sf);
+          /* barra de música: volume (mg) -> filtro quente -> ducking (dk) -> limitador */
+          this.dk = c.createGain(); this.dk.gain.value = 1; this.dk.connect(lim);
+          const mf = c.createBiquadFilter(); mf.type = "lowpass"; mf.frequency.value = 5200; mf.Q.value = .5; mf.connect(this.dk);
+          this.mg = c.createGain(); this.mg.gain.value = 0; this.mg.connect(mf);
+          /* reverb curto e compartilhado (ambiente de quarto): um único convolver para tudo */
+          const L = (c.sampleRate * .8) | 0, ir = c.createBuffer(2, L, c.sampleRate);
+          for (let k = 0; k < 2; k++) { const d = ir.getChannelData(k); for (let i = 0; i < L; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / L, 2.8); }
+          const rl = c.createBiquadFilter(); rl.type = "lowpass"; rl.frequency.value = 3200; const cv = c.createConvolver(); cv.buffer = ir;
+          const rw = c.createGain(); rw.gain.value = .9; rl.connect(cv); cv.connect(rw); rw.connect(lim);
+          const s1 = c.createGain(); s1.gain.value = .14; this.g.connect(s1); s1.connect(rl);
+          const s2 = c.createGain(); s2.gain.value = .3; this.mg.connect(s2); s2.connect(rl);
           const n = this.nb = c.createBuffer(1, c.sampleRate, c.sampleRate), d = n.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
           setInterval(() => this.music(), 450);
         } catch (e) { this.ctx = null; return; }
@@ -1317,20 +1337,31 @@ const Sfx = {
       wake(); const b = e.target.closest("button,[data-act]");
       if (b && !b.disabled && !b.closest("#gBoard,#g2Area,.tool") && !/^(room|buy|equip|do|shower|gclaim|sound)$/.test(b.dataset.act || "")) this.p("tap");
     }, true);
+    ["touchend", "click"].forEach(ev => document.addEventListener(ev, wake, true));
     document.addEventListener("visibilitychange", () => { const c = this.ctx; if (!c) return; if (document.hidden) c.suspend().catch(() => {}); else c.resume().catch(() => {}); });
   },
   p(n, a) {
     if (!this.fx || !this.ctx || document.hidden) return; const f = this.S[n]; if (!f) return;
     const now = performance.now(); if (now - (this._t[n] || 0) < (n in this.W ? this.W[n] : 60)) return; this._t[n] = now;
+    this.vz = this.VAR.test(n) ? 1 + (Math.random() - .5) * .05 : 1;
     try { f.call(this, this.ctx.currentTime + .01, a); } catch (e) {}
+    this.vz = 1; const d = this.D[n]; if (d && this.mu) this.duck(d[0], d[1]);
+  },
+  duck(k, d) {
+    if (!this.dk) return; const g = this.dk.gain, t = this.ctx.currentTime;
+    g.cancelScheduledValues(t); g.setTargetAtTime(k, t, .03); g.setTargetAtTime(1, t + d, .35);
   },
   tone(t, f, d, ty, v, f2, dst) {
-    const c = this.ctx, o = c.createOscillator(), g = c.createGain(); o.type = ty || "sine"; o.frequency.setValueAtTime(f, t); if (f2) o.frequency.exponentialRampToValueAtTime(f2, t + d);
+    if (!dst && this.v >= this.MAXV) return; /* limite de vozes simultâneas (música não conta) */
+    const c = this.ctx, o = c.createOscillator(), g = c.createGain(); if (!dst) { this.v++; o.onended = () => { this.v = Math.max(0, this.v - 1); }; }
+    if (!dst) { f *= this.vz; if (f2) f2 *= this.vz; }
+    o.type = ty || "sine"; o.frequency.setValueAtTime(f, t); if (f2) o.frequency.exponentialRampToValueAtTime(f2, t + d);
     g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(v || .2, t + .012); g.gain.exponentialRampToValueAtTime(.0001, t + d);
     o.connect(g); g.connect(dst || this.g); o.start(t); o.stop(t + d + .03);
   },
   noise(t, d, v, f, f2, q, ty) {
-    const c = this.ctx, s = c.createBufferSource(), b = c.createBiquadFilter(), g = c.createGain(); s.buffer = this.nb; s.loop = true; b.type = ty || "bandpass"; b.Q.value = q || 1;
+    if (this.v >= this.MAXV) return;
+    const c = this.ctx, s = c.createBufferSource(), b = c.createBiquadFilter(), g = c.createGain(); this.v++; s.onended = () => { this.v = Math.max(0, this.v - 1); }; s.buffer = this.nb; s.loop = true; b.type = ty || "bandpass"; b.Q.value = q || 1;
     b.frequency.setValueAtTime(f, t); if (f2) b.frequency.exponentialRampToValueAtTime(f2, t + d);
     g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(v, t + .02); g.gain.exponentialRampToValueAtTime(.0001, t + d);
     s.connect(b); b.connect(g); g.connect(this.g); s.start(t, Math.random()); s.stop(t + d + .03);
