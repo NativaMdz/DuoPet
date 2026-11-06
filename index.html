@@ -14,7 +14,7 @@
 <title>DuoPet</title>
 <!-- Versão publicada. A cada publicação o app compara com a versão aberta e se atualiza sozinho.
      (Mesmo que você esqueça de mudar este número, o app também compara o conteúdo do arquivo.) -->
-<script>window.DP_BUILD = "20261106-0001";
+<script>window.DP_BUILD = "20261106-0002";
 window.addEventListener("beforeinstallprompt", function (e) { e.preventDefault(); window.__pwaPrompt = e; });
 window.addEventListener("appinstalled", function () { window.__pwaPrompt = null; });</script>
 <style>
@@ -1293,14 +1293,10 @@ function sceneSVG(rm, id, pv) {
 
 const HEART = `<svg viewBox="0 0 24 24"><path d="M12 21s-8-5.3-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 5.7-8 11-8 11z" fill="#ff5fa0" stroke="#fff" stroke-width="1.5"/></svg>`;
 const STARSVG = `<svg viewBox="0 0 24 24"><path d="M12 0L14.9 9.1 24 12 14.9 14.9 12 24 9.1 14.9 0 12 9.1 9.1z" fill="#ffe56b"/></svg>`;
-/* ========== SOM (Web Audio: tudo sintetizado, sem arquivos) ========== */
+/* ========== SOM (Web Audio: síntese aprimorada, sem arquivos externos) ========== */
 const Sfx = {
-  ctx: null, fx: true, mu: true, _t: {}, bt: 0, step: 0, v: 0, vz: 1, MAXV: 22,
-  /* ducking: some a música por instantes quando toca um som importante [nível, duração em s] */
-  D: { level: [.3, 1.6], win: [.3, 1.8], lose: [.4, 1.2], ok: [.55, .6], end: [.4, 1], bomb: [.5, .6] },
-  /* sons com leve variação de tom a cada disparo (evita o efeito "metralhadora" de repetição) */
-  VAR: /^(tap|pop|eat|scrub|water|bonk|flip|mup|coin|heart|pet|equip|room|star)$/,
-  W: { water: 160, pet: 400, scrub: 90, pad: 0, mup: 120, flip: 40 },
+  ctx: null, fx: true, mu: true, _t: {}, bt: 0, step: 0,
+  W: { water: 120, pet: 300, scrub: 75, pad: 0, mup: 100, flip: 35 },
   cfg() { try { const o = JSON.parse(localStorage.getItem("dp_sound") || "{}"); this.fx = o.fx !== false; this.mu = o.mu !== false; } catch (e) {} this.label(); },
   save() { try { localStorage.setItem("dp_sound", JSON.stringify({ fx: this.fx, mu: this.mu })); } catch (e) {} this.label(); },
   label() { const e = document.getElementById("menuSnd"); if (e) e.textContent = this.fx && this.mu ? "efeitos e música" : this.fx ? "só efeitos" : "desligado"; },
@@ -1309,26 +1305,23 @@ const Sfx = {
     const wake = () => {
       if (!this.ctx) {
         try {
-          const C = window.AudioContext || window.webkitAudioContext; if (!C) return; const c = this.ctx = new C();
-          /* saída: limitador (teto de pico ~ -1 dBFS) -> volume final */
-          const lim = this.o = c.createDynamicsCompressor(); lim.threshold.value = -10; lim.knee.value = 8; lim.ratio.value = 12; lim.attack.value = .003; lim.release.value = .18;
-          const out = c.createGain(); out.gain.value = .89; lim.connect(out); out.connect(c.destination);
-          /* barra de efeitos: filtro suave tira o chiado dos sons agudos antes do limitador */
-          const sf = c.createBiquadFilter(); sf.type = "lowpass"; sf.frequency.value = 8500; sf.Q.value = .5; sf.connect(lim);
-          this.g = c.createGain(); this.g.gain.value = .8; this.g.connect(sf);
-          /* barra de música: volume (mg) -> filtro quente -> ducking (dk) -> limitador */
-          this.dk = c.createGain(); this.dk.gain.value = 1; this.dk.connect(lim);
-          const mf = c.createBiquadFilter(); mf.type = "lowpass"; mf.frequency.value = 5200; mf.Q.value = .5; mf.connect(this.dk);
-          this.mg = c.createGain(); this.mg.gain.value = 0; this.mg.connect(mf);
-          /* reverb curto e compartilhado (ambiente de quarto): um único convolver para tudo */
-          const L = (c.sampleRate * .8) | 0, ir = c.createBuffer(2, L, c.sampleRate);
-          for (let k = 0; k < 2; k++) { const d = ir.getChannelData(k); for (let i = 0; i < L; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / L, 2.8); }
-          const rl = c.createBiquadFilter(); rl.type = "lowpass"; rl.frequency.value = 3200; const cv = c.createConvolver(); cv.buffer = ir;
-          const rw = c.createGain(); rw.gain.value = .9; rl.connect(cv); cv.connect(rw); rw.connect(lim);
-          const s1 = c.createGain(); s1.gain.value = .14; this.g.connect(s1); s1.connect(rl);
-          const s2 = c.createGain(); s2.gain.value = .3; this.mg.connect(s2); s2.connect(rl);
-          const n = this.nb = c.createBuffer(1, c.sampleRate, c.sampleRate), d = n.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
-          setInterval(() => this.music(), 450);
+          const C = window.AudioContext || window.webkitAudioContext; if (!C) return;
+          let c; try { c = new C({ latencyHint: "interactive" }); } catch (_) { c = new C(); }
+          this.ctx = c;
+          this.o = c.createDynamicsCompressor();
+          this.o.threshold.value = -22; this.o.knee.value = 18; this.o.ratio.value = 3.5;
+          this.o.attack.value = .004; this.o.release.value = .22; this.o.connect(c.destination);
+          this.g = c.createGain(); this.g.gain.value = .78; this.g.connect(this.o);
+          this.mg = c.createGain(); this.mg.gain.value = 0; this.mg.connect(this.o);
+          /* Reverb curto e discreto: dá profundidade aos efeitos sem deixar os toques embolados. */
+          try {
+            const cv = this.rv = c.createConvolver(), len = Math.floor(c.sampleRate * .72), ir = c.createBuffer(2, len, c.sampleRate);
+            for (let ch = 0; ch < 2; ch++) { const a = ir.getChannelData(ch); for (let i = 0; i < len; i++) a[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 3.2); }
+            cv.buffer = ir; this.rg = c.createGain(); this.rg.gain.value = .105; this.g.connect(cv); cv.connect(this.rg); this.rg.connect(this.o);
+          } catch (_) { this.rv = null; }
+          const n = this.nb = c.createBuffer(1, c.sampleRate, c.sampleRate), d = n.getChannelData(0);
+          for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+          this.musicTimer = setInterval(() => this.music(), 350);
         } catch (e) { this.ctx = null; return; }
       }
       if (this.ctx.state !== "running") this.ctx.resume().catch(() => {});
@@ -1337,84 +1330,124 @@ const Sfx = {
       wake(); const b = e.target.closest("button,[data-act]");
       if (b && !b.disabled && !b.closest("#gBoard,#g2Area,.tool") && !/^(room|buy|equip|do|shower|gclaim|sound)$/.test(b.dataset.act || "")) this.p("tap");
     }, true);
-    ["touchend", "click"].forEach(ev => document.addEventListener(ev, wake, true));
     document.addEventListener("visibilitychange", () => { const c = this.ctx; if (!c) return; if (document.hidden) c.suspend().catch(() => {}); else c.resume().catch(() => {}); });
   },
   p(n, a) {
     if (!this.fx || !this.ctx || document.hidden) return; const f = this.S[n]; if (!f) return;
-    const now = performance.now(); if (now - (this._t[n] || 0) < (n in this.W ? this.W[n] : 60)) return; this._t[n] = now;
-    this.vz = this.VAR.test(n) ? 1 + (Math.random() - .5) * .05 : 1;
-    try { f.call(this, this.ctx.currentTime + .01, a); } catch (e) {}
-    this.vz = 1; const d = this.D[n]; if (d && this.mu) this.duck(d[0], d[1]);
-  },
-  duck(k, d) {
-    if (!this.dk) return; const g = this.dk.gain, t = this.ctx.currentTime;
-    g.cancelScheduledValues(t); g.setTargetAtTime(k, t, .03); g.setTargetAtTime(1, t + d, .35);
+    const now = performance.now(); if (now - (this._t[n] || 0) < (n in this.W ? this.W[n] : 55)) return; this._t[n] = now;
+    try { f.call(this, this.ctx.currentTime + .012, a); } catch (e) {}
   },
   tone(t, f, d, ty, v, f2, dst) {
-    if (!dst && this.v >= this.MAXV) return; /* limite de vozes simultâneas (música não conta) */
-    const c = this.ctx, o = c.createOscillator(), g = c.createGain(); if (!dst) { this.v++; o.onended = () => { this.v = Math.max(0, this.v - 1); }; }
-    if (!dst) { f *= this.vz; if (f2) f2 *= this.vz; }
-    o.type = ty || "sine"; o.frequency.setValueAtTime(f, t); if (f2) o.frequency.exponentialRampToValueAtTime(f2, t + d);
-    g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(v || .2, t + .012); g.gain.exponentialRampToValueAtTime(.0001, t + d);
-    o.connect(g); g.connect(dst || this.g); o.start(t); o.stop(t + d + .03);
+    const c = this.ctx, o = c.createOscillator(), g = c.createGain();
+    o.type = ty || "sine"; o.frequency.setValueAtTime(Math.max(1, f), t);
+    if (f2) o.frequency.exponentialRampToValueAtTime(Math.max(1, f2), t + d);
+    const peak = Math.max(.0002, v || .2), attack = Math.min(.025, Math.max(.006, d * .16));
+    g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(peak, t + attack);
+    g.gain.setValueAtTime(peak * .72, t + Math.max(attack + .006, d * .35));
+    g.gain.exponentialRampToValueAtTime(.0001, t + d);
+    o.connect(g); g.connect(dst || this.g); o.start(t); o.stop(t + d + .035);
   },
   noise(t, d, v, f, f2, q, ty) {
-    if (this.v >= this.MAXV) return;
-    const c = this.ctx, s = c.createBufferSource(), b = c.createBiquadFilter(), g = c.createGain(); this.v++; s.onended = () => { this.v = Math.max(0, this.v - 1); }; s.buffer = this.nb; s.loop = true; b.type = ty || "bandpass"; b.Q.value = q || 1;
-    b.frequency.setValueAtTime(f, t); if (f2) b.frequency.exponentialRampToValueAtTime(f2, t + d);
-    g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(v, t + .02); g.gain.exponentialRampToValueAtTime(.0001, t + d);
-    s.connect(b); b.connect(g); g.connect(this.g); s.start(t, Math.random()); s.stop(t + d + .03);
+    const c = this.ctx, s = c.createBufferSource(), b = c.createBiquadFilter(), g = c.createGain();
+    s.buffer = this.nb; s.loop = true; b.type = ty || "bandpass"; b.Q.value = q || 1;
+    b.frequency.setValueAtTime(Math.max(30, f), t); if (f2) b.frequency.exponentialRampToValueAtTime(Math.max(30, f2), t + d);
+    g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(Math.max(.0002, v), t + Math.min(.035, d * .2));
+    g.gain.exponentialRampToValueAtTime(.0001, t + d);
+    s.connect(b); b.connect(g); g.connect(this.g); s.start(t, Math.random() * .8); s.stop(t + d + .035);
   },
   seq(t, a, d, ty, v, gap) { a.forEach((f, i) => this.tone(t + i * gap, f, d, ty, v)); },
   S: {
-    tap(t) { this.tone(t, 900, .05, "triangle", .08, 600); },
-    ok(t) { this.seq(t, [660, 880], .12, "sine", .16, .08); },
-    warn(t) { this.tone(t, 220, .2, "square", .09, 140); this.tone(t + .09, 180, .2, "square", .08, 110); },
-    eat(t) { for (let i = 0; i < 3; i++) { this.noise(t + i * .16, .09, .5, 1100, 500, 2); this.tone(t + i * .16, 180, .08, "sine", .22, 90); } this.seq(t + .55, [520, 780], .1, "sine", .12, .07); },
-    play(t) { this.tone(t, 280, .22, "sine", .22, 640); this.seq(t + .15, [660, 784, 988, 1175], .1, "triangle", .13, .075); },
-    sleep(t) { this.seq(t, [659, 523, 440, 330], .5, "sine", .13, .32); },
-    wake(t) { this.seq(t, [330, 440, 523, 659], .3, "sine", .13, .16); },
-    pet(t) { this.tone(t, 760, .16, "sine", .1, 1000); this.tone(t + .1, 1000, .14, "sine", .07, 1250); },
-    scrub(t) { this.noise(t, .09, .22, 3500, 1800, 3, "highpass"); this.tone(t, 1500 + Math.random() * 500, .05, "sine", .06, 900); },
-    water(t) { this.noise(t, .26, .16, 2600, 3200, .6); },
-    shower(t) { this.noise(t, 1.1, .2, 2200, 3400, .5); },
-    pop(t) { this.tone(t, 500 + Math.random() * 300, .06, "sine", .14, 1100); },
-    clean(t) { this.seq(t + .02, [1175, 1568, 2093], .22, "sine", .09, .09); },
-    coin(t) { this.tone(t, 988, .07, "square", .06); this.tone(t + .07, 1319, .22, "square", .06); },
-    star(t) { this.seq(t, [1319, 1568, 1976], .16, "sine", .1, .06); },
-    heart(t) { this.tone(t, 880, .22, "sine", .09, 1040); },
-    level(t) { this.seq(t, [523, 659, 784, 1047, 1319], .3, "triangle", .15, .11); },
-    equip(t) { this.noise(t, .16, .22, 700, 2200, 1.2); this.tone(t + .08, 780, .08, "triangle", .08); },
-    room(t) { this.noise(t, .26, .2, 400, 1800, .9); },
-    flip(t) { this.tone(t, 520, .05, "square", .05, 780); },
-    match(t) { this.seq(t, [784, 1047], .16, "sine", .15, .09); },
-    miss(t) { this.tone(t, 300, .3, "sawtooth", .07, 150); },
-    win(t) { this.seq(t, [523, 659, 784, 659, 784, 1047], .26, "triangle", .15, .12); },
-    lose(t) { this.seq(t, [392, 330, 262], .3, "triangle", .14, .2); },
-    end(t) { this.tone(t, 440, .8, "sine", .2); this.tone(t, 880, .8, "sine", .08); },
-    bonk(t) { this.tone(t, 320, .12, "sine", .26, 120); this.noise(t, .05, .2, 900, 400, 1); },
-    gold(t) { this.S.bonk.call(this, t); this.seq(t + .05, [1319, 1760, 2349], .16, "sine", .1, .06); },
-    bomb(t) { this.noise(t, .5, .6, 900, 120, .7, "lowpass"); this.tone(t, 110, .45, "sawtooth", .14, 40); },
-    mup(t) { this.tone(t, 420, .06, "sine", .04, 620); },
-    pad(t, p) { this.tone(t, [330, 392, 494, 587][p] || 440, .35, "triangle", .2); }
+    tap(t) { this.noise(t, .025, .018, 4200, 2100, 1.8, "highpass"); this.tone(t + .006, 880, .075, "sine", .026, 660); },
+    ok(t) { this.tone(t, 523.25, .32, "sine", .055); this.tone(t + .045, 659.25, .34, "sine", .042); this.tone(t + .09, 783.99, .48, "sine", .035); this.tone(t + .10, 1046.5, .36, "triangle", .018); },
+    warn(t) { this.tone(t, 245, .18, "triangle", .075, 175); this.tone(t + .13, 196, .22, "triangle", .065, 138); },
+    eat(t) { for (let i = 0; i < 3; i++) { const x = t + i * .16; this.noise(x, .105, .075, 1750, 720, 2.8, "bandpass"); this.tone(x, 235 + i * 16, .12, "triangle", .052, 155); } this.tone(t + .52, 659.25, .22, "sine", .035, 783.99); this.tone(t + .61, 987.77, .3, "sine", .022); },
+    play(t) { this.tone(t, 392, .28, "sine", .052, 587.33); this.tone(t + .08, 587.33, .32, "triangle", .035, 783.99); this.tone(t + .18, 783.99, .42, "sine", .026, 1046.5); this.tone(t + .30, 1174.66, .55, "sine", .018, 1568); },
+    sleep(t) { this.seq(t, [784, 659, 523, 392], .42, "sine", .075, .27); },
+    wake(t) { this.seq(t, [392, 523, 659, 784], .25, "sine", .085, .14); },
+    pet(t) { this.tone(t, 659.25, .34, "sine", .038, 783.99); this.tone(t + .055, 783.99, .42, "sine", .028, 987.77); this.tone(t + .09, 1318.51, .28, "triangle", .012, 1567.98); },
+    scrub(t) { this.noise(t, .12, .12, 3900, 1700, 3.2, "highpass"); this.tone(t + .015, 1750 + Math.random() * 350, .055, "sine", .035, 1050); },
+    water(t) { this.noise(t, .31, .105, 3000, 1750, .75); this.tone(t + .04, 520, .18, "sine", .025, 340); },
+    shower(t) { this.noise(t, 1.05, .13, 2700, 1900, .65); this.noise(t + .06, .82, .045, 850, 1300, .8, "lowpass"); },
+    pop(t) { const f = 480 + Math.random() * 260; this.tone(t, f, .085, "sine", .095, f * 2.1); },
+    clean(t) { this.tone(t, 783.99, .42, "sine", .028); this.tone(t + .07, 987.77, .46, "sine", .024); this.tone(t + .14, 1174.66, .5, "sine", .02); this.tone(t + .22, 1567.98, .62, "sine", .016); },
+    coin(t) { this.tone(t, 987.77, .18, "sine", .045, 1318.51); this.tone(t + .055, 1318.51, .24, "sine", .034, 1760); this.tone(t + .10, 1975.53, .32, "sine", .018, 2349.32); },
+    star(t) { [1318.51, 1567.98, 1975.53, 2637.02].forEach((f, i) => this.tone(t + i * .055, f, .42 + i * .035, "sine", .025 - i * .003, f * 1.002)); },
+    heart(t) { this.tone(t, 523.25, .62, "sine", .026); this.tone(t + .06, 659.25, .58, "sine", .022); this.tone(t + .12, 783.99, .52, "sine", .018); },
+    level(t) { [523.25, 659.25, 783.99, 987.77, 1174.66, 1567.98].forEach((f, i) => this.tone(t + i * .075, f, .55, i > 3 ? "sine" : "triangle", .038 - i * .003)); this.tone(t + .42, 2093, .7, "sine", .016); },
+    equip(t) { this.noise(t, .16, .035, 1500, 4200, 1.2, "highpass"); this.tone(t + .035, 783.99, .3, "sine", .032, 987.77); this.tone(t + .09, 1174.66, .36, "sine", .022, 1567.98); },
+    room(t) { this.noise(t, .32, .028, 650, 2600, .75, "bandpass"); this.tone(t + .07, 523.25, .42, "sine", .022, 659.25); this.tone(t + .13, 783.99, .36, "sine", .014); },
+    flip(t) { this.noise(t, .045, .045, 1800, 850, 1.5, "highpass"); this.tone(t, 680, .055, "triangle", .04, 920); },
+    match(t) { this.seq(t, [784, 988, 1175], .16, "sine", .095, .075); },
+    miss(t) { this.tone(t, 330, .25, "triangle", .065, 185); this.tone(t + .07, 220, .18, "sine", .035, 165); },
+    win(t) { const a = [523.25, 659.25, 783.99, 987.77, 1174.66]; a.forEach((f, i) => this.tone(t + i * .09, f, .68, "sine", .036 - i * .004)); this.tone(t + .48, 1567.98, .95, "sine", .026); this.tone(t + .52, 1975.53, .72, "triangle", .012); },
+    lose(t) { this.seq(t, [494, 392, 330, 262], .28, "sine", .075, .18); },
+    end(t) { this.tone(t, 523, .75, "sine", .075, 392); this.tone(t, 784, .72, "sine", .035, 587); },
+    bonk(t) { this.tone(t, 290, .13, "triangle", .12, 125); this.noise(t, .065, .075, 1050, 420, 1.1); },
+    gold(t) { this.S.bonk.call(this, t); this.seq(t + .045, [1319, 1760, 2093], .17, "sine", .075, .065); },
+    bomb(t) { this.noise(t, .42, .2, 750, 100, .8, "lowpass"); this.tone(t, 125, .38, "sawtooth", .075, 48); },
+    mup(t) { this.tone(t, 440, .075, "sine", .035, 660); },
+    pad(t, p) { const f = [261.63, 329.63, 392, 523.25][p] || 440; this.tone(t, f, .48, "sine", .045); this.tone(t + .018, f * 2, .34, "sine", .014); this.tone(t + .035, f * 1.5, .38, "triangle", .012); }
   },
-  /* música de fundo: acordes suaves + melodia pentatônica aleatória; mais baixa quando o pet dorme, some dentro dos jogos */
+  /* Trilha premium: ambient acústico-sintético, acordes macios, baixo discreto e pequenas notas de piano/caixa musical. */
+  musicVoice(t, f, d, level, pan, bright) {
+    const c = this.ctx; if (!c || !this.mg) return;
+    const filter = c.createBiquadFilter(), env = c.createGain();
+    filter.type = "lowpass"; filter.frequency.setValueAtTime(bright || 1750, t); filter.Q.value = .55;
+    env.gain.setValueAtTime(.0001, t);
+    env.gain.linearRampToValueAtTime(level, t + Math.min(.7, d * .28));
+    env.gain.setValueAtTime(level * .78, t + d * .72);
+    env.gain.exponentialRampToValueAtTime(.0001, t + d + .35);
+    let out = env;
+    if (c.createStereoPanner) { const p = c.createStereoPanner(); p.pan.setValueAtTime(pan || 0, t); env.connect(p); p.connect(this.mg); }
+    else env.connect(this.mg);
+    filter.connect(env);
+    const a = c.createOscillator(), b = c.createOscillator();
+    a.type = "sine"; b.type = "triangle";
+    a.frequency.setValueAtTime(f, t); b.frequency.setValueAtTime(f, t); b.detune.setValueAtTime(7, t);
+    a.connect(filter); b.connect(filter); a.start(t); b.start(t); a.stop(t + d + .4); b.stop(t + d + .4);
+  },
+  musicBell(t, f, level, pan) {
+    const c = this.ctx; if (!c) return;
+    const p = c.createGain(); p.gain.setValueAtTime(.0001, t); p.gain.exponentialRampToValueAtTime(level, t + .012); p.gain.exponentialRampToValueAtTime(.0001, t + .72);
+    let dst = this.mg;
+    if (c.createStereoPanner) { const sp = c.createStereoPanner(); sp.pan.setValueAtTime(pan || 0, t); p.connect(sp); sp.connect(dst); } else p.connect(dst);
+    const o = c.createOscillator(), h = c.createOscillator(); o.type = "sine"; h.type = "sine"; o.frequency.setValueAtTime(f, t); h.frequency.setValueAtTime(f * 2.01, t);
+    const hg = c.createGain(); hg.gain.value = .18; o.connect(p); h.connect(hg); hg.connect(p); o.start(t); h.start(t); o.stop(t + .76); h.stop(t + .76);
+  },
   music() {
     const c = this.ctx; if (!c || c.state !== "running") return;
-    const play = this.mu && !document.hidden && !(view === "games" && /^play/.test(Games.sc)), sl = S.pet.sleeping;
-    this.mg.gain.setTargetAtTime(play ? (sl ? .35 : 1) : 0, c.currentTime, .6);
-    if (!play) { this.bt = 0; return; }
-    const now = c.currentTime; if (this.bt < now) this.bt = now + .1;
-    const CH = [[261.6, 329.6, 392], [220, 261.6, 329.6], [174.6, 220, 261.6], [196, 246.9, 293.7]], SC = [523.3, 587.3, 659.3, 784, 880, 1046.5], B = .75;
-    while (this.bt < now + 1.6) {
-      const t = this.bt, s = this.step++;
-      if (s % 4 === 0) CH[(s / 4) % 4].forEach(f => this.tone(t, f / 2, B * 4.2, "sine", .06, 0, this.mg));
-      if (!sl && Math.random() < .55) this.tone(t, SC[Math.random() * SC.length | 0], B * 1.6, "sine", .05, 0, this.mg);
-      this.bt += B;
+    const playing = this.mu && !document.hidden && !(view === "games" && /^play/.test(Games.sc));
+    const sleeping = !!S.pet.sleeping;
+    this.mg.gain.setTargetAtTime(playing ? (sleeping ? .20 : .48) : 0, c.currentTime, .85);
+    if (!playing) { this.bt = 0; return; }
+    const now = c.currentTime; if (this.bt < now) this.bt = now + .10;
+    /* Cmaj7 · Am7 · Fmaj7 · G6: progressão circular, acolhedora e sem tensão excessiva. */
+    const chords = [
+      [261.63, 329.63, 392.00, 493.88],
+      [220.00, 261.63, 329.63, 392.00],
+      [174.61, 220.00, 261.63, 329.63],
+      [196.00, 246.94, 293.66, 392.00]
+    ];
+    const roots = [65.41, 55.00, 43.65, 49.00];
+    const melody = [659.25, 587.33, 523.25, 587.33, 783.99, 659.25, 587.33, 523.25, 493.88, 587.33, 659.25, 783.99, 880.00, 783.99, 659.25, 587.33];
+    const beat = .82;
+    while (this.bt < now + 1.55) {
+      const t = this.bt, n = this.step++, bar = Math.floor(n / 4) % 4, chord = chords[bar];
+      if (n % 4 === 0) {
+        chord.forEach((f, i) => this.musicVoice(t, f, beat * 3.8, i === 0 ? .012 : .0085, (i - 1.5) * .34, i === 3 ? 2200 : 1450));
+        this.musicVoice(t, roots[bar], beat * 3.45, .024, 0, 520);
+      }
+      if (!sleeping && n % 2 === 1) {
+        const note = melody[(n * 3 + bar * 2) % melody.length];
+        this.musicBell(t + .04, note, .018, n % 4 === 1 ? -.32 : .32);
+      }
+      if (!sleeping && n % 4 === 3) {
+        const note = chord[(bar + 1) % chord.length] * 2;
+        this.musicBell(t + .22, note, .008, .18);
+      }
+      this.bt += beat;
     }
-  }
-};
+  }};
 const FX = {
   vib(n) { const t = performance.now(); if (t - (this._v || 0) < 150) return; this._v = t; try { navigator.vibrate && navigator.vibrate(n); } catch (e) {} },
   burst(x, y, kind, n) {
