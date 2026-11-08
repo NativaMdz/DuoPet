@@ -14,7 +14,7 @@
 <title>DuoPet</title>
 <!-- Versão publicada. A cada publicação o app compara com a versão aberta e se atualiza sozinho.
      (Mesmo que você esqueça de mudar este número, o app também compara o conteúdo do arquivo.) -->
-<script>window.DP_BUILD = "20261108-0001";
+<script>window.DP_BUILD = "20261108-0002";
 window.addEventListener("beforeinstallprompt", function (e) { e.preventDefault(); window.__pwaPrompt = e; });
 window.addEventListener("appinstalled", function () { window.__pwaPrompt = null; });</script>
 <style>
@@ -1079,27 +1079,26 @@ const TLEAF = (x, y, r, k, c1, c2) => `<g transform="translate(${x} ${y}) rotate
 const TOPN = {
   /* 1. Camiseta Polo: azul-clara, gola dobrada azul-marinho, 3 botões brancos, mangas curtas, barra arredondada */
   polo: u => `<defs>${TGR(u, "#bfe3fd", "#86c6f5", "#58a2e2")}</defs>
-<g clip-path="url(#${u}c)"><path d="M26 125Q100 156 174 125V204H26z" fill="url(#${u}t)" stroke="none"/>${TSH}${THL}</g>${TOUT}
-<rect x="93.5" y="141" width="13" height="42" rx="6" fill="#a5d6f9" stroke-width="2.4"/>
-<path d="M46 127Q74 143 99 141Q99 152 95 157Q66 152 46 127z" fill="#23428c"/><path d="M154 127Q126 143 101 141Q101 152 105 157Q134 152 154 127z" fill="#23428c"/>
-<path d="M56 132Q76 142 94 144M144 132Q124 142 106 144" fill="none" stroke="#fff" stroke-width="2.2" opacity=".35"/>
-<path d="M62 142Q80 151 94 152M138 142Q120 151 106 152" fill="none" stroke="#17306a" stroke-width="2" opacity=".6"/>
-<g stroke-width="2.2"><circle cx="100" cy="162" r="3.4" fill="#fff"/><circle cx="100" cy="171" r="3.4" fill="#fff"/><circle cx="100" cy="180" r="3.4" fill="#fff"/></g>`,
+<g clip-path="url(#${u}c)"><path d="M26 127Q100 168 174 127V204H26z" fill="url(#${u}t)" stroke="none"/>${TSH}${THL}</g>${TOUT}
+<rect x="93.5" y="149" width="13" height="35" rx="6" fill="#a5d6f9" stroke-width="2.4"/>
+<path d="M50 134Q74 147 99 149Q99 155 96 158Q68 155 50 134z" fill="#23428c"/><path d="M150 134Q126 147 101 149Q101 155 104 158Q132 155 150 134z" fill="#23428c"/>
+<path d="M58 138Q76 148 94 151M142 138Q124 148 106 151" fill="none" stroke="#fff" stroke-width="2.2" opacity=".35"/>
+<g stroke-width="2.2"><circle cx="100" cy="164" r="3" fill="#fff"/><circle cx="100" cy="172" r="3" fill="#fff"/><circle cx="100" cy="180" r="3" fill="#fff"/></g>`,
   /* 2. Suéter Listrado: branco com faixas horizontais vermelhas, gola arredondada, acabamentos canelados */
   sueter: u => `<defs>${TGR(u, "#ffffff", "#fbf3f6", "#eadde4")}</defs>
-<g clip-path="url(#${u}c)"><path d="M24 124Q100 156 176 124V204H24z" fill="url(#${u}t)" stroke="none"/>
-<g fill="none" stroke="#e2374a" stroke-width="8.5"><path d="M18 148Q100 166 182 148"/><path d="M18 164Q100 182 182 164"/></g>${TSH}${THL}
-${TBAND("M40 154A63 55 0 0 0 160 154", 8, "#d9364a", "#a01a2c", "1.6 4.2")}</g>${TOUT}
-${TBAND("M24 124Q100 156 176 124", 9, "#d9364a", "#a01a2c", "1.6 4.2")}`,
+<g clip-path="url(#${u}c)"><path d="M24 131Q100 171 176 131V204H24z" fill="url(#${u}t)" stroke="none"/>
+<g fill="none" stroke="#e2374a" stroke-width="6"><path d="M18 156Q100 168 182 156"/><path d="M18 166Q100 178 182 166"/></g>${TSH}${THL}
+${TBAND("M41 152A63 58 0 0 0 159 152", 6, "#d9364a", "#a01a2c", "1.6 4.2")}</g>${TOUT}
+${TBAND("M24 131Q100 171 176 131", 7, "#d9364a", "#a01a2c", "1.6 4.2")}`,
   /* 3. Moletom Casual: verde-escuro, mangas curtas, bolso frontal arredondado, dois cordões pequenos */
   moletom: u => `<defs>${TGR(u, "#46936a", "#2d6a4a", "#1f4c35")}</defs>
-<g clip-path="url(#${u}c)"><path d="M26 125Q100 158 174 125V204H26z" fill="url(#${u}t)" stroke="none"/>${TSH}${THL}
-<path d="M50 168Q100 154 150 168Q156 180 138 190H62Q44 180 50 168z" fill="#2a6246" stroke-width="2.6"/>
-<path d="M58 171Q100 160 142 171" fill="none" stroke="#7fc79b" stroke-width="1.8" stroke-dasharray="3 3.4" opacity=".8"/>
-${TBAND("M40 154A63 55 0 0 0 160 154", 8, "#1f4c35", "#0d2a1c", "1.6 4.2")}</g>${TOUT}
-${TBAND("M26 125Q100 158 174 125", 9, "#1f4c35", "#0d2a1c", "1.6 4.2")}
-<g fill="none" stroke-linecap="round"><path d="M93.5 146Q91 155 92.5 163M106.5 146Q109 155 107.5 163" stroke="${SK}" stroke-width="5.6"/><path d="M93.5 146Q91 155 92.5 163M106.5 146Q109 155 107.5 163" stroke="#f6efdc" stroke-width="2.4"/></g>
-<g fill="#f6efdc" stroke-width="2"><ellipse cx="92.5" cy="166" rx="2.7" ry="3.8"/><ellipse cx="107.5" cy="166" rx="2.7" ry="3.8"/></g>`,
+<g clip-path="url(#${u}c)"><path d="M26 132Q100 172 174 132V204H26z" fill="url(#${u}t)" stroke="none"/>${TSH}${THL}
+<path d="M52 180Q100 168 148 180Q152 188 138 193H62Q48 188 52 180z" fill="#2a6246" stroke-width="2.6"/>
+<path d="M60 182Q100 172 140 182" fill="none" stroke="#7fc79b" stroke-width="1.8" stroke-dasharray="3 3.4" opacity=".8"/>
+${TBAND("M41 152A63 58 0 0 0 159 152", 6, "#1f4c35", "#0d2a1c", "1.6 4.2")}</g>${TOUT}
+${TBAND("M26 132Q100 172 174 132", 8, "#1f4c35", "#0d2a1c", "1.6 4.2")}
+<g fill="none" stroke-linecap="round"><path d="M94 156Q92 161 93 165M106 156Q108 161 107 165" stroke="${SK}" stroke-width="5.6"/><path d="M94 156Q92 161 93 165M106 156Q108 161 107 165" stroke="#f6efdc" stroke-width="2.4"/></g>
+<g fill="#f6efdc" stroke-width="2"><ellipse cx="93" cy="167.500" rx="2.7" ry="3.6"/><ellipse cx="107" cy="167.500" rx="2.7" ry="3.6"/></g>`,
   /* 4. Camiseta Marinheiro: branca, gola azul-marinho em V, duas faixas azuis, laço integrado */
   marinheiro: u => `<defs>${TGR(u, "#ffffff", "#f5f8fd", "#dbe5f3")}</defs>
 <g clip-path="url(#${u}c)"><path d="M24 124L90 154Q100 159 110 154L176 124V204H24z" fill="url(#${u}t)" stroke="none"/>${TSH}${THL}
@@ -1109,51 +1108,52 @@ ${TBAND("M26 125Q100 158 174 125", 9, "#1f4c35", "#0d2a1c", "1.6 4.2")}
 <path d="M85 160q4-3 8-1M115 160q-4-3-8-1" fill="none" stroke="#fff" stroke-width="1.8" opacity=".5"/>`,
   /* 5. Macacão Dinossauro: verde, peça única, barriga oval verde-clara, manchas laterais, mangas arredondadas */
   dino: u => `<defs>${TGR(u, "#86d567", "#57b94a", "#3b9a38")}</defs>
-<g clip-path="url(#${u}c)"><path d="M24 123Q100 152 176 123V204H24z" fill="url(#${u}t)" stroke="none"/>${TSH}${THL}
-<g fill="#2f8a33" stroke="none" opacity=".8"><ellipse cx="50" cy="146" rx="5.4" ry="3.8" transform="rotate(30 50 146)"/><ellipse cx="57" cy="166" rx="4.6" ry="3.2" transform="rotate(40 57 166)"/><ellipse cx="150" cy="146" rx="5.4" ry="3.8" transform="rotate(-30 150 146)"/><ellipse cx="143" cy="166" rx="4.6" ry="3.2" transform="rotate(-40 143 166)"/><ellipse cx="46" cy="132" rx="3.6" ry="2.6" transform="rotate(30 46 132)"/><ellipse cx="154" cy="132" rx="3.6" ry="2.6" transform="rotate(-30 154 132)"/></g>
-<ellipse cx="100" cy="161" rx="31" ry="25" fill="#d9f4a4" stroke-width="2.6"/>
-<path d="M78 151Q100 158 122 151M73 161Q100 169 127 161M78 171Q100 178 122 171" fill="none" stroke="#b2dd72" stroke-width="2.6" stroke-linecap="round"/>
-<path d="M82 148q6-3 12-2" fill="none" stroke="#fff" stroke-width="3" opacity=".6"/></g>${TOUT}
-${TBAND("M24 123Q100 152 176 123", 7, "#3b9a38", "#1f6a28", "1.6 4.2")}`,
+<g clip-path="url(#${u}c)"><path d="M24 131Q100 171 176 131V204H24z" fill="url(#${u}t)" stroke="none"/>${TSH}${THL}
+<g fill="#2f8a33" stroke="none" opacity=".8"><ellipse cx="50" cy="154" rx="5.4" ry="3.8" transform="rotate(30 50 154)"/><ellipse cx="58" cy="172" rx="4.6" ry="3.2" transform="rotate(40 58 172)"/><ellipse cx="150" cy="154" rx="5.4" ry="3.8" transform="rotate(-30 150 154)"/><ellipse cx="142" cy="172" rx="4.6" ry="3.2" transform="rotate(-40 142 172)"/><ellipse cx="45" cy="145" rx="3.6" ry="2.6" transform="rotate(30 45 145)"/><ellipse cx="155" cy="145" rx="3.6" ry="2.6" transform="rotate(-30 155 145)"/></g>
+<ellipse cx="100" cy="168" rx="29" ry="18.500" fill="#d9f4a4" stroke-width="2.6"/>
+<path d="M78 160Q100 166 122 160M74 168Q100 174 126 168M78 176Q100 182 122 176" fill="none" stroke="#b2dd72" stroke-width="2.4" stroke-linecap="round"/>
+<path d="M84 156q6-3 12-2" fill="none" stroke="#fff" stroke-width="3" opacity=".6"/></g>${TOUT}
+${TBAND("M24 131Q100 171 176 131", 7, "#3b9a38", "#1f6a28", "1.6 4.2")}`,
   /* 6. Vestidinho de Corações: rosa-claro, corpete ajustado, saia curta ondulada, pequenos corações na barra */
   vcoracao: u => `<defs>${TGR(u, "#ffd3e6", "#ffa7cc", "#f783b6")}</defs>
-<g clip-path="url(#${u}c)"><path d="${THEM(6, 64, 55, 6, 166, 14)}L172 144Q100 164 28 144z" fill="url(#${u}t)" stroke-width="3"/>
-<path d="M60 164Q58 171 61 176M86 168Q85 174 87 179M114 168Q115 174 113 179M140 164Q142 171 139 176" fill="none" stroke="#ffc8e0" stroke-width="2.2" opacity=".75"/>
+<g clip-path="url(#${u}c)"><path d="${THEM(6, 64, 55, 6, 166, 14)}L172 150Q100 170 28 150z" fill="url(#${u}t)" stroke-width="3"/>
+<path d="${THEM(6, 59, 50, 6, 166, 14)}" fill="none" stroke="#fff" stroke-width="2" stroke-dasharray="3 3.600" opacity=".85"/>
+<path d="M60 168Q58 174 61 178M86 172Q85 177 87 181M114 172Q115 177 113 181M140 168Q142 174 139 178" fill="none" stroke="#ffc8e0" stroke-width="2.2" opacity=".75"/>
 ${THMID(6, 55, 45, 166, 14).map(([x, y]) => THRT(x, y - 1, .55, "#fff")).join("")}
-<path d="M24 124C50 144 82 140 100 148C118 140 150 144 176 124V148Q100 168 24 148z" fill="url(#${u}t)" stroke-width="3"/>${TSH}
-<path d="M24 148Q100 168 176 148" fill="none" stroke="#e5659e" stroke-width="2.6"/>
-<path d="M24 124C50 144 82 140 100 148C118 140 150 144 176 124" fill="none" stroke="${SK}" stroke-width="8.4"/><path d="M24 124C50 144 82 140 100 148C118 140 150 144 176 124" fill="none" stroke="#fff" stroke-width="5"/></g>${TOUT}`,
+<path d="M24 128C50 150 82 150 100 156C118 150 150 150 176 128V154Q100 174 24 154z" fill="url(#${u}t)" stroke-width="3"/>${TSH}
+<path d="M24 154Q100 174 176 154" fill="none" stroke="#e5659e" stroke-width="2.6"/>
+<path d="M24 128C50 150 82 150 100 156C118 150 150 150 176 128" fill="none" stroke="${SK}" stroke-width="8.4"/><path d="M24 128C50 150 82 150 100 156C118 150 150 150 176 128" fill="none" stroke="#fff" stroke-width="5"/></g>${TOUT}`,
   /* 7. Blusinha Lavanda: lilás, gola branca arredondada, mangas curtas, pequena flor central */
   blusa: u => `<defs>${TGR(u, "#e0d1ff", "#bda3f7", "#9a7bea")}</defs>
-<g clip-path="url(#${u}c)"><path d="M24 127Q100 164 176 127V204H24z" fill="url(#${u}t)" stroke="none"/>${TSH}${THL}
+<g clip-path="url(#${u}c)"><path d="M24 130Q100 172 176 130V204H24z" fill="url(#${u}t)" stroke="none"/>${TSH}${THL}
 <path d="M39.8 150A67 59 0 0 0 160.2 150" fill="none" stroke="#fff" stroke-width="4"/></g>${TOUT}
-<path d="M36 130C50 144 74 152 97 150C97 143 92 139 84 137C68 134 50 129 36 130z" fill="#fff"/><path d="M164 130C150 144 126 152 103 150C103 143 108 139 116 137C132 134 150 129 164 130z" fill="#fff"/>
-<path d="M52 136Q72 143 90 145M148 136Q128 143 110 145" fill="none" stroke="#d9cdf7" stroke-width="2" opacity=".9"/>
-<g stroke-width="1.8"><g fill="#fff"><circle cx="100" cy="164" r="3.7"/><circle cx="105" cy="168" r="3.7"/><circle cx="103" cy="174" r="3.7"/><circle cx="97" cy="174" r="3.7"/><circle cx="95" cy="168" r="3.7"/></g><circle cx="100" cy="170" r="3.2" fill="#ffd54a"/></g>`,
+<path d="M38 140C52 154 76 162 97 160C97 153 92 149 84 147C69 144 52 139 38 140z" fill="#fff"/><path d="M162 140C148 154 124 162 103 160C103 153 108 149 116 147C131 144 148 139 162 140z" fill="#fff"/>
+<path d="M54 145Q74 152 90 153M146 145Q126 152 110 153" fill="none" stroke="#d9cdf7" stroke-width="2" opacity=".9"/>
+<g stroke-width="1.8"><g fill="#fff"><circle cx="100" cy="168" r="3.7"/><circle cx="105" cy="172" r="3.7"/><circle cx="103" cy="178" r="3.7"/><circle cx="97" cy="178" r="3.7"/><circle cx="95" cy="172" r="3.7"/></g><circle cx="100" cy="174" r="3.2" fill="#ffd54a"/></g>`,
   /* 8. Vestido Moranguinho: vermelho, sementes amarelas, gola verde em folhas, saia arredondada */
   moranguinho: u => `<defs>${TGR(u, "#ff8388", "#f2495a", "#d62d45")}</defs>
-<g clip-path="url(#${u}c)"><path d="M24 122Q100 150 176 122V204H24z" fill="url(#${u}t)" stroke="none"/>${TSH}${THL}
-<g>${[[62, 152, 20], [82, 160, -10], [102, 163, 8], [122, 160, 14], [142, 152, -18], [50, 140, 24], [152, 140, -22], [72, 174, 10], [94, 178, -8], [116, 176, 12], [136, 172, -10], [88, 150, 6], [118, 148, -8], [58, 166, 14], [146, 166, -14]].map(([x, y, r]) => TSEED(x, y, r)).join("")}</g>
+<g clip-path="url(#${u}c)"><path d="M24 130Q100 170 176 130V204H24z" fill="url(#${u}t)" stroke="none"/>${TSH}${THL}
+<g>${[[60, 160, 20], [80, 166, -10], [100, 170, 8], [120, 166, 14], [140, 160, -18], [52, 148, 24], [150, 148, -22], [70, 176, 10], [92, 180, -8], [114, 178, 12], [134, 174, -10], [86, 157, 6], [116, 156, -8], [58, 170, 14], [144, 170, -14]].map(([x, y, r]) => TSEED(x, y, r)).join("")}</g>
 <path d="M39.8 150A67 59 0 0 0 160.2 150" fill="none" stroke="#ff9aa3" stroke-width="2" stroke-dasharray="3 4" opacity=".8"/>
-${TBAND("M24 122Q100 150 176 122", 6, "#3fae43", "", "")}</g>${TOUT}
-${TLEAF(49, 129, 46, .9, "#4cbd4a", "#bff0a6")}${TLEAF(151, 129, -46, .9, "#4cbd4a", "#bff0a6")}${TLEAF(62, 133, 36, 1.25, "#58c84e", "#bff0a6")}${TLEAF(138, 133, -36, 1.25, "#58c84e", "#bff0a6")}${TLEAF(100, 137, 0, 1.4, "#62d055", "#d2f7bd")}`,
+${TBAND("M24 130Q100 170 176 130", 6, "#3fae43", "", "")}</g>${TOUT}
+${TLEAF(49, 141, 46, .9, "#4cbd4a", "#bff0a6")}${TLEAF(151, 141, -46, .9, "#4cbd4a", "#bff0a6")}${TLEAF(62, 145, 36, 1.2, "#58c84e", "#bff0a6")}${TLEAF(138, 145, -36, 1.2, "#58c84e", "#bff0a6")}${TLEAF(100, 151, 0, 1.35, "#62d055", "#d2f7bd")}`,
   /* 9. Pijama Nuvem: azul-pastel, nuvens brancas, gola branca, mangas curtas */
   pijnuvem: u => `<defs>${TGR(u, "#d3eaff", "#a3d3f9", "#79b8ef")}</defs>
-<g clip-path="url(#${u}c)"><path d="M24 126Q100 168 176 126V204H24z" fill="url(#${u}t)" stroke="none"/>${TSH}${THL}
-${TCLOUD(66, 164, .95)}${TCLOUD(136, 162, .95)}${TCLOUD(80, 180, .8)}${TCLOUD(122, 181, .8)}${TCLOUD(46, 150, .6)}${TCLOUD(156, 150, .6)}
-<path d="M100 158V190" fill="none" stroke="#6fb0e8" stroke-width="2.2"/>
+<g clip-path="url(#${u}c)"><path d="M24 129Q100 171 176 129V204H24z" fill="url(#${u}t)" stroke="none"/>${TSH}${THL}
+${TCLOUD(62, 170, .85)}${TCLOUD(138, 168, .85)}${TCLOUD(82, 182, .7)}${TCLOUD(120, 182, .7)}${TCLOUD(46, 157, .55)}${TCLOUD(156, 157, .55)}
+<path d="M100 161V190" fill="none" stroke="#6fb0e8" stroke-width="2.2"/>
 <path d="M39.8 150A67 59 0 0 0 160.2 150" fill="none" stroke="#fff" stroke-width="4"/></g>${TOUT}
-<g clip-path="url(#${u}c)"><path d="M24 125Q100 167 176 125V135Q100 179 24 135z" fill="#fff"/></g>
-<g fill="#fff" stroke-width="2"><circle cx="100" cy="168" r="3.4"/><circle cx="100" cy="177" r="3.4"/></g>`,
+<g clip-path="url(#${u}c)"><path d="M24 129Q100 171 176 129V139Q100 183 24 139z" fill="#fff"/></g>
+<g fill="#fff" stroke-width="2"><circle cx="100" cy="170" r="3.2"/><circle cx="100" cy="179" r="3.2"/></g>`,
   /* 10. Vestido Princesa: rosa com detalhes lilás, corpete delicado, saia em duas camadas, faixa dourada fina na cintura */
   princesa: u => `<defs>${TGR(u, "#ffc4e1", "#ff9dcc", "#f478b5")}<linearGradient id="${u}l" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#dcc4ff"/><stop offset="1" stop-color="#b48df0"/></linearGradient></defs>
-<g clip-path="url(#${u}c)"><path d="${THEM(6, 65, 56, 5, 166, 14)}L172 146Q100 166 28 146z" fill="url(#${u}l)" stroke-width="3"/>
-<path d="${THEM(5, 56, 44, 6, 164, 16)}L168 146Q100 166 32 146z" fill="url(#${u}t)" stroke-width="3"/>
-<path d="M64 158Q62 163 65 167M88 163Q87 167 89 170M112 163Q113 167 111 170M136 158Q138 163 135 167" fill="none" stroke="#ffc8e0" stroke-width="2" opacity=".75"/>
-<path d="M24 123C48 138 80 140 100 138C120 140 152 138 176 123V148Q100 168 24 148z" fill="url(#${u}t)" stroke-width="3"/>${TSH}
-<path d="M24 123C48 138 80 140 100 138C120 140 152 138 176 123" fill="none" stroke="${SK}" stroke-width="8.4"/><path d="M24 123C48 138 80 140 100 138C120 140 152 138 176 123" fill="none" stroke="#cfb0ff" stroke-width="5"/>
-<path d="M24 148Q100 168 176 148" fill="none" stroke="${SK}" stroke-width="6.8"/><path d="M24 148Q100 168 176 148" fill="none" stroke="#ffd04a" stroke-width="3.4"/>
-<path d="M100 151l5 6-5 6-5-6z" fill="#d9bcff" stroke-width="2"/></g>${TOUT}`
+<g clip-path="url(#${u}c)"><path d="${THEM(6, 66, 58, 5, 166, 14)}L172 152Q100 172 28 152z" fill="url(#${u}l)" stroke-width="3"/>
+<path d="${THEM(5, 58, 50, 6, 164, 16)}L168 152Q100 172 32 152z" fill="url(#${u}t)" stroke-width="3"/>
+<path d="M64 166Q62 171 65 175M88 171Q87 175 89 178M112 171Q113 175 111 178M136 166Q138 171 135 175" fill="none" stroke="#ffc8e0" stroke-width="2" opacity=".75"/>
+<path d="M24 127C48 144 80 150 100 150C120 150 152 144 176 127V154Q100 174 24 154z" fill="url(#${u}t)" stroke-width="3"/>${TSH}
+<path d="M24 127C48 144 80 150 100 150C120 150 152 144 176 127" fill="none" stroke="${SK}" stroke-width="8.4"/><path d="M24 127C48 144 80 150 100 150C120 150 152 144 176 127" fill="none" stroke="#cfb0ff" stroke-width="5"/>
+<path d="M24 154Q100 174 176 154" fill="none" stroke="${SK}" stroke-width="6.8"/><path d="M24 154Q100 174 176 154" fill="none" stroke="#ffd04a" stroke-width="3.4"/>
+<path d="M100 158l5 6-5 6-5-6z" fill="#d9bcff" stroke-width="2"/></g>${TOUT}`
 };
 Object.assign(SLV, {
   polo: ["#7dc0f3", "#23428c", "#3f8bd0"], sueter: ["#fff", "#e2374a", "#c92b40"], moletom: ["#2d6a4a", "#1f4c35", "#0d2a1c"],
